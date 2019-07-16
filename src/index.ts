@@ -5,8 +5,7 @@ import GameScene from "./scenes/gamescene";
 let game: Phaser.Game;
 
 class MyGame extends Phaser.Game {
-
-  private version:string;
+  private version: string;
 
   constructor(config: Phaser.Types.Core.GameConfig) {
     super(config);
@@ -23,10 +22,3 @@ class MyGame extends Phaser.Game {
 window.onload = function() {
   game = new MyGame(config);
 };
-
-window.onresize = function() {
-  console.log(window.innerWidth, window.innerHeight);
-  // game.canvas.width = window.innerWidth;
-  // game.canvas.height = window.innerHeight;
-  game.renderer.resize(window.innerWidth, window.innerHeight);
-}
