@@ -1,5 +1,5 @@
 # Phaser 3 Typescript Webpack Template
-[![GitHub release](https://img.shields.io/github/release/Naereen/StrapDown.js.svg)](https://GitHub.com/Naereen/StrapDown.js/releases/)
+[![GitHub release](https://img.shields.io/github/tag/div-int/hackman.svg)](https://GitHub.com/div-int/hackman/tags/)
 ![GitHub](https://img.shields.io/github/license/div-int/hackman.svg?style=popout)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/cf836f9d285f4a7a82e899c5840d9a55)](https://app.codacy.com/app/scottjmoore/hackman?utm_source=github.com&utm_medium=referral&utm_content=div-int/hackman&utm_campaign=Badge_Grade_Dashboard)
 
