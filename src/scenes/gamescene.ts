@@ -1,19 +1,20 @@
 import 'phaser';
 import { Version } from '../version';
-import UIScene from './uiscene';
-import LevelScene from './levelscene';
+import { UIScene } from './uiscene';
+import { LevelScene } from './levelscene';
 import { GameState } from './gamestate';
 import '../gameobjects/hackman';
-import HackMan from '../gameobjects/hackman';
+import { HackMan } from '../gameobjects/hackman';
 
-export default class GameScene extends Phaser.Scene {
+const MAXSPRITE = 5000;
+const WHITE = 0xffffff;
+export class GameScene extends Phaser.Scene {
   private _uiscene: UIScene;
   private _levelscene: LevelScene;
   private _gameState: GameState;
 
   private _statusText: Phaser.GameObjects.BitmapText;
-
-  private _hackman: HackMan[] = new Array<HackMan>(5000);
+  private _hackman: HackMan[] = new Array<HackMan>(MAXSPRITE);
 
   constructor() {
     super('GameScene');
@@ -59,8 +60,7 @@ export default class GameScene extends Phaser.Scene {
 
     for (let i = 0; i < this._hackman.length; i++) {
       this._hackman[i] = new HackMan(this, 0, 0, 0);
-      this.add.existing(this._hackman[i]);
-      this.physics.add.existing(this._hackman[i]);
+      this._hackman[i].add(this);
     }
 
     this._hackman.map((hackman: HackMan) => {
@@ -70,8 +70,8 @@ export default class GameScene extends Phaser.Scene {
         .setRandomPosition()
         .setCollideWorldBounds(true, 1, 1)
         .setVelocity(
-          Phaser.Math.Between(-200, 200),
-          Phaser.Math.Between(-200, 200)
+          Phaser.Math.Between(-256, 256),
+          Phaser.Math.Between(-256, 256)
         )
         .anims.play('hackmanWalk', true, Phaser.Math.Between(0, 4));
     });
@@ -96,17 +96,17 @@ export default class GameScene extends Phaser.Scene {
       true
     );
 
-    for (let i = 0; i < this._hackman.length / 100; i++) {
+    for (let i = 0; i < this._hackman.length >> 8; i++) {
       const r = Phaser.Math.Between(1, 255);
       const g = Phaser.Math.Between(1, 255);
       const b = Phaser.Math.Between(1, 255);
       const rgb = (r << 16) | (g << 8) | b;
       this._hackman[Phaser.Math.Between(0, this._hackman.length - 1)]
         .setVelocity(
-          Phaser.Math.Between(-200, 200),
-          Phaser.Math.Between(-200, 200)
+          Phaser.Math.Between(-256, 256),
+          Phaser.Math.Between(-256, 256)
         )
-        .setTint(rgb, rgb, 0xffffff, 0xffffff);
+        .setTint(rgb, rgb, WHITE, WHITE);
     }
   }
 }
