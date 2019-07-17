@@ -1,4 +1,5 @@
+/* global VERSION,COMMITHASH,BRANCH */
 // @ts-ignore
-var _version =`${VERSION}-${BRANCH}`;
+const _version = `${VERSION}-${BRANCH}`;
 
-export var Version = _version;
+export const Version = _version;
