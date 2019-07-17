@@ -14,7 +14,7 @@ export class GameState {
   }
 }
 
-export module GameState {
+export declare module GameState {
   export enum PlayerState {
     Starting,
     Alive,
@@ -22,6 +22,6 @@ export module GameState {
     Attacked,
     Dieing,
     Dead,
-    PoweredUp
+    PoweredUp,
   }
 }
