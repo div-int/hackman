@@ -3,7 +3,7 @@ export class GameState {
   public level: number;
   public players: number;
   public playerStates: {
-    [index: number]: { playerState: GameState.PlayerState };
+    [index: number]: { playerState: PlayerState };
   };
 
   constructor() {
@@ -14,14 +14,12 @@ export class GameState {
   }
 }
 
-export module GameState {
-  export enum PlayerState {
-    Starting,
-    Alive,
-    Attacking,
-    Attacked,
-    Dieing,
-    Dead,
-    PoweredUp
-  }
+export enum PlayerState {
+  Starting,
+  Alive,
+  Attacking,
+  Attacked,
+  Dieing,
+  Dead,
+  PoweredUp,
 }

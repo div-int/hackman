@@ -1,20 +1,26 @@
-export default {
+import "phaser";
+
+export const config = {
+  parent: "Phaser3",
   type: Phaser.AUTO,
-  parent: 'Phaser3',
-  width: window.innerWidth,
+
+  backgroundColor: "#000000",
   height: window.innerHeight,
-  backgroundColor: '#000000',
+  width: window.innerWidth,
+
   pixelArt: true,
   roundPixels: false,
   scale: {
     mode: Phaser.Scale.RESIZE,
-    autoCenter: Phaser.Scale.CENTER_BOTH
+    autoCenter: Phaser.Scale.CENTER_BOTH,
   },
+
   physics: {
-    default: 'arcade',
+    default: "arcade",
+
     arcade: {
       debug: false,
-      gravity: { x: 0, y: 0 }
-    }
-  }
+      gravity: { x: 0, y: 0 },
+    },
+  },
 };
