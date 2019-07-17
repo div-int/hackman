@@ -3,7 +3,7 @@ import 'phaser';
 const hackmanSpritesPNG = require('../assets/images/sprites/hackman.png');
 const hackmanSprites = 'hackmanSprites';
 
-export default class HackMan extends Phaser.Physics.Arcade.Sprite {
+export class HackMan extends Phaser.Physics.Arcade.Sprite {
   static load(scene: Phaser.Scene) {
     scene.load.spritesheet(hackmanSprites, hackmanSpritesPNG, {
       frameWidth: 16,
