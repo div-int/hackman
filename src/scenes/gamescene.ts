@@ -30,10 +30,7 @@ export default class GameScene extends Phaser.Scene {
 
   preload() {
     console.log(`GameScene::preload() : ${Version}`);
-
-    for (let i = 0; i < this._hackman.length; i++) {
-      this._hackman[i] = new HackMan(this);
-    }
+    HackMan.load(this);
   }
 
   create() {
@@ -60,9 +57,15 @@ export default class GameScene extends Phaser.Scene {
     // Add Level scene object but don't start it yet.
     this.game.scene.add('LevelScene', this._levelscene);
 
-    this._hackman.map(hackman => {
+    for (let i = 0; i < this._hackman.length; i++) {
+      this._hackman[i] = new HackMan(this, 0, 0, 0);
+      this.add.existing(this._hackman[i]);
+      this.physics.add.existing(this._hackman[i]);
+    }
+
+    this._hackman.map((hackman: HackMan) => {
+      console.log(hackman);
       hackman
-        .create(320, 256, Phaser.Math.Between(0, 4))
         .setScale(4)
         .setRandomPosition()
         .setCollideWorldBounds(true, 1, 1)
@@ -93,11 +96,17 @@ export default class GameScene extends Phaser.Scene {
       true
     );
 
-    this._hackman[Phaser.Math.Between(0, this._hackman.length - 1)]
-      .sprite()
-      .setVelocity(
-        Phaser.Math.Between(-200, 200),
-        Phaser.Math.Between(-200, 200)
-      );
+    for (let i = 0; i < this._hackman.length / 100; i++) {
+      const r = Phaser.Math.Between(1, 255);
+      const g = Phaser.Math.Between(1, 255);
+      const b = Phaser.Math.Between(1, 255);
+      const rgb = (r << 16) | (g << 8) | b;
+      this._hackman[Phaser.Math.Between(0, this._hackman.length - 1)]
+        .setVelocity(
+          Phaser.Math.Between(-200, 200),
+          Phaser.Math.Between(-200, 200)
+        )
+        .setTint(rgb, rgb, 0xffffff, 0xffffff);
+    }
   }
 }
