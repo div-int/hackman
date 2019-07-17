@@ -6,6 +6,7 @@ import { GameState } from "./gamestate";
 import "../gameobjects/hackman";
 import { HackMan } from "../gameobjects/hackman";
 
+const SECSMILLISECS = 1000.0;
 const MAXSPRITEDESKTOP = 500;
 const MAXSPRITEMOBILE = 100;
 let maxsprite = 500;
@@ -92,7 +93,7 @@ export class GameScene extends Phaser.Scene {
   update(timestamp: number, elapsed: number) {
     if (this._statusText) {
       this._statusText.setText(
-        `${(timestamp / 1000.0).toFixed(0)}s ${elapsed.toFixed(2)}ms ${
+        `${(timestamp / SECSMILLISECS).toFixed(0)}s ${elapsed.toFixed(2)}ms ${
           this.sys.game.device.os.desktop ? "Desktop" : "Mobile"
         }`
       );
