@@ -1,17 +1,21 @@
 export const config = {
-  type: Phaser.AUTO,
   parent: "Phaser3",
-  width: window.innerWidth,
-  height: window.innerHeight,
+  type: Phaser.AUTO,
+
   backgroundColor: "#000000",
+  height: window.innerHeight,
+  width: window.innerWidth,
+
   pixelArt: true,
   roundPixels: false,
   scale: {
     mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
+
   physics: {
     default: "arcade",
+
     arcade: {
       debug: false,
       gravity: { x: 0, y: 0 }
