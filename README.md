@@ -42,13 +42,13 @@ You can write modern Typescript, ES6+ JavaScript and Babel will transpile it to 
 want your project to support. The targeted browsers are set in the `.babelrc` file and the default currently
 targets all browsers with total usage over "0.25%" but excludes IE11 and Opera Mini.
 
-```js
-  "browsers": [
-    ">0.25%",
-    "not ie 11",
-    "not op_mini all"
-  ]
-```
+    ```js
+      "browsers": [
+        ">0.25%",
+        "not ie 11",
+        "not op_mini all"
+      ]
+    ```
 
 ### Webpack
 
