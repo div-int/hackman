@@ -6,6 +6,14 @@
     "outDir": "./dist/",
     "target": "ES2016",
     "sourceMap": true,
-    "strict": false
+    "strict": false,
+
+    "plugins": [{
+      "name": "typescript-tslint-plugin",
+      "alwaysShowRuleFailuresAsWarnings": false,
+      "ignoreDefinitionFiles": true,
+      "configFile": "./tslint.json",
+      "suppressWhileTypeErrorsPresent": false
+    }]
   }
 }
