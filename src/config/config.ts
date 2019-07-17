@@ -1,9 +1,9 @@
-export default {
+export const config = {
   type: Phaser.AUTO,
-  parent: 'Phaser3',
+  parent: "Phaser3",
   width: window.innerWidth,
   height: window.innerHeight,
-  backgroundColor: '#000000',
+  backgroundColor: "#000000",
   pixelArt: true,
   roundPixels: false,
   scale: {
@@ -11,7 +11,7 @@ export default {
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
   physics: {
-    default: 'arcade',
+    default: "arcade",
     arcade: {
       debug: false,
       gravity: { x: 0, y: 0 }

@@ -1,11 +1,11 @@
-import 'phaser';
-import { Version } from '../version';
+import "phaser";
+import { Version } from "../version";
 
-export default class LevelScene extends Phaser.Scene {
+export class LevelScene extends Phaser.Scene {
   private _level: number;
 
   constructor(level: number) {
-    super('LevelScene');
+    super("LevelScene");
     console.log(`LevelScene::constructor(level = ${level}) : ${Version}`);
 
     this._level = level;
