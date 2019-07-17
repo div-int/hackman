@@ -1,3 +1,5 @@
+import "phaser";
+
 export const config = {
   parent: "Phaser3",
   type: Phaser.AUTO,

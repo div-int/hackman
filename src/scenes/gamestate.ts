@@ -14,7 +14,7 @@ export class GameState {
   }
 }
 
-export declare module GameState {
+export declare namespace GameState {
   export enum PlayerState {
     Starting,
     Alive,
