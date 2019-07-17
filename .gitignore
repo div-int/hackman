@@ -66,3 +66,5 @@ dist/
 # temporary files
 *.*~
 *.swp
+
+.firebase/
