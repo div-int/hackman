@@ -11,9 +11,9 @@ Loading assets via JavaScript module `import` and Typescript module `require` is
 
 To use as a template for a new project you must clone the repo from github.com and not install from [npmjs.com](https://www.npmjs.com/package/@div-int/phaser3-typescript-webpack).
 
--     `git clone` <https://github.com/div-int/phaser3-typescript-webpack.git> **_NameOfProject_**
--     `cd` **_NameOfProject_**
--     `npm install`
+- `git clone [https://github.com/div-int/phaser3-typescript-webpack.git](https://github.com/div-int/phaser3-typescript-webpack.git) **_NameOfProject_**`
+- `cd **_NameOfProject_**`
+- `npm install`
 
 ## Requirements
 
@@ -33,7 +33,7 @@ After cloning the repo, run `npm install` from your project directory. Then, you
 server by running `npm start`.
 
 After starting the development server with `npm start`, you can edit any files in the `src` folder
-and webpack will automatically recompile and reload your server (available at `<http://localhost:8080>`
+and webpack will automatically recompile and reload your server (available at `[http://localhost:8080](http://localhost:8080)`
 by default).
 
 ## Customizing Template
@@ -63,5 +63,5 @@ new configuration files and target them in specific npm tasks inside of `package
 After you run the `npm run build` command, your code will be built into a single bundle located at
 `dist/bundle.min.js` along with any other assets you project depended.
 
-If you put the contents of the `dist` folder in a publicly-accessible location (say something like `<http://mycoolserver.com>`),
-you should be able to open `<http://mycoolserver.com/index.html>` and play your game.
+If you put the contents of the `dist` folder in a publicly-accessible location (say something like `[http://mycoolserver.com](http://mycoolserver.com)`),
+you should be able to open `[http://mycoolserver.com/index.html](http://mycoolserver.com/index.html)` and play your game.
