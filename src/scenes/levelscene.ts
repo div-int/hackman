@@ -9,6 +9,10 @@ export default class LevelScene extends Phaser.Scene {
     console.log(`LevelScene::constructor(level = ${level}) : ${Version}`);
 
     this._level = level;
+
+    window.onresize = () => {
+      this.physics.world.setBounds(0, 0, window.innerWidth, window.innerHeight);
+    };
   }
 
   preload() {}
