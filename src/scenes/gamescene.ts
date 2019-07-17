@@ -4,15 +4,14 @@ import { UIScene } from './uiscene';
 import { LevelScene } from './levelscene';
 import { GameState } from './gamestate';
 import '../gameobjects/hackman';
-import HackMan from '../gameobjects/hackman';
+import { HackMan } from '../gameobjects/hackman';
 
-export default class GameScene extends Phaser.Scene {
+export class GameScene extends Phaser.Scene {
   private _uiscene: UIScene;
   private _levelscene: LevelScene;
   private _gameState: GameState;
 
   private _statusText: Phaser.GameObjects.BitmapText;
-
   private _hackman: HackMan[] = new Array<HackMan>(5000);
 
   constructor() {
