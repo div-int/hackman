@@ -1,12 +1,12 @@
-import 'phaser';
-import { Version } from '../version';
-import UIScene from './uiscene';
-import LevelScene from './levelscene';
-import { GameState } from './gamestate';
-import '../gameobjects/hackman';
-import HackMan from '../gameobjects/hackman';
+import "phaser";
+import { Version } from "../version";
+import { UIScene } from "./uiscene";
+import { LevelScene } from "./levelscene";
+import { GameState } from "./gamestate";
+import "../gameobjects/hackman";
+import HackMan from "../gameobjects/hackman";
 
-export default class GameScene extends Phaser.Scene {
+export class GameScene extends Phaser.Scene {
   private _uiscene: UIScene;
   private _levelscene: LevelScene;
   private _gameState: GameState;
@@ -16,7 +16,7 @@ export default class GameScene extends Phaser.Scene {
   private _hackman: HackMan[] = new Array<HackMan>(5000);
 
   constructor() {
-    super('GameScene');
+    super("GameScene");
     console.log(`GameScene::constructor() : ${Version}`);
 
     this._uiscene = new UIScene();
@@ -37,25 +37,25 @@ export default class GameScene extends Phaser.Scene {
     console.log(`GameScene::create() : ${Version}`);
 
     // Add UI scene object and start it.
-    this.game.scene.add('UIScene', this._uiscene);
-    this.game.scene.start('UIScene');
+    this.game.scene.add("UIScene", this._uiscene);
+    this.game.scene.start("UIScene");
 
     /** Add bitmap text object to ui scene for our status text.
      * Use an event handler when complete as the ui scene has not been created yet.
      */
 
-    this._uiscene.load.on('complete', () => {
+    this._uiscene.load.on("complete", () => {
       this._statusText = this._uiscene.addBitmapText(
         16,
         48,
-        '<Placeholder>',
+        "<Placeholder>",
         16,
         0
       );
     });
 
     // Add Level scene object but don't start it yet.
-    this.game.scene.add('LevelScene', this._levelscene);
+    this.game.scene.add("LevelScene", this._levelscene);
 
     for (let i = 0; i < this._hackman.length; i++) {
       this._hackman[i] = new HackMan(this, 0, 0, 0);
@@ -73,7 +73,7 @@ export default class GameScene extends Phaser.Scene {
           Phaser.Math.Between(-200, 200),
           Phaser.Math.Between(-200, 200)
         )
-        .anims.play('hackmanWalk', true, Phaser.Math.Between(0, 4));
+        .anims.play("hackmanWalk", true, Phaser.Math.Between(0, 4));
     });
 
     // this._hackman.map(hackman => {
