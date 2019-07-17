@@ -1,5 +1,5 @@
 # Phaser 3 Typescript Webpack Template
-
+![GitHub](https://img.shields.io/github/license/div-int/hackman.svg?style=popout)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/cf836f9d285f4a7a82e899c5840d9a55)](https://app.codacy.com/app/scottjmoore/hackman?utm_source=github.com&utm_medium=referral&utm_content=div-int/hackman&utm_campaign=Badge_Grade_Dashboard)
 
 A Phaser 3 project template with Typescript support, ES6 support via [Babel 7](https://babeljs.io/) and [Webpack 4](https://webpack.js.org/)
