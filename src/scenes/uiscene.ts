@@ -1,8 +1,8 @@
 import "phaser";
 import { Version } from "../version";
 
-const pressStart2PPNG = require("../assets/fonts/press-start-2p_0.png");
-const pressStart2PXML = require("../assets/fonts/press-start-2p.xml");
+// const pressStart2PPNG = require("../assets/fonts/press-start-2p_0.png");
+// const pressStart2PXML = require("../assets/fonts/press-start-2p.xml");
 
 export class UIScene extends Phaser.Scene {
   constructor() {
@@ -13,7 +13,11 @@ export class UIScene extends Phaser.Scene {
   preload() {
     console.log(`UIScene::preload() : ${Version}`);
 
-    this.load.bitmapFont("press-start-2p", pressStart2PPNG, pressStart2PXML);
+    this.load.bitmapFont(
+      "press-start-2p",
+      require("../assets/fonts/press-start-2p_0.png"),
+      require("../assets/fonts/press-start-2p.xml")
+    );
   }
 
   create() {

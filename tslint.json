@@ -1,0 +1,3 @@
+{
+  "no-magic-numbers": [true, -1, 0, 1]
+}

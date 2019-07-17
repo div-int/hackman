@@ -10,7 +10,7 @@ export const config = {
   roundPixels: false,
   scale: {
     mode: Phaser.Scale.RESIZE,
-    autoCenter: Phaser.Scale.CENTER_BOTH
+    autoCenter: Phaser.Scale.CENTER_BOTH,
   },
 
   physics: {
@@ -18,7 +18,7 @@ export const config = {
 
     arcade: {
       debug: false,
-      gravity: { x: 0, y: 0 }
-    }
-  }
+      gravity: { x: 0, y: 0 },
+    },
+  },
 };
