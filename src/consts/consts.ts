@@ -16,4 +16,15 @@ namespace Consts {
     Blue = 0x0000ff,
     White = 0xffffff,
   }
+
+  export const enum Times {
+    MilliSecondsInSecond = 1000.0,
+  }
+
+  export const enum Game {
+    MaxSpriteDesktop = 256,
+    MaxSpriteMobile = 128,
+    ScaleDesktop = 4,
+    ScaleMobile = 2,
+  }
 }

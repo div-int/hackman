@@ -5,13 +5,9 @@ import { UIScene } from "./uiscene";
 import { LevelScene } from "./levelscene";
 import { GameState } from "../gameobjects/gamestate";
 import { HackMan, HackManWalkDirection } from "../gameobjects/hackman";
-import { Ghost, GhostWalkDirection } from "../gameobjects/ghost";
+import { Ghost } from "../gameobjects/ghost";
 
 const hackmanSprites = "hackmanSprites";
-
-const SECSMILLISECS = 1000.0;
-const MAXSPRITEDESKTOP = 128;
-const MAXSPRITEMOBILE = 128;
 
 let maxsprite: number;
 let scale: number;
@@ -42,11 +38,11 @@ export class GameScene extends Phaser.Scene {
     console.log(`GameScene::preload() : ${Version}`);
 
     if (this.sys.game.device.os.desktop) {
-      scale = 4;
-      maxsprite = MAXSPRITEDESKTOP;
+      scale = Consts.Game.ScaleDesktop;
+      maxsprite = Consts.Game.MaxSpriteDesktop;
     } else {
-      scale = 2;
-      maxsprite = MAXSPRITEMOBILE;
+      scale = Consts.Game.ScaleMobile;
+      maxsprite = Consts.Game.MaxSpriteMobile;
     }
 
     console.log(
