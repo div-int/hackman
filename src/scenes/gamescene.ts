@@ -9,8 +9,8 @@ import { Ghost, GhostWalkDirection } from "../gameobjects/ghost";
 const hackmanSprites = "hackmanSprites";
 
 const SECSMILLISECS = 1000.0;
-const MAXSPRITEDESKTOP = 500;
-const MAXSPRITEMOBILE = 125;
+const MAXSPRITEDESKTOP = 512;
+const MAXSPRITEMOBILE = 128;
 const WHITE = 0xffffff;
 
 let maxsprite = 500;
@@ -23,8 +23,8 @@ export class GameScene extends Phaser.Scene {
   private _gameState: GameState;
 
   private _statusText: Phaser.GameObjects.BitmapText;
-  private _hackman: HackMan[] = new Array<HackMan>(MAXSPRITEDESKTOP);
-  private _ghosts: Ghost[] = new Array<Ghost>(MAXSPRITEDESKTOP);
+  private _hackman: HackMan[];
+  private _ghosts: Ghost[];
 
   constructor() {
     super("GameScene");
@@ -42,6 +42,14 @@ export class GameScene extends Phaser.Scene {
   preload() {
     console.log(`GameScene::preload() : ${Version}`);
 
+    if (this.sys.game.device.os.desktop) {
+      scale = 4;
+      maxsprite = MAXSPRITEDESKTOP;
+    } else {
+      scale = 2;
+      maxsprite = MAXSPRITEMOBILE;
+    }
+
     this.load.spritesheet(
       hackmanSprites,
       require("../assets/images/sprites/hackman.png"),
@@ -58,13 +66,8 @@ export class GameScene extends Phaser.Scene {
   create() {
     console.log(`GameScene::create() : ${Version}`);
 
-    if (this.sys.game.device.os.desktop) {
-      scale = 4;
-      maxsprite = MAXSPRITEDESKTOP;
-    } else {
-      scale = 2;
-      maxsprite = MAXSPRITEMOBILE;
-    }
+    this._hackman = new Array<HackMan>(maxsprite);
+    this._ghosts = new Array<Ghost>(maxsprite);
 
     // Add UI scene object and start it.
     this.game.scene.add("UIScene", this._uiscene);
@@ -131,7 +134,7 @@ export class GameScene extends Phaser.Scene {
       );
     }
 
-    for (let i = 0; i < maxsprite >> 4; i++) {
+    for (let i = 0; i < maxsprite >> 6; i++) {
       let hackman: HackMan = this._hackman[
         Phaser.Math.Between(0, this._hackman.length - 1)
       ];
@@ -157,7 +160,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this._ghosts.map(ghost => {
-      ghost.setDepth(ghost.x + ghost.y * window.innerWidth).update();
+      ghost.setDepth(ghost.x + ghost.y * window.innerWidth); //.update();
     });
   }
 }
