@@ -142,6 +142,7 @@ export class GameScene extends Phaser.Scene {
     this._hackman.map(hackman => {
       hackman.setDepth(hackman.x + hackman.y * window.innerWidth);
     });
+
     this._ghosts.map(ghost => {
       ghost.setDepth(ghost.x + ghost.y * window.innerWidth);
       ghost.update();
