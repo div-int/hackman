@@ -3,14 +3,17 @@ import { Version } from "../version";
 import { UIScene } from "./uiscene";
 import { LevelScene } from "./levelscene";
 import { GameState } from "./gamestate";
-import "../gameobjects/hackman";
 import { HackMan } from "../gameobjects/hackman";
+import { Ghost, GhostWalkDirection } from "../gameobjects/ghost";
+
+const hackmanSprites = "hackmanSprites";
 
 const SECSMILLISECS = 1000.0;
-const MAXSPRITEDESKTOP = 500;
+const MAXSPRITEDESKTOP = 200;
 const MAXSPRITEMOBILE = 100;
-let maxsprite = 500;
 const WHITE = 0xffffff;
+
+let maxsprite = 500;
 
 let scale = 4;
 
@@ -21,6 +24,7 @@ export class GameScene extends Phaser.Scene {
 
   private _statusText: Phaser.GameObjects.BitmapText;
   private _hackman: HackMan[] = new Array<HackMan>(MAXSPRITEDESKTOP);
+  private _ghosts: Ghost[] = new Array<Ghost>(MAXSPRITEDESKTOP);
 
   constructor() {
     super("GameScene");
@@ -37,7 +41,18 @@ export class GameScene extends Phaser.Scene {
 
   preload() {
     console.log(`GameScene::preload() : ${Version}`);
+
+    this.load.spritesheet(
+      hackmanSprites,
+      require("../assets/images/sprites/hackman.png"),
+      {
+        frameWidth: 16,
+        frameHeight: 16,
+      }
+    );
+
     HackMan.load(this);
+    Ghost.load(this);
   }
 
   create() {
@@ -73,8 +88,15 @@ export class GameScene extends Phaser.Scene {
     // this.game.scene.add("LevelScene", this._levelscene);
 
     for (let i = 0; i < maxsprite; i++) {
-      this._hackman[i] = new HackMan(this, 0, 0, 0);
+      this._hackman[i] = new HackMan(this, 0, 0);
       this._hackman[i].add(this);
+      this._ghosts[i] = new Ghost(
+        this,
+        window.innerWidth >> 1,
+        window.innerHeight >> 1,
+        Phaser.Math.Between(0, Ghost.MaxGhostNo())
+      );
+      this._ghosts[i].add(this);
     }
 
     this._hackman.map((hackman: HackMan) => {
@@ -86,7 +108,21 @@ export class GameScene extends Phaser.Scene {
           Phaser.Math.Between(-256, 256),
           Phaser.Math.Between(-256, 256)
         )
+        .setBounce(1)
         .anims.play("hackmanWalk", true, Phaser.Math.Between(0, 4));
+    });
+
+    this._ghosts.map((ghost: Ghost) => {
+      ghost
+        .setScale(scale)
+        .setRandomPosition()
+        .setCollideWorldBounds(true)
+        .setVelocity(
+          Phaser.Math.Between(-256, 256),
+          Phaser.Math.Between(-256, 256)
+        )
+        .setBounce(1)
+        .walk(GhostWalkDirection.Left);
     });
   }
 
