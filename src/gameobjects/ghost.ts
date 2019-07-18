@@ -7,10 +7,10 @@ const maxGhostNo = 3;
 const maxDirections = 3;
 const ghostFrameRate = 5;
 
-const ghost1 = 1;
-const ghost2 = 2;
-const ghost3 = 3;
-const ghost4 = 4;
+const ghost1 = 5;
+const ghost2 = 6;
+const ghost3 = 7;
+const ghost4 = 8;
 
 const walkRightStart = 0;
 const walkRightEnd = 1;
