@@ -47,6 +47,18 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     return maxDirections;
   }
 
+  GhostNo() {
+    get: {
+      return this._ghostNo;
+    }
+  }
+
+  WalkDirection() {
+    get: {
+      return this._walkDirection;
+    }
+  }
+
   static load(scene: Phaser.Scene) {
     scene.load.on("complete", () => {
       scene.anims.create({
