@@ -51,7 +51,7 @@ export class GameScene extends Phaser.Scene {
 
     this.load.spritesheet(
       hackmanSprites,
-      require("../assets/images/sprites/hackman.png"),
+      require("../assets/images/sprites/hackman.padded.png"),
       {
         frameWidth: 16,
         frameHeight: 16,

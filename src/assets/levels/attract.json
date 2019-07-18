@@ -35,12 +35,12 @@
         {
          "columns":16,
          "firstgid":1,
-         "image":"..\/images\/tiles\/default.png",
-         "imageheight":256,
-         "imagewidth":256,
-         "margin":0,
+         "image":"..\/images\/tiles\/default.padded.png",
+         "imageheight":288,
+         "imagewidth":288,
+         "margin":1,
          "name":"default",
-         "spacing":0,
+         "spacing":2,
          "tilecount":256,
          "tileheight":16,
          "tiles":[
