@@ -9,8 +9,8 @@ import { Ghost, GhostWalkDirection } from "../gameobjects/ghost";
 const hackmanSprites = "hackmanSprites";
 
 const SECSMILLISECS = 1000.0;
-const MAXSPRITEDESKTOP = 16;
-const MAXSPRITEMOBILE = 8;
+const MAXSPRITEDESKTOP = 256;
+const MAXSPRITEMOBILE = 128;
 const WHITE = 0xffffff;
 
 let maxsprite = 500;
