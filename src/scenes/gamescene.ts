@@ -77,6 +77,13 @@ export class GameScene extends Phaser.Scene {
       "stars1",
       require("../assets/images/backgrounds/stars1.jpg")
     );
+
+    // Add UI scene object and start it.
+    this.game.scene.add("UIScene", this._uiscene);
+    this.game.scene.start("UIScene");
+
+    // Add Level scene object but don't start it yet.
+    this.game.scene.add("LevelScene", this._levelscene);
   }
 
   create() {
@@ -130,26 +137,14 @@ export class GameScene extends Phaser.Scene {
 
     this._ghosts = new Array<Ghost>(maxsprite);
 
-    // Add UI scene object and start it.
-    this.game.scene.add("UIScene", this._uiscene);
-    this.game.scene.start("UIScene");
-
-    /** Add bitmap text object to ui scene for our status text.
-     * Use an event handler when complete as the ui scene has not been created yet.
-     */
-
-    this._uiscene.load.on("complete", () => {
-      this._statusText = this._uiscene.addBitmapText(
-        16,
-        48,
-        "<Placeholder>",
-        16,
-        0
-      );
-    });
-
-    // Add Level scene object but don't start it yet.
-    // this.game.scene.add("LevelScene", this._levelscene);
+    /** Add bitmap text object to ui scene for our status text. */
+    this._statusText = this._uiscene.addBitmapText(
+      16,
+      16,
+      "<Placeholder>",
+      16,
+      0
+    );
 
     for (let i = 0; i < maxsprite; i++) {
       this._ghosts[i] = new Ghost(
