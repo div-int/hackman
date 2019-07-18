@@ -112,7 +112,7 @@ export class GameScene extends Phaser.Scene {
           Phaser.Math.Between(-256, 256)
         )
         .setBounce(1)
-        .anims.play("hackmanWalk", true, Phaser.Math.Between(0, 4));
+        .anims.play("hackmanWalkLeft", true, Phaser.Math.Between(0, 4));
     });
 
     this._ghosts.map((ghost: Ghost) => {
@@ -134,7 +134,7 @@ export class GameScene extends Phaser.Scene {
       );
     }
 
-    for (let i = 0; i < maxsprite >> 2; i++) {
+    for (let i = 0; i < maxsprite >> 6; i++) {
       let hackman: HackMan = this._hackman[
         Phaser.Math.Between(0, this._hackman.length - 1)
       ];
@@ -142,16 +142,7 @@ export class GameScene extends Phaser.Scene {
         Phaser.Math.Between(0, this._ghosts.length - 1)
       ];
 
-      hackman
-        .setVelocity(
-          Phaser.Math.Between(-256, 256),
-          Phaser.Math.Between(-256, 256)
-        )
-        .anims.play("hackmanWalkBlink", true)
-        .once(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, () => {
-          hackman.anims.play("hackmanWalk", false);
-        });
-
+      hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections()));
       ghost.walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
     }
 
