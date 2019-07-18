@@ -2,14 +2,14 @@ import "phaser";
 import { Version } from "../version";
 import { UIScene } from "./uiscene";
 import { LevelScene } from "./levelscene";
-import { GameState } from "./gamestate";
+import { GameState } from "../gameobjects/gamestate";
 import { HackMan } from "../gameobjects/hackman";
 import { Ghost, GhostWalkDirection } from "../gameobjects/ghost";
 
 const hackmanSprites = "hackmanSprites";
 
 const SECSMILLISECS = 1000.0;
-const MAXSPRITEDESKTOP = 250;
+const MAXSPRITEDESKTOP = 500;
 const MAXSPRITEMOBILE = 125;
 const WHITE = 0xffffff;
 
@@ -131,37 +131,33 @@ export class GameScene extends Phaser.Scene {
       );
     }
 
-    this.cameras.main.backgroundColor.setTo(
-      Phaser.Math.Between(0, 255),
-      Phaser.Math.Between(0, 255),
-      Phaser.Math.Between(0, 255),
-      Phaser.Math.Between(0, 255),
-      true
-    );
-
-    this._hackman.map(hackman => {
-      hackman.setDepth(hackman.x + hackman.y * window.innerWidth);
-    });
-
-    this._ghosts.map(ghost => {
-      ghost.setDepth(ghost.x + ghost.y * window.innerWidth);
-      ghost.update();
-    });
-
-    for (let i = 0; i < maxsprite >> 8; i++) {
-      let sprite: HackMan = this._hackman[
+    for (let i = 0; i < maxsprite >> 4; i++) {
+      let hackman: HackMan = this._hackman[
         Phaser.Math.Between(0, this._hackman.length - 1)
       ];
+      let ghost: Ghost = this._ghosts[
+        Phaser.Math.Between(0, this._ghosts.length - 1)
+      ];
 
-      sprite
+      hackman
         .setVelocity(
           Phaser.Math.Between(-256, 256),
           Phaser.Math.Between(-256, 256)
         )
         .anims.play("hackmanWalkBlink", true)
         .once(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, () => {
-          sprite.anims.play("hackmanWalk", false);
+          hackman.anims.play("hackmanWalk", false);
         });
+
+      ghost.walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
     }
+
+    this._hackman.map(hackman => {
+      hackman.setDepth(hackman.x + hackman.y * window.innerWidth).update();
+    });
+
+    this._ghosts.map(ghost => {
+      ghost.setDepth(ghost.x + ghost.y * window.innerWidth).update();
+    });
   }
 }
