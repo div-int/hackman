@@ -3,7 +3,7 @@ import { Version } from "../version";
 import { UIScene } from "./uiscene";
 import { LevelScene } from "./levelscene";
 import { GameState } from "../gameobjects/gamestate";
-import { HackMan } from "../gameobjects/hackman";
+import { HackMan, HackManWalkDirection } from "../gameobjects/hackman";
 import { Ghost, GhostWalkDirection } from "../gameobjects/ghost";
 
 const hackmanSprites = "hackmanSprites";
@@ -22,7 +22,7 @@ export class GameScene extends Phaser.Scene {
   private _gameState: GameState;
 
   private _statusText: Phaser.GameObjects.BitmapText;
-  private _hackman: HackMan[];
+  private _hackman: HackMan;
   private _ghosts: Ghost[];
 
   constructor() {
@@ -83,9 +83,22 @@ export class GameScene extends Phaser.Scene {
       .createDynamicLayer("Pills", defaultTiles)
       .setScale(scale);
 
-    this.cameras.main.setBackgroundColor("#888888");
+    this._hackman = new HackMan(
+      this,
+      window.innerWidth >> 1,
+      window.innerHeight >> 1
+    );
+    this._hackman.add(this);
+    this._hackman
+      .setScale(scale)
+      .setRandomPosition()
+      .setCollideWorldBounds(true, 1, 1)
+      .setBounce(1)
+      .walk(HackManWalkDirection.Left);
 
-    this._hackman = new Array<HackMan>(maxsprite);
+    this.cameras.main.setBackgroundColor("#888888");
+    this.cameras.main.startFollow(this._hackman, false, 0.1, 0.1);
+
     this._ghosts = new Array<Ghost>(maxsprite);
 
     // Add UI scene object and start it.
@@ -110,8 +123,6 @@ export class GameScene extends Phaser.Scene {
     // this.game.scene.add("LevelScene", this._levelscene);
 
     for (let i = 0; i < maxsprite; i++) {
-      this._hackman[i] = new HackMan(this, 0, 0).setScale(scale);
-      this._hackman[i].add(this);
       this._ghosts[i] = new Ghost(
         this,
         window.innerWidth >> 1,
@@ -120,18 +131,6 @@ export class GameScene extends Phaser.Scene {
       ).setScale(scale);
       this._ghosts[i].add(this);
     }
-
-    this._hackman.map((hackman: HackMan) => {
-      hackman
-        .setRandomPosition()
-        .setCollideWorldBounds(true, 1, 1)
-        .setVelocity(
-          Phaser.Math.Between(-256, 256),
-          Phaser.Math.Between(-256, 256)
-        )
-        .setBounce(1)
-        .anims.play("hackmanWalkLeft", true, Phaser.Math.Between(0, 4));
-    });
 
     this._ghosts.map((ghost: Ghost) => {
       ghost
@@ -152,20 +151,19 @@ export class GameScene extends Phaser.Scene {
     }
 
     for (let i = 0; i < maxsprite >> 6; i++) {
-      let hackman: HackMan = this._hackman[
-        Phaser.Math.Between(0, this._hackman.length - 1)
-      ];
       let ghost: Ghost = this._ghosts[
         Phaser.Math.Between(0, this._ghosts.length - 1)
       ];
 
-      hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections()));
       ghost.walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
     }
 
-    this._hackman.map(hackman => {
-      hackman.setDepth(hackman.x + hackman.y * window.innerWidth).update();
-    });
+    if (Phaser.Math.Between(0, 256) === 1) {
+      this._hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections()));
+    }
+    this._hackman
+      .setDepth(this._hackman.x + this._hackman.y * window.innerWidth)
+      .update();
 
     this._ghosts.map(ghost => {
       ghost.setDepth(ghost.x + ghost.y * window.innerWidth).update();
