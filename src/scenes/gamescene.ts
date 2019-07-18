@@ -9,8 +9,8 @@ import { Ghost, GhostWalkDirection } from "../gameobjects/ghost";
 const hackmanSprites = "hackmanSprites";
 
 const SECSMILLISECS = 1000.0;
-const MAXSPRITEDESKTOP = 512;
-const MAXSPRITEMOBILE = 128;
+const MAXSPRITEDESKTOP = 16;
+const MAXSPRITEMOBILE = 8;
 const WHITE = 0xffffff;
 
 let maxsprite = 500;
@@ -134,7 +134,7 @@ export class GameScene extends Phaser.Scene {
       );
     }
 
-    for (let i = 0; i < maxsprite >> 6; i++) {
+    for (let i = 0; i < maxsprite >> 4; i++) {
       let hackman: HackMan = this._hackman[
         Phaser.Math.Between(0, this._hackman.length - 1)
       ];
