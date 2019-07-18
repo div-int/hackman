@@ -1,4 +1,5 @@
 import "phaser";
+import "../consts/consts";
 import { Version } from "../version";
 import { UIScene } from "./uiscene";
 import { LevelScene } from "./levelscene";
@@ -11,7 +12,6 @@ const hackmanSprites = "hackmanSprites";
 const SECSMILLISECS = 1000.0;
 const MAXSPRITEDESKTOP = 128;
 const MAXSPRITEMOBILE = 128;
-const WHITE = 0xffffff;
 
 let maxsprite: number;
 let scale: number;
@@ -93,13 +93,13 @@ export class GameScene extends Phaser.Scene {
     );
     this.add
       .image(0, 0, "stars1")
-      .setAlpha(0.5)
+      .setAlpha(Consts.MagicNumbers.Half)
       .setScrollFactor(0, 0)
       .setScale(scale >> 1);
     let mapLayerBackground = attractLevel
       .createStaticLayer("Background", attractTiles)
       .setScale(scale)
-      .setScrollFactor(0.5, 0.5);
+      .setScrollFactor(Consts.MagicNumbers.Half, Consts.MagicNumbers.Half);
     let mapLayerWalls = attractLevel
       .createStaticLayer("Walls", attractTiles)
       .setScale(scale);
@@ -120,8 +120,13 @@ export class GameScene extends Phaser.Scene {
       .setBounce(1)
       .walk(HackManWalkDirection.Left);
 
-    this.cameras.main.setBackgroundColor("#111144");
-    this.cameras.main.startFollow(this._hackman, false, 0.1, 0.1);
+    this.cameras.main.setBackgroundColor(Consts.Colours.Black);
+    this.cameras.main.startFollow(
+      this._hackman,
+      false,
+      Consts.MagicNumbers.Tenth,
+      Consts.MagicNumbers.Tenth
+    );
 
     this._ghosts = new Array<Ghost>(maxsprite);
 
