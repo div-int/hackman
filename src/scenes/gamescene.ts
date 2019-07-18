@@ -9,13 +9,12 @@ import { Ghost, GhostWalkDirection } from "../gameobjects/ghost";
 const hackmanSprites = "hackmanSprites";
 
 const SECSMILLISECS = 1000.0;
-const MAXSPRITEDESKTOP = 256;
+const MAXSPRITEDESKTOP = 128;
 const MAXSPRITEMOBILE = 128;
 const WHITE = 0xffffff;
 
-let maxsprite = 500;
-
-let scale = 4;
+let maxsprite: number;
+let scale: number;
 
 export class GameScene extends Phaser.Scene {
   private _uiscene: UIScene;
@@ -61,10 +60,30 @@ export class GameScene extends Phaser.Scene {
 
     HackMan.load(this);
     Ghost.load(this);
+
+    this.load.tilemapTiledJSON(
+      "attractLevel",
+      require("../assets/levels/attract.json")
+    );
+    this.load.image(
+      "defaultTiles",
+      require("../assets/images/tiles/default.png")
+    );
   }
 
   create() {
     console.log(`GameScene::create() : ${Version}`);
+
+    let attractLevel = this.add.tilemap("attractLevel");
+    let defaultTiles = attractLevel.addTilesetImage("default", "defaultTiles");
+    let mapLayerWalls = attractLevel
+      .createStaticLayer("Walls", defaultTiles)
+      .setScale(scale);
+    let mapLayerPills = attractLevel
+      .createDynamicLayer("Pills", defaultTiles)
+      .setScale(scale);
+
+    this.cameras.main.setBackgroundColor("#888888");
 
     this._hackman = new Array<HackMan>(maxsprite);
     this._ghosts = new Array<Ghost>(maxsprite);
@@ -91,20 +110,19 @@ export class GameScene extends Phaser.Scene {
     // this.game.scene.add("LevelScene", this._levelscene);
 
     for (let i = 0; i < maxsprite; i++) {
-      this._hackman[i] = new HackMan(this, 0, 0);
+      this._hackman[i] = new HackMan(this, 0, 0).setScale(scale);
       this._hackman[i].add(this);
       this._ghosts[i] = new Ghost(
         this,
         window.innerWidth >> 1,
         window.innerHeight >> 1,
         Phaser.Math.Between(0, Ghost.MaxGhostNo())
-      );
+      ).setScale(scale);
       this._ghosts[i].add(this);
     }
 
     this._hackman.map((hackman: HackMan) => {
       hackman
-        .setScale(scale)
         .setRandomPosition()
         .setCollideWorldBounds(true, 1, 1)
         .setVelocity(
@@ -117,7 +135,6 @@ export class GameScene extends Phaser.Scene {
 
     this._ghosts.map((ghost: Ghost) => {
       ghost
-        .setScale(scale)
         .setRandomPosition()
         .setCollideWorldBounds(true)
         .setBounce(1)
