@@ -4,6 +4,7 @@ import { RIGHT } from "phaser";
 const hackmanSprites = "hackmanSprites";
 const defaultFrame = [16, 32, 48, 64];
 const maxGhostNo = 3;
+const maxDirections = 3;
 const ghostFrameRate = 5;
 
 const ghost1 = 1;
@@ -21,17 +22,29 @@ const walkUpStart = 6;
 const walkUpEnd = 7;
 
 export enum GhostWalkDirection {
-  Right = "Right",
-  Down = "Down",
-  Left = "Left",
-  Up = "Up",
+  Right,
+  Down,
+  Left,
+  Up,
 }
+
+const ghostWalkDirectionValues = [
+  { direction: "Right", velocity: { x: 100, y: 0 } },
+  { direction: "Down", velocity: { x: 0, y: 100 } },
+  { direction: "Left", velocity: { x: -100, y: 0 } },
+  { direction: "Up", velocity: { x: 0, y: -100 } },
+];
 
 export class Ghost extends Phaser.Physics.Arcade.Sprite {
   private _ghostNo: number;
+  private _walkDirection: GhostWalkDirection;
 
   static MaxGhostNo() {
     return maxGhostNo;
+  }
+
+  static MaxDirections() {
+    return maxDirections;
   }
 
   static load(scene: Phaser.Scene) {
@@ -198,7 +211,39 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   }
 
   walk(walkDirection: GhostWalkDirection) {
-    console.log(`ghost${this._ghostNo + 1}Walk${walkDirection}`);
-    this.anims.play(`ghost${this._ghostNo + 1}Walk${walkDirection}`);
+    this._walkDirection = walkDirection;
+
+    this.setVelocity(
+      ghostWalkDirectionValues[walkDirection].velocity.x,
+      ghostWalkDirectionValues[walkDirection].velocity.y
+    );
+    this.anims.play(
+      `ghost${this._ghostNo + 1}Walk${
+        ghostWalkDirectionValues[walkDirection].direction
+      }`
+    );
+  }
+
+  update() {
+    let direction: GhostWalkDirection;
+    const { x, y } = this.body.velocity;
+
+    if (Math.abs(x) > Math.abs(y)) {
+      if (x <= 0) {
+        direction = GhostWalkDirection.Left;
+      } else {
+        direction = GhostWalkDirection.Right;
+      }
+    } else {
+      if (y <= 0) {
+        direction = GhostWalkDirection.Up;
+      } else {
+        direction = GhostWalkDirection.Down;
+      }
+    }
+
+    if (direction != this._walkDirection) {
+      this.walk(direction);
+    }
   }
 }

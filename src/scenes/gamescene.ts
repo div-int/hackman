@@ -9,8 +9,8 @@ import { Ghost, GhostWalkDirection } from "../gameobjects/ghost";
 const hackmanSprites = "hackmanSprites";
 
 const SECSMILLISECS = 1000.0;
-const MAXSPRITEDESKTOP = 200;
-const MAXSPRITEMOBILE = 100;
+const MAXSPRITEDESKTOP = 250;
+const MAXSPRITEMOBILE = 125;
 const WHITE = 0xffffff;
 
 let maxsprite = 500;
@@ -117,12 +117,8 @@ export class GameScene extends Phaser.Scene {
         .setScale(scale)
         .setRandomPosition()
         .setCollideWorldBounds(true)
-        .setVelocity(
-          Phaser.Math.Between(-256, 256),
-          Phaser.Math.Between(-256, 256)
-        )
         .setBounce(1)
-        .walk(GhostWalkDirection.Left);
+        .walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
     });
   }
 
@@ -145,6 +141,10 @@ export class GameScene extends Phaser.Scene {
 
     this._hackman.map(hackman => {
       hackman.setDepth(hackman.x + hackman.y * window.innerWidth);
+    });
+    this._ghosts.map(ghost => {
+      ghost.setDepth(ghost.x + ghost.y * window.innerWidth);
+      ghost.update();
     });
 
     for (let i = 0; i < maxsprite >> 8; i++) {
