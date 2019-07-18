@@ -1,17 +1,10 @@
 import "phaser";
 
 const hackmanSprites = "hackmanSprites";
+const defaultFrame = 0;
 
 export class HackMan extends Phaser.Physics.Arcade.Sprite {
   static load(scene: Phaser.Scene) {
-    scene.load.spritesheet(
-      hackmanSprites,
-      require("../assets/images/sprites/hackman.png"),
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-      }
-    );
     scene.load.on("complete", () => {
       scene.anims.create({
         key: "hackmanWalk",
@@ -37,8 +30,8 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  constructor(scene: Phaser.Scene, x: number, y: number, frame: number) {
-    super(scene, x, y, hackmanSprites, frame);
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    super(scene, x, y, hackmanSprites, defaultFrame);
   }
 
   add(scene: Phaser.Scene) {
