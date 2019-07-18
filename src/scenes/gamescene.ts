@@ -134,7 +134,7 @@ export class GameScene extends Phaser.Scene {
       );
     }
 
-    for (let i = 0; i < maxsprite >> 4; i++) {
+    for (let i = 0; i < maxsprite >> 2; i++) {
       let hackman: HackMan = this._hackman[
         Phaser.Math.Between(0, this._hackman.length - 1)
       ];
@@ -160,7 +160,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this._ghosts.map(ghost => {
-      ghost.setDepth(ghost.x + ghost.y * window.innerWidth); //.update();
+      ghost.setDepth(ghost.x + ghost.y * window.innerWidth).update();
     });
   }
 }
