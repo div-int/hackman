@@ -49,13 +49,17 @@ export class GameScene extends Phaser.Scene {
       maxsprite = MAXSPRITEMOBILE;
     }
 
-    this.load.spritesheet(
-      hackmanSprites,
-      require("../assets/images/sprites/hackman.padded.png"),
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-      }
+    console.log(
+      this.load.spritesheet(
+        hackmanSprites,
+        require("../assets/images/sprites/hackman.padded.png"),
+        {
+          frameWidth: 16,
+          frameHeight: 16,
+          margin: 1,
+          spacing: 2,
+        }
+      )
     );
 
     HackMan.load(this);
@@ -67,7 +71,11 @@ export class GameScene extends Phaser.Scene {
     );
     this.load.image(
       "defaultTiles",
-      require("../assets/images/tiles/default.png")
+      require("../assets/images/tiles/default.padded.png")
+    );
+    this.load.image(
+      "stars1",
+      require("../assets/images/backgrounds/stars1.jpg")
     );
   }
 
@@ -75,12 +83,28 @@ export class GameScene extends Phaser.Scene {
     console.log(`GameScene::create() : ${Version}`);
 
     let attractLevel = this.add.tilemap("attractLevel");
-    let defaultTiles = attractLevel.addTilesetImage("default", "defaultTiles");
+    let attractTiles = attractLevel.addTilesetImage(
+      "default",
+      "defaultTiles",
+      16,
+      16,
+      1,
+      2
+    );
+    this.add
+      .image(0, 0, "stars1")
+      .setAlpha(0.5)
+      .setScrollFactor(0, 0)
+      .setScale(scale >> 1);
+    let mapLayerBackground = attractLevel
+      .createStaticLayer("Background", attractTiles)
+      .setScale(scale)
+      .setScrollFactor(0.5, 0.5);
     let mapLayerWalls = attractLevel
-      .createStaticLayer("Walls", defaultTiles)
+      .createStaticLayer("Walls", attractTiles)
       .setScale(scale);
     let mapLayerPills = attractLevel
-      .createDynamicLayer("Pills", defaultTiles)
+      .createDynamicLayer("Pills", attractTiles)
       .setScale(scale);
 
     this._hackman = new HackMan(
@@ -96,7 +120,7 @@ export class GameScene extends Phaser.Scene {
       .setBounce(1)
       .walk(HackManWalkDirection.Left);
 
-    this.cameras.main.setBackgroundColor("#888888");
+    this.cameras.main.setBackgroundColor("#111144");
     this.cameras.main.startFollow(this._hackman, false, 0.1, 0.1);
 
     this._ghosts = new Array<Ghost>(maxsprite);
