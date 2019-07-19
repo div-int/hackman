@@ -54,17 +54,15 @@ export class GameScene extends Phaser.Scene {
       maxsprite = Consts.Game.MaxSpriteMobile;
     }
 
-    console.log(
-      this.load.spritesheet(
-        hackmanSprites,
-        require("../assets/images/sprites/hackman.padded.png"),
-        {
-          frameWidth: 16,
-          frameHeight: 16,
-          margin: 1,
-          spacing: 2,
-        }
-      )
+    this.load.spritesheet(
+      hackmanSprites,
+      require("../assets/images/sprites/hackman.padded.png"),
+      {
+        frameWidth: 16,
+        frameHeight: 16,
+        margin: 1,
+        spacing: 2,
+      }
     );
 
     HackMan.load(this);
@@ -96,14 +94,14 @@ export class GameScene extends Phaser.Scene {
 
     this._hackmanGroup = this.physics.add.group({
       immovable: true,
-      bounceX: 0,
-      bounceY: 0,
+      bounceX: 0.1,
+      bounceY: 0.1,
     });
 
     this._ghostGroup = this.physics.add.group({
       immovable: true,
-      bounceX: 0,
-      bounceY: 0,
+      bounceX: 0.1,
+      bounceY: 0.1,
     });
 
     let attractLevel = this.add.tilemap("attractLevel");
@@ -187,7 +185,7 @@ export class GameScene extends Phaser.Scene {
       mapLayerPills,
       (hackman: HackMan, tile: any) => {
         if (tile.index != -1) {
-          console.log("Overlap : ", hackman, tile);
+          // console.log("Overlap : ", hackman, tile);
 
           mapLayerPills.removeTileAt(tile.x, tile.y);
           mapLayerShadows.removeTileAt(tile.x, tile.y);
@@ -199,7 +197,7 @@ export class GameScene extends Phaser.Scene {
       this._hackmanGroup,
       mapLayerWalls,
       (hackman: HackMan, tile: Phaser.GameObjects.TileSprite) => {
-        console.log("Collide : ", hackman, tile);
+        // console.log("Collide : ", hackman, tile);
 
         hackman.walk(hackman.WalkDirection() + Phaser.Math.Between(-1, 1));
       }
@@ -209,23 +207,25 @@ export class GameScene extends Phaser.Scene {
       this._ghostGroup,
       mapLayerWalls,
       (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
-        console.log("Collide : ", ghost, tile);
+        // console.log("Collide : ", ghost, tile);
       }
     );
 
-    // this.physics.add.collider(
-    //   this._hackmanGroup,
-    //   this._ghostGroup,
-    //   (hackman: HackMan, ghost: Ghost) => {
-    //     console.log("Collide : ", hackman, ghost);
-    //   }
-    // );
+    this.physics.add.collider(
+      this._hackmanGroup,
+      this._ghostGroup,
+      (hackman: HackMan, ghost: Ghost) => {
+        console.log("Collide : ", hackman, ghost);
+        ghost.kill();
+        ghost.destroy();
+      }
+    );
 
     this.physics.add.collider(
       this._ghostGroup,
       this._ghostGroup,
       (ghost1: Ghost, ghost2: Ghost) => {
-        console.log("Collide : ", ghost1, ghost2);
+        // console.log("Collide : ", ghost1, ghost2);
       }
     );
 
@@ -307,21 +307,29 @@ export class GameScene extends Phaser.Scene {
       );
     }
 
-    let ghost: Ghost = this._ghosts[
-      Phaser.Math.Between(0, this._ghosts.length - 1)
-    ];
+    try {
+      let ghost: Ghost = [...this._ghosts][
+        Phaser.Math.Between(0, this._ghosts.length - 1)
+      ];
 
-    ghost.walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
+      if (ghost && typeof ghost !== "undefined") {
+        ghost.walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
+      }
 
-    if (Phaser.Math.Between(0, 1024) === 1) {
-      this._hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections()));
+      if (Phaser.Math.Between(0, 1024) === 1) {
+        this._hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections()));
+      }
+      this._hackman
+        .setDepth(this._hackman.x + this._hackman.y * window.innerWidth)
+        .update();
+
+      [...this._ghosts].map(ghost => {
+        if (ghost && typeof ghost !== "undefined") {
+          ghost.update();
+        }
+      });
+    } catch (e) {
+      console.log(e);
     }
-    this._hackman
-      .setDepth(this._hackman.x + this._hackman.y * window.innerWidth)
-      .update();
-
-    this._ghosts.map(ghost => {
-      ghost.setDepth(ghost.x + ghost.y * window.innerWidth).update();
-    });
   }
 }

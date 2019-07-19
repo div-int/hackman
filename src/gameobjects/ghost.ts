@@ -236,6 +236,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   }
 
   walk(walkDirection: GhostWalkDirection) {
+    if (!this.active) return;
     this.face(walkDirection);
     this.setVelocity(
       ghostWalkDirectionValues[walkDirection].velocity.x,
@@ -244,6 +245,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   }
 
   face(walkDirection: GhostWalkDirection) {
+    if (!this.active) return;
     this._walkDirection = walkDirection;
     // console.log(
     //   `ghost${this._ghostNo + 1}Walk${
@@ -259,7 +261,17 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     );
   }
 
+  kill() {
+    if (!this.active) return;
+    this.anims.stop();
+    this._shadowSprite.setActive(false);
+    this._shadowSprite.destroy();
+    this.setActive(false);
+  }
+
   update() {
+    if (!this.active) return;
+    this.setDepth(this.x + this.y * window.innerWidth);
     let direction: GhostWalkDirection;
     const { x, y } = this.body.velocity;
 
