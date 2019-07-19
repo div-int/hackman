@@ -238,7 +238,7 @@ export class GameScene extends Phaser.Scene {
     this._hackman.add(this);
     this._hackman
       .setScale(scale)
-      .setRandomPosition(512, 512, 1024, 1024)
+      .setRandomPosition(128 * scale, 128 * scale, 256 * scale, 256 * scale)
       .setCollideWorldBounds(true, 1, 1)
       .setBounce(1)
       .setSize(16, 16)
@@ -285,7 +285,7 @@ export class GameScene extends Phaser.Scene {
 
     this._ghosts.map((ghost: Ghost) => {
       ghost
-        .setRandomPosition(512, 512, 1024, 1024)
+        .setRandomPosition(128 * scale, 128 * scale, 256 * scale, 256 * scale)
         .setCollideWorldBounds(true)
         .setBounce(1)
         .setSize(16, 16)
