@@ -12,6 +12,7 @@ const hackmanSprites = "hackmanSprites";
 
 let maxsprite: number;
 let scale: number;
+let button: Phaser.GameObjects.Image;
 
 export class GameScene extends Phaser.Scene {
   private _uiscene: UIScene;
@@ -40,6 +41,7 @@ export class GameScene extends Phaser.Scene {
 
     window.onresize = () => {
       this.physics.world.setBounds(0, 0, window.innerWidth, window.innerHeight);
+      button.setPosition(window.innerWidth - 32, 16);
     };
   }
 
@@ -103,6 +105,30 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     console.log(`GameScene::create() : ${Version}`);
+
+    button = this.add
+      .image(window.innerWidth - 32, 32, hackmanSprites, 0)
+      .setDepth(256 * 256 * 256)
+      .setScale(scale)
+      .setScrollFactor(0, 0)
+      .setOrigin(1, 0)
+      .setInteractive();
+
+    button.on(
+      "pointerup",
+      function() {
+        if (this.scale.isFullscreen) {
+          button.setFrame(0);
+
+          this.scale.stopFullscreen();
+        } else {
+          button.setFrame(4);
+
+          this.scale.startFullscreen();
+        }
+      },
+      this
+    );
 
     this._hackmanGroup = this.physics.add.group({
       immovable: true,
