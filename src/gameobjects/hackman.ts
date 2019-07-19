@@ -28,6 +28,8 @@ const hackManWalkDirectionValues = [
 ];
 export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _walkDirection: HackManWalkDirection;
+  private _faceDirection: HackManWalkDirection;
+  private _shadowSprite: Phaser.Physics.Arcade.Sprite;
 
   static MaxDirections() {
     return maxDirections;
@@ -36,6 +38,12 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   WalkDirection() {
     get: {
       return this._walkDirection;
+    }
+  }
+
+  FaceDirection() {
+    get: {
+      return this._faceDirection;
     }
   }
 
@@ -97,38 +105,71 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, hackmanSprites, defaultFrame);
+
+    this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
+      scene,
+      x,
+      y,
+      hackmanSprites,
+      defaultFrame
+    )
+      .setDepth(4)
+      .setTint(0)
+      .setAlpha(Consts.MagicNumbers.Quarter);
   }
 
   add(scene: Phaser.Scene) {
     scene.add.existing(this);
     scene.physics.add.existing(this);
+    scene.add.existing(this._shadowSprite);
   }
 
   walk(walkDirection: HackManWalkDirection) {
+    console.log(`HackMan.walk(${walkDirection})`);
+    if (walkDirection > HackMan.MaxDirections()) {
+      walkDirection = walkDirection - (HackMan.MaxDirections() + 1);
+    }
+    if (walkDirection < 0) {
+      walkDirection = walkDirection + (HackMan.MaxDirections() + 1);
+    }
+    console.log(`walkDirection = ${walkDirection}`);
+
+    this._walkDirection = walkDirection;
     this.face(walkDirection);
     this.setVelocity(
       hackManWalkDirectionValues[walkDirection].velocity.x,
       hackManWalkDirectionValues[walkDirection].velocity.y
     );
+
+    console.log(`vx, vy = ${this.body.velocity.x}, ${this.body.velocity.y}`);
   }
 
-  face(walkDirection: HackManWalkDirection) {
-    this._walkDirection = walkDirection;
+  face(faceDirection: HackManWalkDirection) {
+    if (faceDirection > HackMan.MaxDirections() || faceDirection < 0) {
+      faceDirection = faceDirection % (HackMan.MaxDirections() + 1);
+    }
+    this._faceDirection = faceDirection;
     // console.log(
     //   `ghost${this._ghostNo + 1}Walk${
     //     ghostWalkDirectionValues[walkDirection].direction
     //   }`
     // );
     this.anims.play(
-      `hackmanWalk${hackManWalkDirectionValues[walkDirection].direction}`,
+      `hackmanWalk${hackManWalkDirectionValues[faceDirection].direction}`,
       true,
       0
     );
   }
 
   update() {
-    let direction: HackManWalkDirection;
     const { x, y } = this.body.velocity;
+
+    this._shadowSprite.scale = this.scale;
+    this._shadowSprite.x = this.x + Consts.Game.ShadowOffset;
+    this._shadowSprite.y = this.y + Consts.Game.ShadowOffset;
+    this._shadowSprite.frame = this.frame;
+
+    let direction: HackManWalkDirection;
 
     if (Math.abs(x) > Math.abs(y)) {
       if (x <= 0) {

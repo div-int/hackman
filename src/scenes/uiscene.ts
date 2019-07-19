@@ -51,6 +51,6 @@ export class UIScene extends Phaser.Scene {
   }
 
   update() {
-    //this._versionText.setPosition(16, window.innerHeight - 32);
+    this._versionText.setPosition(16, window.innerHeight - 32);
   }
 }

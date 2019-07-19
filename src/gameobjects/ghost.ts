@@ -38,6 +38,7 @@ const ghostWalkDirectionValues = [
 export class Ghost extends Phaser.Physics.Arcade.Sprite {
   private _ghostNo: number;
   private _walkDirection: GhostWalkDirection;
+  private _shadowSprite: Phaser.Physics.Arcade.Sprite;
 
   static MaxGhostNo() {
     return maxGhostNo;
@@ -214,12 +215,24 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number, ghostNo: number) {
     super(scene, x, y, hackmanSprites, defaultFrame[ghostNo]);
 
+    this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
+      scene,
+      x,
+      y,
+      hackmanSprites,
+      defaultFrame[ghostNo]
+    )
+      .setDepth(4)
+      .setTint(0)
+      .setAlpha(Consts.MagicNumbers.Quarter);
+
     this._ghostNo = ghostNo;
   }
 
   add(scene: Phaser.Scene) {
     scene.add.existing(this);
     scene.physics.add.existing(this);
+    scene.add.existing(this._shadowSprite);
   }
 
   walk(walkDirection: GhostWalkDirection) {
@@ -249,6 +262,11 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   update() {
     let direction: GhostWalkDirection;
     const { x, y } = this.body.velocity;
+
+    this._shadowSprite.scale = this.scale;
+    this._shadowSprite.x = this.x + Consts.Game.ShadowOffset;
+    this._shadowSprite.y = this.y + Consts.Game.ShadowOffset;
+    this._shadowSprite.frame = this.frame;
 
     if (Math.abs(x) > Math.abs(y)) {
       if (x <= 0) {

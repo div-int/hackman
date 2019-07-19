@@ -6,6 +6,7 @@ import { LevelScene } from "./levelscene";
 import { GameState } from "../gameobjects/gamestate";
 import { HackMan, HackManWalkDirection } from "../gameobjects/hackman";
 import { Ghost } from "../gameobjects/ghost";
+import { config } from "../config/config";
 
 const hackmanSprites = "hackmanSprites";
 
@@ -20,6 +21,14 @@ export class GameScene extends Phaser.Scene {
   private _statusText: Phaser.GameObjects.BitmapText;
   private _hackman: HackMan;
   private _ghosts: Ghost[];
+  private _hackmanGroup: Phaser.Physics.Arcade.Group;
+  private _ghostGroup: Phaser.Physics.Arcade.Group;
+
+  private _maskShape: Phaser.GameObjects.Graphics;
+  private _mask: Phaser.Display.Masks.GeometryMask;
+  private _backgroundImage: Phaser.GameObjects.Image;
+  private _mapLayerBackgroundMask: Phaser.Tilemaps.DynamicTilemapLayer;
+  private _mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
 
   constructor() {
     super("GameScene");
@@ -85,6 +94,18 @@ export class GameScene extends Phaser.Scene {
   create() {
     console.log(`GameScene::create() : ${Version}`);
 
+    this._hackmanGroup = this.physics.add.group({
+      immovable: true,
+      bounceX: 0,
+      bounceY: 0,
+    });
+
+    this._ghostGroup = this.physics.add.group({
+      immovable: true,
+      bounceX: 0,
+      bounceY: 0,
+    });
+
     let attractLevel = this.add.tilemap("attractLevel");
     let attractTiles = attractLevel.addTilesetImage(
       "default",
@@ -94,34 +115,144 @@ export class GameScene extends Phaser.Scene {
       1,
       2
     );
-    this.add
+
+    this._maskShape = this.make.graphics(config);
+
+    this._maskShape.fillStyle(Consts.Colours.White);
+    this._maskShape.beginPath();
+    this._maskShape.fillRect(0, 0, 128, 128);
+    this._maskShape.fillRect(256, 256, 128, 128);
+    this._maskShape.fillRect(512, 256, 128, 128);
+    this._maskShape.fillRect(256, 512, 128, 128);
+    this._maskShape.fillRect(1024, 512, 256, 256);
+    this._maskShape.setScrollFactor(Consts.MagicNumbers.Half);
+
+    this._mask = this._maskShape.createGeometryMask();
+
+    this._backgroundImage = this.add
       .image(0, 0, "stars1")
-      .setAlpha(Consts.MagicNumbers.Half)
-      .setScrollFactor(0, 0)
+      .setDepth(5)
+      // .setAlpha(Consts.MagicNumbers.Half)
+      .setMask(this._mask)
+      .setScrollFactor(Consts.MagicNumbers.Quarter)
       .setScale(scale >> 1);
+
     let mapLayerBackground = attractLevel
       .createStaticLayer("Background", attractTiles)
+      .setDepth(3)
       .setScale(scale)
-      .setScrollFactor(Consts.MagicNumbers.Half, Consts.MagicNumbers.Half);
+      .setScrollFactor(Consts.MagicNumbers.Half);
+
     let mapLayerWalls = attractLevel
-      .createStaticLayer("Walls", attractTiles)
+      .createDynamicLayer("Walls", attractTiles)
+      .setDepth(5)
+      .setScale(scale)
+      .setCollisionByExclusion([-1], true, true);
+
+    let mapLayerShadows = attractLevel
+      .createBlankDynamicLayer(
+        "Shadows",
+        attractTiles,
+        Consts.Game.ShadowOffset,
+        Consts.Game.ShadowOffset
+      )
+      .setAlpha(Consts.MagicNumbers.Quarter)
+      .setDepth(4)
       .setScale(scale);
+
+    let wallTiles = mapLayerWalls.getTilesWithin(0, 0);
+
+    wallTiles.map((tile: Phaser.Tilemaps.Tile) => {
+      if (tile.index != -1) {
+        mapLayerShadows.putTileAt(tile.index + 5, tile.x, tile.y);
+      }
+    });
+
     let mapLayerPills = attractLevel
       .createDynamicLayer("Pills", attractTiles)
+      .setOriginFromFrame()
+      .setDepth(7)
       .setScale(scale);
+
+    let pillTiles = mapLayerPills.getTilesWithin(0, 0);
+
+    pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
+      if (tile.index != -1) {
+        mapLayerShadows.putTileAt(tile.index + 5, tile.x, tile.y);
+      }
+    });
+
+    this.physics.add.overlap(
+      this._hackmanGroup,
+      mapLayerPills,
+      (hackman: HackMan, tile: any) => {
+        if (tile.index != -1) {
+          console.log("Overlap : ", hackman, tile);
+
+          mapLayerPills.removeTileAt(tile.x, tile.y);
+          mapLayerShadows.removeTileAt(tile.x, tile.y);
+        }
+      }
+    );
+
+    this.physics.add.collider(
+      this._hackmanGroup,
+      mapLayerWalls,
+      (hackman: HackMan, tile: Phaser.GameObjects.TileSprite) => {
+        console.log("Collide : ", hackman, tile);
+
+        hackman.walk(hackman.WalkDirection() + Phaser.Math.Between(-1, 1));
+      }
+    );
+
+    // this.physics.add.collider(
+    //   this._ghostGroup,
+    //   mapLayerWalls,
+    //   (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
+    //     console.log("Collide : ", ghost, tile);
+    //   }
+    // );
+
+    // this.physics.add.collider(
+    //   this._hackmanGroup,
+    //   this._ghostGroup,
+    //   (hackman: HackMan, ghost: Ghost) => {
+    //     console.log("Collide : ", hackman, ghost);
+    //   }
+    // );
+
+    // this.physics.add.collider(
+    //   this._ghostGroup,
+    //   this._ghostGroup,
+    //   (ghost1: Ghost, ghost2: Ghost) => {
+    //     console.log("Collide : ", ghost1, ghost2);
+    //   }
+    // );
 
     this._hackman = new HackMan(
       this,
       window.innerWidth >> 1,
       window.innerHeight >> 1
     );
+
     this._hackman.add(this);
     this._hackman
       .setScale(scale)
-      .setRandomPosition()
+      .setRandomPosition(512, 512, 1024, 1024)
       .setCollideWorldBounds(true, 1, 1)
       .setBounce(1)
-      .walk(HackManWalkDirection.Left);
+      .setSize(16, 16)
+      .setOffset(0, 0)
+      .walk(HackManWalkDirection.Up);
+
+    this._hackmanGroup.add(this._hackman);
+
+    this.physics.world.setBounds(
+      0,
+      0,
+      attractLevel.widthInPixels * (scale >> 1),
+      attractLevel.heightInPixels * (scale >> 1)
+    );
 
     this.cameras.main.setBackgroundColor(Consts.Colours.Black);
     this.cameras.main.startFollow(
@@ -154,31 +285,35 @@ export class GameScene extends Phaser.Scene {
 
     this._ghosts.map((ghost: Ghost) => {
       ghost
-        .setRandomPosition()
+        .setRandomPosition(512, 512, 1024, 1024)
         .setCollideWorldBounds(true)
         .setBounce(1)
+        .setSize(16, 16)
+        .setOffset(0, 0)
         .walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
+
+      this._ghostGroup.add(ghost);
     });
   }
 
   update(timestamp: number, elapsed: number) {
     if (this._statusText) {
       this._statusText.setText(
-        `${(timestamp / SECSMILLISECS).toFixed(0)}s ${elapsed.toFixed(2)}ms ${
+        `${(timestamp / Consts.Times.MilliSecondsInSecond).toFixed(
+          0
+        )}s ${elapsed.toFixed(2)}ms ${
           this.sys.game.device.os.desktop ? "Desktop" : "Mobile"
         }`
       );
     }
 
-    for (let i = 0; i < maxsprite >> 6; i++) {
-      let ghost: Ghost = this._ghosts[
-        Phaser.Math.Between(0, this._ghosts.length - 1)
-      ];
+    let ghost: Ghost = this._ghosts[
+      Phaser.Math.Between(0, this._ghosts.length - 1)
+    ];
 
-      ghost.walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
-    }
+    ghost.walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
 
-    if (Phaser.Math.Between(0, 256) === 1) {
+    if (Phaser.Math.Between(0, 1024) === 1) {
       this._hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections()));
     }
     this._hackman
