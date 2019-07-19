@@ -21,10 +21,10 @@ export enum HackManWalkDirection {
 }
 
 const hackManWalkDirectionValues = [
-  { direction: "Right", velocity: { x: 200, y: 0 } },
-  { direction: "Down", velocity: { x: 0, y: 200 } },
-  { direction: "Left", velocity: { x: -200, y: 0 } },
-  { direction: "Up", velocity: { x: 0, y: -200 } },
+  { direction: "Right", velocity: { x: 100, y: 0 } },
+  { direction: "Down", velocity: { x: 0, y: 100 } },
+  { direction: "Left", velocity: { x: -100, y: 0 } },
+  { direction: "Up", velocity: { x: 0, y: -100 } },
 ];
 export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _walkDirection: HackManWalkDirection;
@@ -137,8 +137,8 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._walkDirection = walkDirection;
     this.face(walkDirection);
     this.setVelocity(
-      hackManWalkDirectionValues[walkDirection].velocity.x,
-      hackManWalkDirectionValues[walkDirection].velocity.y
+      hackManWalkDirectionValues[walkDirection].velocity.x * this.scaleX,
+      hackManWalkDirectionValues[walkDirection].velocity.y * this.scaleY
     );
 
     console.log(`vx, vy = ${this.body.velocity.x}, ${this.body.velocity.y}`);

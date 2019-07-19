@@ -4,6 +4,7 @@ namespace Consts {
     Tenth = 0.1,
     Quarter = 0.25,
     Half = 0.5,
+    ThreeQuarters = 0.75,
     One = 1,
   }
 
