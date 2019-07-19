@@ -125,14 +125,12 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   }
 
   walk(walkDirection: HackManWalkDirection) {
-    console.log(`HackMan.walk(${walkDirection})`);
     if (walkDirection > HackMan.MaxDirections()) {
       walkDirection = walkDirection - (HackMan.MaxDirections() + 1);
     }
     if (walkDirection < 0) {
       walkDirection = walkDirection + (HackMan.MaxDirections() + 1);
     }
-    console.log(`walkDirection = ${walkDirection}`);
 
     this._walkDirection = walkDirection;
     this.face(walkDirection);
@@ -140,8 +138,6 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       hackManWalkDirectionValues[walkDirection].velocity.x * this.scaleX,
       hackManWalkDirectionValues[walkDirection].velocity.y * this.scaleY
     );
-
-    console.log(`vx, vy = ${this.body.velocity.x}, ${this.body.velocity.y}`);
   }
 
   face(faceDirection: HackManWalkDirection) {
@@ -149,11 +145,6 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       faceDirection = faceDirection % (HackMan.MaxDirections() + 1);
     }
     this._faceDirection = faceDirection;
-    // console.log(
-    //   `ghost${this._ghostNo + 1}Walk${
-    //     ghostWalkDirectionValues[walkDirection].direction
-    //   }`
-    // );
     this.anims.play(
       `hackmanWalk${hackManWalkDirectionValues[faceDirection].direction}`,
       true,

@@ -23,10 +23,20 @@ namespace Consts {
   }
 
   export const enum Game {
-    MaxSpriteDesktop = 32,
+    MaxSpriteDesktop = 16,
     MaxSpriteMobile = 16,
     ScaleDesktop = 4,
     ScaleMobile = 2,
+
+    GhostXStart = 15,
+    GhostYStart = 12,
+    HackManXStart = 15,
+    HackManYStart = 15,
+
+    PowerPillTile = 50,
+    GhostGateTileUp = 52,
+    GhostGateTileRight = 53,
+    GhostGateTileLeft = 54,
 
     TileShadowOffset = 8,
     ShadowOffset = 32,

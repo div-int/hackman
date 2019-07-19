@@ -2,16 +2,18 @@ import "phaser";
 import { RIGHT } from "phaser";
 
 const hackmanSprites = "hackmanSprites";
-const defaultFrame = [16, 32, 48, 64];
 const maxGhostNo = 3;
 const maxDirections = 3;
 const ghostFrameRate = 5;
 
-const ghost1 = 5;
-const ghost2 = 6;
-const ghost3 = 7;
-const ghost4 = 8;
+const ghost0 = 5;
+const ghost1 = 6;
+const ghost2 = 7;
+const ghost3 = 8;
 const ghostFrightened = 9;
+const ghostEaten = 10;
+
+const defaultFrame = [ghost0 * 16, ghost1 * 16, ghost2 * 16, ghost3 * 16];
 
 const walkRightStart = 0;
 const walkRightEnd = 1;
@@ -33,6 +35,7 @@ export enum GhostState {
   Chase,
   Scatter,
   Frightened,
+  Eaten,
 }
 
 const ghostWalkDirectionValues = [
@@ -45,6 +48,8 @@ const ghostWalkDirectionValues = [
 export class Ghost extends Phaser.Physics.Arcade.Sprite {
   private _ghostNo: number;
   private _walkDirection: GhostWalkDirection;
+  private _faceDirection: GhostWalkDirection;
+  private _animationPrefix: string;
   private _ghostState: GhostState;
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
 
@@ -60,25 +65,100 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     return this._ghostNo;
   }
 
+  set GhostNo(ghostNo: number) {
+    this._ghostNo = ghostNo;
+  }
+
   get WalkDirection() {
     return this._walkDirection;
+  }
+
+  set WalkDirection(walkDirection: GhostWalkDirection) {
+    this._walkDirection = walkDirection % (Ghost.MaxDirections() + 1);
+
+    if (walkDirection < 0) this._walkDirection += Ghost.MaxDirections() + 1;
+  }
+
+  get FaceDirection() {
+    return this._faceDirection;
+  }
+
+  set FaceDirection(faceDirection: GhostWalkDirection) {
+    this._faceDirection = faceDirection % (Ghost.MaxDirections() + 1);
+
+    if (faceDirection < 0) this._faceDirection += Ghost.MaxDirections() + 1;
   }
 
   get GhostState() {
     return this._ghostState;
   }
-  set GhostState(ghostState: GhostState) {
-    this._ghostState = ghostState;
 
-    if ((ghostState = GhostState.Frightened)) {
+  set GhostState(ghostState: GhostState) {
+    if (ghostState === this._ghostState) return;
+
+    if (ghostState === GhostState.Frightened) {
+      if (this._ghostState === GhostState.Eaten) return;
       this.setAlpha(Consts.MagicNumbers.ThreeQuarters);
-    } else {
-      this.setAlpha(Consts.MagicNumbers.One);
+      this._animationPrefix = "ghostFrightened";
+      this._ghostState = ghostState;
+      this.updateAnimation();
+      this.walk(this.WalkDirection + 2);
+      return;
     }
+    if (ghostState === GhostState.Eaten) {
+      this.setAlpha(Consts.MagicNumbers.One);
+      this._animationPrefix = "ghostEaten";
+      this._ghostState = ghostState;
+      this.updateAnimation();
+      this.walk(this.WalkDirection + 2);
+      return;
+    }
+
+    this.setAlpha(Consts.MagicNumbers.One);
+    this._animationPrefix = `ghost${this.GhostNo}`;
+    this._ghostState = ghostState;
+    this.updateAnimation();
   }
 
   static load(scene: Phaser.Scene) {
     scene.load.on("complete", () => {
+      scene.anims.create({
+        key: "ghost0WalkRight",
+        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
+          start: walkRightStart + 16 * ghost0,
+          end: walkRightEnd + 16 * ghost0,
+        }),
+        frameRate: ghostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghost0WalkDown",
+        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
+          start: walkDownStart + 16 * ghost0,
+          end: walkDownEnd + 16 * ghost0,
+        }),
+        frameRate: ghostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghost0WalkLeft",
+        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
+          start: walkLeftStart + 16 * ghost0,
+          end: walkLeftEnd + 16 * ghost0,
+        }),
+        frameRate: ghostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghost0WalkUp",
+        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
+          start: walkUpStart + 16 * ghost0,
+          end: walkUpEnd + 16 * ghost0,
+        }),
+        frameRate: ghostFrameRate,
+        repeat: -1,
+      });
+
       scene.anims.create({
         key: "ghost1WalkRight",
         frames: scene.anims.generateFrameNumbers(hackmanSprites, {
@@ -191,43 +271,6 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
       });
 
       scene.anims.create({
-        key: "ghost4WalkRight",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkRightStart + 16 * ghost4,
-          end: walkRightEnd + 16 * ghost4,
-        }),
-        frameRate: ghostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: "ghost4WalkDown",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkDownStart + 16 * ghost4,
-          end: walkDownEnd + 16 * ghost4,
-        }),
-        frameRate: ghostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: "ghost4WalkLeft",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkLeftStart + 16 * ghost4,
-          end: walkLeftEnd + 16 * ghost4,
-        }),
-        frameRate: ghostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: "ghost4WalkUp",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkUpStart + 16 * ghost4,
-          end: walkUpEnd + 16 * ghost4,
-        }),
-        frameRate: ghostFrameRate,
-        repeat: -1,
-      });
-
-      scene.anims.create({
         key: "ghostFrightenedWalkRight",
         frames: scene.anims.generateFrameNumbers(hackmanSprites, {
           start: walkRightStart + 16 * ghostFrightened,
@@ -263,10 +306,54 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
         frameRate: ghostFrameRate,
         repeat: -1,
       });
+
+      scene.anims.create({
+        key: "ghostEatenWalkRight",
+        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
+          start: walkRightStart + 16 * ghostEaten,
+          end: walkRightEnd + 16 * ghostEaten,
+        }),
+        frameRate: ghostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghostEatenWalkDown",
+        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
+          start: walkDownStart + 16 * ghostEaten,
+          end: walkDownEnd + 16 * ghostEaten,
+        }),
+        frameRate: ghostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghostEatenWalkLeft",
+        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
+          start: walkLeftStart + 16 * ghostEaten,
+          end: walkLeftEnd + 16 * ghostEaten,
+        }),
+        frameRate: ghostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghostEatenWalkUp",
+        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
+          start: walkUpStart + 16 * ghostEaten,
+          end: walkUpEnd + 16 * ghostEaten,
+        }),
+        frameRate: ghostFrameRate,
+        repeat: -1,
+      });
     });
   }
 
-  constructor(scene: Phaser.Scene, x: number, y: number, ghostNo: number) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    ghostNo: number,
+    walkDirection: number,
+    ghostState?: GhostState
+  ) {
     super(scene, x, y, hackmanSprites, defaultFrame[ghostNo]);
 
     this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
@@ -281,7 +368,15 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
       .setAlpha(Consts.MagicNumbers.Quarter);
 
     this._ghostNo = ghostNo;
-    this.GhostState = GhostState.Frightened;
+    this._walkDirection = walkDirection;
+    this._faceDirection = walkDirection;
+
+    this.GhostNo = ghostNo;
+    this.WalkDirection = walkDirection;
+    this.FaceDirection = walkDirection;
+
+    if (ghostState === undefined) this.GhostState = GhostState.Scatter;
+    else this.GhostState = ghostState;
   }
 
   add(scene: Phaser.Scene) {
@@ -290,40 +385,35 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this._shadowSprite);
   }
 
-  walk(walkDirection: GhostWalkDirection) {
-    if (!this.active) return;
-    this.face(walkDirection);
-    this.setVelocity(
-      ghostWalkDirectionValues[walkDirection].velocity.x * this.scaleX,
-      ghostWalkDirectionValues[walkDirection].velocity.y * this.scaleY
+  updateAnimation() {
+    this.anims.play(
+      `${this._animationPrefix}Walk${
+        ghostWalkDirectionValues[this.FaceDirection].direction
+      }`,
+      true,
+      0
     );
   }
 
-  face(walkDirection: GhostWalkDirection) {
+  walk(walkDirection: GhostWalkDirection) {
     if (!this.active) return;
-    this._walkDirection = walkDirection;
-    // console.log(
-    //   `ghost${this._ghostNo + 1}Walk${
-    //     ghostWalkDirectionValues[walkDirection].direction
-    //   }`
-    // );
-    if (this._ghostState === GhostState.Frightened) {
-      this.anims.play(
-        `ghostFrightenedWalk${
-          ghostWalkDirectionValues[walkDirection].direction
-        }`,
-        true,
-        0
-      );
-    } else {
-      this.anims.play(
-        `ghost${this._ghostNo + 1}Walk${
-          ghostWalkDirectionValues[walkDirection].direction
-        }`,
-        true,
-        0
-      );
-    }
+    if (this.WalkDirection === walkDirection) return;
+
+    this.WalkDirection = walkDirection;
+
+    this.setVelocity(
+      ghostWalkDirectionValues[this.WalkDirection].velocity.x * this.scaleX,
+      ghostWalkDirectionValues[this.WalkDirection].velocity.y * this.scaleY
+    );
+    this.face(walkDirection);
+  }
+
+  face(faceDirection: GhostWalkDirection) {
+    if (!this.active) return;
+    if (this.FaceDirection === faceDirection) return;
+
+    this.FaceDirection = faceDirection;
+    this.updateAnimation();
   }
 
   kill() {
@@ -359,8 +449,6 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
       }
     }
 
-    if (direction != this._walkDirection) {
-      this.face(direction);
-    }
+    this.face(direction);
   }
 }

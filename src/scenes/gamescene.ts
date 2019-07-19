@@ -5,7 +5,7 @@ import { UIScene } from "./uiscene";
 import { LevelScene } from "./levelscene";
 import { GameState } from "../gameobjects/gamestate";
 import { HackMan, HackManWalkDirection } from "../gameobjects/hackman";
-import { Ghost } from "../gameobjects/ghost";
+import { Ghost, GhostState, GhostWalkDirection } from "../gameobjects/ghost";
 import { config } from "../config/config";
 
 const hackmanSprites = "hackmanSprites";
@@ -41,6 +41,18 @@ export class GameScene extends Phaser.Scene {
     window.onresize = () => {
       this.physics.world.setBounds(0, 0, window.innerWidth, window.innerHeight);
     };
+  }
+
+  async FrightenGhosts(timeToFrighten: number) {
+    this._ghosts.map(ghost => (ghost.GhostState = GhostState.Frightened));
+    this.time.delayedCall(
+      timeToFrighten,
+      () => {
+        this._ghosts.map(ghost => (ghost.GhostState = GhostState.Chase));
+      },
+      [],
+      this
+    );
   }
 
   preload() {
@@ -161,10 +173,28 @@ export class GameScene extends Phaser.Scene {
     let wallTiles = mapLayerWalls.getTilesWithin(0, 0);
 
     wallTiles.map((tile: Phaser.Tilemaps.Tile) => {
-      if (tile.index != -1) {
-        mapLayerShadows.putTileAt(tile, tile.x, tile.y).index +=
-          Consts.Game.TileShadowOffset;
+      if (tile.index == -1) return;
+      if (tile.index === Consts.Game.GhostGateTileUp) {
+        tile.collideUp = true;
+        tile.collideDown = false;
+        tile.visible = false;
+        return;
       }
+      if (tile.index === Consts.Game.GhostGateTileRight) {
+        tile.collideRight = true;
+        tile.collideLeft = false;
+        tile.visible = false;
+        return;
+      }
+      if (tile.index === Consts.Game.GhostGateTileLeft) {
+        tile.collideLeft = true;
+        tile.collideRight = false;
+        tile.visible = false;
+        return;
+      }
+
+      mapLayerShadows.putTileAt(tile, tile.x, tile.y).index +=
+        Consts.Game.TileShadowOffset;
     });
 
     let mapLayerPills = attractLevel
@@ -189,6 +219,10 @@ export class GameScene extends Phaser.Scene {
         if (tile.index != -1) {
           // console.log("Overlap : ", hackman, tile);
 
+          if (tile.index == Consts.Game.PowerPillTile) {
+            this.FrightenGhosts(10 * Consts.Times.MilliSecondsInSecond);
+          }
+
           mapLayerPills.removeTileAt(tile.x, tile.y);
           mapLayerShadows.removeTileAt(tile.x, tile.y);
         }
@@ -209,7 +243,9 @@ export class GameScene extends Phaser.Scene {
       this._ghostGroup,
       mapLayerWalls,
       (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
-        // console.log("Collide : ", ghost, tile);
+        if (Math.random() >= Consts.MagicNumbers.Half)
+          ghost.walk(ghost.WalkDirection + 1);
+        else ghost.walk(ghost.WalkDirection + -1);
       }
     );
 
@@ -217,9 +253,14 @@ export class GameScene extends Phaser.Scene {
       this._hackmanGroup,
       this._ghostGroup,
       (hackman: HackMan, ghost: Ghost) => {
-        console.log("Collide : ", hackman, ghost);
-        ghost.kill();
-        ghost.destroy();
+        // console.log("Collide : ", hackman, ghost);
+
+        if (ghost.GhostState === GhostState.Frightened) {
+          ghost.GhostState = GhostState.Eaten;
+        } else {
+          // ghost.kill();
+          // ghost.destroy();
+        }
       }
     );
 
@@ -231,24 +272,22 @@ export class GameScene extends Phaser.Scene {
       }
     );
 
-    this._hackman = new HackMan(
-      this,
-      window.innerWidth >> 1,
-      window.innerHeight >> 1
-    );
+    this._hackman = new HackMan(this, 0, 0);
 
     this._hackman.add(this);
     this._hackman
       .setScale(scale)
-      .setRandomPosition(128 * scale, 128 * scale, 256 * scale, 256 * scale)
+      .setPosition(
+        (8 + Consts.Game.HackManXStart * 16) * scale,
+        (8 + Consts.Game.HackManYStart * 16) * scale
+      )
       .setCollideWorldBounds(true, 1, 1)
       .setBounce(1)
-      .setOffset(1, 1)
-      .walk(HackManWalkDirection.Up);
+      .setOffset(1, 1);
 
     this._hackman.body.setCircle(7);
     this._hackmanGroup.add(this._hackman);
-
+    this._hackman.walk(HackManWalkDirection.Right);
     this.physics.world.setBounds(
       0,
       0,
@@ -278,23 +317,38 @@ export class GameScene extends Phaser.Scene {
     for (let i = 0; i < maxsprite; i++) {
       this._ghosts[i] = new Ghost(
         this,
-        window.innerWidth >> 1,
-        window.innerHeight >> 1,
-        Phaser.Math.Between(0, Ghost.MaxGhostNo())
+        0,
+        0,
+        Phaser.Math.Between(0, Ghost.MaxGhostNo()),
+        GhostWalkDirection.Down
       ).setScale(scale);
       this._ghosts[i].add(this);
     }
 
     this._ghosts.map((ghost: Ghost) => {
       ghost
-        .setRandomPosition(128 * scale, 128 * scale, 256 * scale, 256 * scale)
+        .setPosition(
+          (8 +
+            Phaser.Math.Between(
+              Consts.Game.GhostXStart - 1,
+              Consts.Game.GhostXStart + 2
+            ) *
+              16) *
+            scale,
+          (8 +
+            Phaser.Math.Between(
+              Consts.Game.GhostYStart - 1,
+              Consts.Game.GhostYStart + 1
+            ) *
+              16) *
+            scale
+        )
         .setCollideWorldBounds(true)
-        .setBounce(1)
-        .setOffset(1, 1)
-        .walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
+        .setOffset(1, 1);
 
       ghost.setCircle(7);
       this._ghostGroup.add(ghost);
+      ghost.walk(3);
     });
   }
 
@@ -310,11 +364,11 @@ export class GameScene extends Phaser.Scene {
     }
 
     try {
-      let ghost: Ghost = [...this._ghosts][
+      let ghost: Ghost = this._ghosts[
         Phaser.Math.Between(0, this._ghosts.length - 1)
       ];
 
-      if (ghost && typeof ghost !== "undefined") {
+      if (Phaser.Math.Between(0, 256) === 1) {
         ghost.walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
       }
 
@@ -325,10 +379,8 @@ export class GameScene extends Phaser.Scene {
         .setDepth(this._hackman.x + this._hackman.y * window.innerWidth)
         .update();
 
-      [...this._ghosts].map(ghost => {
-        if (ghost && typeof ghost !== "undefined") {
-          ghost.update();
-        }
+      this._ghosts.map(ghost => {
+        ghost.update();
       });
     } catch (e) {
       console.log(e);
