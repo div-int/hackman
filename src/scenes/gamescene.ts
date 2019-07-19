@@ -118,11 +118,11 @@ export class GameScene extends Phaser.Scene {
 
     this._maskShape.fillStyle(Consts.Colours.White);
     this._maskShape.beginPath();
-    this._maskShape.fillRect(0, 0, 128, 128);
-    this._maskShape.fillRect(256, 256, 128, 128);
-    this._maskShape.fillRect(512, 256, 128, 128);
-    this._maskShape.fillRect(256, 512, 128, 128);
-    this._maskShape.fillRect(1024, 512, 256, 256);
+    this._maskShape.fillRect(0, 0, 32 * scale, 32 * scale);
+    this._maskShape.fillRect(64 * scale, 64 * scale, 32 * scale, 32 * scale);
+    this._maskShape.fillRect(128 * scale, 64 * scale, 32 * scale, 32 * scale);
+    this._maskShape.fillRect(64 * scale, 128 * scale, 32 * scale, 32 * scale);
+    this._maskShape.fillRect(256 * scale, 128 * scale, 64 * scale, 64 * scale);
     this._maskShape.setScrollFactor(Consts.MagicNumbers.Half);
 
     this._mask = this._maskShape.createGeometryMask();
