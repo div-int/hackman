@@ -4,6 +4,8 @@ import { Version } from "../version";
 const GREEN = 0x00ff00;
 const CYAN = 0x00ffff;
 
+let scale: number;
+
 export class UIScene extends Phaser.Scene {
   private _versionText: Phaser.GameObjects.BitmapText;
 
@@ -20,6 +22,12 @@ export class UIScene extends Phaser.Scene {
       require("../assets/fonts/press-start-2p_0.png"),
       require("../assets/fonts/press-start-2p.xml")
     );
+
+    if (this.sys.game.device.os.desktop) {
+      scale = Consts.Game.ScaleDesktop;
+    } else {
+      scale = Consts.Game.ScaleMobile;
+    }
   }
 
   create() {
@@ -31,11 +39,12 @@ export class UIScene extends Phaser.Scene {
         window.innerHeight - 32,
         "press-start-2p",
         `Version : ${Version}`,
-        16,
+        8,
         Phaser.GameObjects.BitmapText.ALIGN_RIGHT
       )
       .setScrollFactor(0, 0)
-      .setTint(GREEN, GREEN, CYAN, CYAN);
+      .setTint(GREEN, GREEN, CYAN, CYAN)
+      .setScale(scale >> 1);
   }
 
   addBitmapText(
@@ -47,7 +56,8 @@ export class UIScene extends Phaser.Scene {
   ): Phaser.GameObjects.BitmapText {
     return this.add
       .bitmapText(x, y, "press-start-2p", text, size, align)
-      .setScrollFactor(0, 0);
+      .setScrollFactor(0, 0)
+      .setScale(scale >> 1);
   }
 
   update() {

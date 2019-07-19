@@ -269,7 +269,7 @@ export class GameScene extends Phaser.Scene {
       16,
       16,
       "<Placeholder>",
-      16,
+      8,
       0
     );
 
