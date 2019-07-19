@@ -205,13 +205,13 @@ export class GameScene extends Phaser.Scene {
       }
     );
 
-    // this.physics.add.collider(
-    //   this._ghostGroup,
-    //   mapLayerWalls,
-    //   (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
-    //     console.log("Collide : ", ghost, tile);
-    //   }
-    // );
+    this.physics.add.collider(
+      this._ghostGroup,
+      mapLayerWalls,
+      (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
+        console.log("Collide : ", ghost, tile);
+      }
+    );
 
     // this.physics.add.collider(
     //   this._hackmanGroup,
@@ -221,13 +221,13 @@ export class GameScene extends Phaser.Scene {
     //   }
     // );
 
-    // this.physics.add.collider(
-    //   this._ghostGroup,
-    //   this._ghostGroup,
-    //   (ghost1: Ghost, ghost2: Ghost) => {
-    //     console.log("Collide : ", ghost1, ghost2);
-    //   }
-    // );
+    this.physics.add.collider(
+      this._ghostGroup,
+      this._ghostGroup,
+      (ghost1: Ghost, ghost2: Ghost) => {
+        console.log("Collide : ", ghost1, ghost2);
+      }
+    );
 
     this._hackman = new HackMan(
       this,
