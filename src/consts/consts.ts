@@ -27,6 +27,6 @@ namespace Consts {
     ScaleDesktop = 4,
     ScaleMobile = 2,
 
-    ShadowOffset = 64,
+    ShadowOffset = 32,
   }
 }
