@@ -266,8 +266,8 @@ export class GameScene extends Phaser.Scene {
 
     /** Add bitmap text object to ui scene for our status text. */
     this._statusText = this._uiscene.addBitmapText(
-      16,
-      16,
+      4 * scale,
+      4 * scale,
       "<Placeholder>",
       8,
       0

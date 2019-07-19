@@ -35,8 +35,8 @@ export class UIScene extends Phaser.Scene {
 
     this._versionText = this.add
       .bitmapText(
-        16,
-        window.innerHeight - 32,
+        8 * scale,
+        window.innerHeight - 8 * scale,
         "press-start-2p",
         `Version : ${Version}`,
         8,
@@ -61,6 +61,6 @@ export class UIScene extends Phaser.Scene {
   }
 
   update() {
-    this._versionText.setPosition(16, window.innerHeight - 32);
+    this._versionText.setPosition(4 * scale, window.innerHeight - 8 * scale);
   }
 }
