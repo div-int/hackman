@@ -30,8 +30,10 @@ namespace Consts {
 
     GhostXStart = 15,
     GhostYStart = 12,
+
     HackManXStart = 15,
     HackManYStart = 15,
+    HackmanFrameRate = 20,
 
     PowerPillTile = 50,
     GhostGateTileUp = 52,

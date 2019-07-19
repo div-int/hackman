@@ -3,7 +3,6 @@ import "phaser";
 const hackmanSprites = "hackmanSprites";
 const defaultFrame = 0;
 const maxDirections = 3;
-const hackmanFrameRate = 10;
 
 const walkRight = 0;
 const walkDown = 16;
@@ -55,7 +54,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           start: walkStart + walkRight,
           end: walkEnd + walkRight,
         }),
-        frameRate: hackmanFrameRate,
+        frameRate: Consts.Game.HackmanFrameRate,
         yoyo: true,
         repeat: -1,
       });
@@ -65,7 +64,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           start: walkStart + walkDown,
           end: walkEnd + walkDown,
         }),
-        frameRate: hackmanFrameRate,
+        frameRate: Consts.Game.HackmanFrameRate,
         yoyo: true,
         repeat: -1,
       });
@@ -75,7 +74,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           start: walkStart + walkLeft,
           end: walkEnd + walkLeft,
         }),
-        frameRate: hackmanFrameRate,
+        frameRate: Consts.Game.HackmanFrameRate,
         yoyo: true,
         repeat: -1,
       });
@@ -85,7 +84,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           start: walkStart + walkUp,
           end: walkEnd + walkUp,
         }),
-        frameRate: hackmanFrameRate,
+        frameRate: Consts.Game.HackmanFrameRate,
         yoyo: true,
         repeat: -1,
       });
@@ -96,7 +95,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           start: 5,
           end: 9,
         }),
-        frameRate: hackmanFrameRate,
+        frameRate: Consts.Game.HackmanFrameRate,
         yoyo: true,
         repeat: 0,
       });
