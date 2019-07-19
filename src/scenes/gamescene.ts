@@ -162,7 +162,8 @@ export class GameScene extends Phaser.Scene {
 
     wallTiles.map((tile: Phaser.Tilemaps.Tile) => {
       if (tile.index != -1) {
-        mapLayerShadows.putTileAt(tile, tile.x, tile.y).index += 5;
+        mapLayerShadows.putTileAt(tile, tile.x, tile.y).index +=
+          Consts.Game.TileShadowOffset;
       }
     });
 
@@ -176,7 +177,8 @@ export class GameScene extends Phaser.Scene {
 
     pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
       if (tile.index != -1) {
-        mapLayerShadows.putTileAt(tile.index + 5, tile.x, tile.y);
+        mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index +=
+          Consts.Game.TileShadowOffset;
       }
     });
 
@@ -241,10 +243,10 @@ export class GameScene extends Phaser.Scene {
       .setRandomPosition(128 * scale, 128 * scale, 256 * scale, 256 * scale)
       .setCollideWorldBounds(true, 1, 1)
       .setBounce(1)
-      .setSize(16, 16)
-      .setOffset(0, 0)
+      .setOffset(1, 1)
       .walk(HackManWalkDirection.Up);
 
+    this._hackman.body.setCircle(7);
     this._hackmanGroup.add(this._hackman);
 
     this.physics.world.setBounds(
@@ -288,10 +290,10 @@ export class GameScene extends Phaser.Scene {
         .setRandomPosition(128 * scale, 128 * scale, 256 * scale, 256 * scale)
         .setCollideWorldBounds(true)
         .setBounce(1)
-        .setSize(16, 16)
-        .setOffset(0, 0)
+        .setOffset(1, 1)
         .walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
 
+      ghost.setCircle(7);
       this._ghostGroup.add(ghost);
     });
   }
@@ -316,7 +318,7 @@ export class GameScene extends Phaser.Scene {
         ghost.walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
       }
 
-      if (Phaser.Math.Between(0, 1024) === 1) {
+      if (Phaser.Math.Between(0, 256) === 1) {
         this._hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections()));
       }
       this._hackman
