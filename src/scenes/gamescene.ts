@@ -164,10 +164,7 @@ export class GameScene extends Phaser.Scene {
 
     wallTiles.map((tile: Phaser.Tilemaps.Tile) => {
       if (tile.index != -1) {
-        let newTile = mapLayerShadows.putTileAt(tile.index + 5, tile.x, tile.y);
-
-        newTile.setFlipX(tile.flipX);
-        newTile.setFlipY(tile.flipY);
+        mapLayerShadows.putTileAt(tile, tile.x, tile.y).index += 5;
       }
     });
 
