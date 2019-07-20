@@ -169,7 +169,7 @@ export class GameScene extends Phaser.Scene {
       // .setAlpha(Consts.MagicNumbers.Half)
       .setMask(this._mask)
       .setScrollFactor(Consts.MagicNumbers.Quarter)
-      .setScale(scale);
+      .setScale(scale / 2);
 
     let mapLayerBackground = attractLevel
       .createStaticLayer("Background", attractTiles, -256 * scale, -256 * scale)
@@ -246,8 +246,8 @@ export class GameScene extends Phaser.Scene {
           this._maskShape.fillStyle(Consts.Colours.White);
           this._maskShape.beginPath();
           this._maskShape.fillRect(
-            tile.x * 32 * scale,
-            tile.y * 32 * scale,
+            (tile.x - 8) * 32 * scale,
+            (tile.y - 8) * 32 * scale,
             32 * scale,
             32 * scale
           );
