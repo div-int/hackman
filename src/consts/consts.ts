@@ -1,4 +1,10 @@
 namespace Consts {
+  export const enum Scenes {
+    GameScene = "GameScene",
+    UIScene = "UIScene",
+    LevelScene = "LevelScene",
+  }
+
   export const enum MagicNumbers {
     Zero = 0,
     Tenth = 0.1,
