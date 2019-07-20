@@ -21,7 +21,6 @@ export class GameScene extends Phaser.Scene {
 
   private _statusText: Phaser.GameObjects.BitmapText;
   private _hackman: HackMan;
-  private _ghosts: Ghost[];
   private _hackmanGroup: Phaser.Physics.Arcade.Group;
   private _ghostGroup: Phaser.Physics.Arcade.Group;
 
@@ -46,11 +45,16 @@ export class GameScene extends Phaser.Scene {
   }
 
   async FrightenGhosts(timeToFrighten: number) {
-    this._ghosts.map(ghost => (ghost.GhostState = GhostState.Frightened));
+    this._ghostGroup.children.each((ghost: Ghost) => {
+      ghost.GhostState = GhostState.Frightened;
+    }, this);
+
     this.time.delayedCall(
       timeToFrighten,
       () => {
-        this._ghosts.map(ghost => (ghost.GhostState = GhostState.Chase));
+        this._ghostGroup.children.each((ghost: Ghost) => {
+          ghost.GhostState = GhostState.Chase;
+        });
       },
       [],
       this
@@ -156,18 +160,7 @@ export class GameScene extends Phaser.Scene {
     );
 
     this._maskShape = this.make.graphics(config);
-
-    this._maskShape.fillStyle(Consts.Colours.White);
-    this._maskShape.beginPath();
-    this._maskShape.fillRect(
-      15 * 32 * scale,
-      15 * 32 * scale,
-      64 * scale,
-      64 * scale
-    );
-    this._maskShape.closePath();
     this._maskShape.setScrollFactor(Consts.MagicNumbers.Half);
-
     this._mask = this._maskShape.createGeometryMask();
 
     this._backgroundImage = this.add
@@ -296,13 +289,16 @@ export class GameScene extends Phaser.Scene {
       this._hackmanGroup,
       this._ghostGroup,
       (hackman: HackMan, ghost: Ghost) => {
-        // console.log("Collide : ", hackman, ghost);
+        console.log("Collide : ", hackman, ghost);
+
+        if (ghost.GhostState === GhostState.Eaten) return;
 
         if (ghost.GhostState === GhostState.Frightened) {
           ghost.GhostState = GhostState.Eaten;
         } else {
-          // ghost.kill();
-          // ghost.destroy();
+          this._ghostGroup.remove(ghost);
+          ghost.kill();
+          ghost.destroy();
         }
       }
     );
@@ -346,7 +342,7 @@ export class GameScene extends Phaser.Scene {
       Consts.MagicNumbers.Tenth
     );
 
-    this._ghosts = new Array<Ghost>(maxsprite);
+    // this._ghosts = new Array<Ghost>(maxsprite);
 
     /** Add bitmap text object to ui scene for our status text. */
     this._statusText = this._uiscene.addBitmapText(
@@ -357,18 +353,47 @@ export class GameScene extends Phaser.Scene {
       0
     );
 
+    this._ghostGroup.runChildUpdate = true;
+
     for (let i = 0; i < maxsprite; i++) {
-      this._ghosts[i] = new Ghost(
-        this,
-        0,
-        0,
-        Phaser.Math.Between(0, Ghost.MaxGhostNo()),
-        GhostWalkDirection.Down
-      ).setScale(scale);
-      this._ghosts[i].add(this);
+      this._ghostGroup.add(
+        new Ghost(
+          this,
+          0,
+          0,
+          Phaser.Math.Between(0, Ghost.MaxGhostNo()),
+          GhostWalkDirection.Down
+        ).setScale(scale),
+        true
+      );
     }
 
-    this._ghosts.map((ghost: Ghost) => {
+    // this._ghosts.map((ghost: Ghost) => {
+    //   ghost
+    //     .setPosition(
+    //       (8 +
+    //         Phaser.Math.Between(
+    //           Consts.Game.GhostXStart - 1,
+    //           Consts.Game.GhostXStart + 2
+    //         ) *
+    //           16) *
+    //         scale,
+    //       (8 +
+    //         Phaser.Math.Between(
+    //           Consts.Game.GhostYStart - 1,
+    //           Consts.Game.GhostYStart + 1
+    //         ) *
+    //           16) *
+    //         scale
+    //     )
+    //     .setCollideWorldBounds(true)
+    //     .setOffset(1, 1);
+
+    //   ghost.setCircle(7);
+    //   ghost.walk(3);
+    // });
+
+    this._ghostGroup.children.each((ghost: Ghost) => {
       ghost
         .setPosition(
           (8 +
@@ -390,9 +415,8 @@ export class GameScene extends Phaser.Scene {
         .setOffset(1, 1);
 
       ghost.setCircle(7);
-      this._ghostGroup.add(ghost);
       ghost.walk(3);
-    });
+    }, this);
   }
 
   update(timestamp: number, elapsed: number) {
@@ -406,27 +430,11 @@ export class GameScene extends Phaser.Scene {
       );
     }
 
-    try {
-      let ghost: Ghost = this._ghosts[
-        Phaser.Math.Between(0, this._ghosts.length - 1)
-      ];
-
-      if (Phaser.Math.Between(0, 256) === 1) {
-        ghost.walk(Phaser.Math.Between(0, Ghost.MaxDirections()));
-      }
-
-      if (Phaser.Math.Between(0, 256) === 1) {
-        this._hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections()));
-      }
-      this._hackman
-        .setDepth(this._hackman.x + this._hackman.y * window.innerWidth)
-        .update();
-
-      this._ghosts.map(ghost => {
-        ghost.update();
-      });
-    } catch (e) {
-      console.log(e);
+    if (Phaser.Math.Between(0, 256) === 1) {
+      this._hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections()));
     }
+    this._hackman
+      .setDepth(this._hackman.x + this._hackman.y * window.innerWidth)
+      .update();
   }
 }
