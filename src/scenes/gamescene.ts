@@ -172,15 +172,13 @@ export class GameScene extends Phaser.Scene {
       .setScale(scale);
 
     let mapLayerBackground = attractLevel
-      .createStaticLayer("Background", attractTiles)
+      .createStaticLayer("Background", attractTiles, -256 * scale, -256 * scale)
       .setDepth(3)
       .setScale(scale)
       .setScrollFactor(Consts.MagicNumbers.Half);
 
-    mapLayerBackground.setPosition(-256 * scale, -256 * scale);
-
     let mapLayerWalls = attractLevel
-      .createDynamicLayer("Walls", attractTiles)
+      .createDynamicLayer("Walls", attractTiles, 0, 0)
       .setDepth(5)
       .setScale(scale)
       .setCollisionByExclusion([-1], true, true);
@@ -189,8 +187,8 @@ export class GameScene extends Phaser.Scene {
       .createBlankDynamicLayer(
         "Shadows",
         attractTiles,
-        Consts.Game.ShadowOffset,
-        Consts.Game.ShadowOffset
+        Consts.Game.ShadowOffset * scale,
+        Consts.Game.ShadowOffset * scale
       )
       .setAlpha(Consts.MagicNumbers.Quarter)
       .setDepth(4)
@@ -224,7 +222,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     let mapLayerPills = attractLevel
-      .createDynamicLayer("Pills", attractTiles)
+      .createDynamicLayer("Pills", attractTiles, 0, 0)
       .setOriginFromFrame()
       .setDepth(7)
       .setScale(scale);

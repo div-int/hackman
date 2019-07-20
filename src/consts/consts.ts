@@ -33,6 +33,7 @@ namespace Consts {
 
     HackManXStart = 15,
     HackManYStart = 15,
+
     HackmanFrameRate = 20,
 
     PowerPillTile = 50,
@@ -44,6 +45,7 @@ namespace Consts {
     LeaveFullScreen = 255,
 
     TileShadowOffset = 8,
-    ShadowOffset = 32,
+
+    ShadowOffset = 8,
   }
 }
