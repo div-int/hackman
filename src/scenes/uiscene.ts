@@ -33,6 +33,8 @@ export class UIScene extends Phaser.Scene {
   create() {
     console.log(`UIScene::create() : ${Version}`);
 
+    this.scene.bringToTop();
+
     this._versionText = this.add
       .bitmapText(
         8 * scale,

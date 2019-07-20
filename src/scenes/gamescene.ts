@@ -2,7 +2,6 @@ import "phaser";
 import "../consts/consts";
 import { Version } from "../version";
 import { UIScene } from "./uiscene";
-import { LevelScene } from "./levelscene";
 import { GameState } from "../gameobjects/gamestate";
 import { HackMan, HackManWalkDirection } from "../gameobjects/hackman";
 import { Ghost, GhostState, GhostWalkDirection } from "../gameobjects/ghost";
@@ -16,7 +15,6 @@ let button: Phaser.GameObjects.Image;
 
 export class GameScene extends Phaser.Scene {
   private _uiscene: UIScene;
-  private _levelscene: LevelScene;
   private _gameState: GameState;
 
   private _statusText: Phaser.GameObjects.BitmapText;
@@ -30,12 +28,16 @@ export class GameScene extends Phaser.Scene {
   private _mapLayerBackgroundMask: Phaser.Tilemaps.DynamicTilemapLayer;
   private _mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
 
+  get UIScene(): UIScene {
+    if (!this._uiscene)
+      return (this._uiscene = <UIScene>this.scene.get(Consts.Scenes.UIScene));
+    else return this._uiscene;
+  }
   constructor() {
     super("GameScene");
     console.log(`GameScene::constructor() : ${Version}`);
 
-    this._uiscene = new UIScene();
-    this._levelscene = new LevelScene(0);
+    // this._uiscene = new UIScene();
     this._gameState = new GameState();
 
     window.onresize = () => {
@@ -98,13 +100,6 @@ export class GameScene extends Phaser.Scene {
       "stars1",
       require("../assets/images/backgrounds/stars1.jpg")
     );
-
-    // Add UI scene object and start it.
-    this.game.scene.add("UIScene", this._uiscene);
-    this.game.scene.start("UIScene");
-
-    // Add Level scene object but don't start it yet.
-    this.game.scene.add("LevelScene", this._levelscene);
   }
 
   create() {
@@ -343,7 +338,7 @@ export class GameScene extends Phaser.Scene {
     // this._ghosts = new Array<Ghost>(maxsprite);
 
     /** Add bitmap text object to ui scene for our status text. */
-    this._statusText = this._uiscene.addBitmapText(
+    this._statusText = this.UIScene.addBitmapText(
       4 * scale,
       4 * scale,
       "<Placeholder>",
