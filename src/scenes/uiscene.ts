@@ -1,6 +1,6 @@
 import "phaser";
-import { hackManGame } from "../index";
 import "../consts/consts";
+import { hackManGame } from "../index";
 
 let scale: number;
 
