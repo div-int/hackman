@@ -41,7 +41,7 @@ export class GameScene extends Phaser.Scene {
 
     window.onresize = () => {
       this.physics.world.setBounds(0, 0, window.innerWidth, window.innerHeight);
-      button.setPosition(window.innerWidth - 32, 16);
+      button.setPosition(window.innerWidth - 4 * scale, 4 * scale);
     };
   }
 
@@ -107,7 +107,12 @@ export class GameScene extends Phaser.Scene {
     console.log(`GameScene::create() : ${Version}`);
 
     button = this.add
-      .image(window.innerWidth - 32, 32, hackmanSprites, 0)
+      .image(
+        window.innerWidth - 4 * scale,
+        4 * scale,
+        hackmanSprites,
+        Consts.Game.GoFullScreen
+      )
       .setDepth(256 * 256 * 256)
       .setScale(scale)
       .setScrollFactor(0, 0)
@@ -116,14 +121,12 @@ export class GameScene extends Phaser.Scene {
 
     button.on(
       "pointerup",
-      function() {
+      () => {
         if (this.scale.isFullscreen) {
-          button.setFrame(0);
-
+          button.setFrame(Consts.Game.LeaveFullScreen);
           this.scale.stopFullscreen();
         } else {
-          button.setFrame(4);
-
+          button.setFrame(Consts.Game.GoFullScreen);
           this.scale.startFullscreen();
         }
       },

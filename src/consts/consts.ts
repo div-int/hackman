@@ -40,6 +40,9 @@ namespace Consts {
     GhostGateTileRight = 53,
     GhostGateTileLeft = 54,
 
+    GoFullScreen = 254,
+    LeaveFullScreen = 255,
+
     TileShadowOffset = 8,
     ShadowOffset = 32,
   }
