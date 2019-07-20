@@ -23,8 +23,8 @@ namespace Consts {
   }
 
   export const enum Game {
-    MaxSpriteDesktop = 4,
-    MaxSpriteMobile = 4,
+    MaxSpriteDesktop = 64,
+    MaxSpriteMobile = 64,
     ScaleDesktop = 4,
     ScaleMobile = 2,
 
