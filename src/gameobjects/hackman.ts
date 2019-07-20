@@ -1,6 +1,5 @@
 import "phaser";
 
-const hackmanSprites = "hackmanSprites";
 const defaultFrame = 0;
 const maxDirections = 3;
 
@@ -50,40 +49,52 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     scene.load.on("complete", () => {
       scene.anims.create({
         key: "hackmanWalkRight",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkStart + walkRight,
-          end: walkEnd + walkRight,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkStart + walkRight,
+            end: walkEnd + walkRight,
+          }
+        ),
         frameRate: Consts.Game.HackmanFrameRate,
         yoyo: true,
         repeat: -1,
       });
       scene.anims.create({
         key: "hackmanWalkDown",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkStart + walkDown,
-          end: walkEnd + walkDown,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkStart + walkDown,
+            end: walkEnd + walkDown,
+          }
+        ),
         frameRate: Consts.Game.HackmanFrameRate,
         yoyo: true,
         repeat: -1,
       });
       scene.anims.create({
         key: "hackmanWalkLeft",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkStart + walkLeft,
-          end: walkEnd + walkLeft,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkStart + walkLeft,
+            end: walkEnd + walkLeft,
+          }
+        ),
         frameRate: Consts.Game.HackmanFrameRate,
         yoyo: true,
         repeat: -1,
       });
       scene.anims.create({
         key: "hackmanWalkUp",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkStart + walkUp,
-          end: walkEnd + walkUp,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkStart + walkUp,
+            end: walkEnd + walkUp,
+          }
+        ),
         frameRate: Consts.Game.HackmanFrameRate,
         yoyo: true,
         repeat: -1,
@@ -91,10 +102,13 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
 
       scene.anims.create({
         key: "hackmanWalkRightBlink",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: 5,
-          end: 9,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: 5,
+            end: 9,
+          }
+        ),
         frameRate: Consts.Game.HackmanFrameRate,
         yoyo: true,
         repeat: 0,
@@ -103,13 +117,13 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, hackmanSprites, defaultFrame);
+    super(scene, x, y, Consts.Resources.HackManSprites, defaultFrame);
 
     this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
       scene,
       x,
       y,
-      hackmanSprites,
+      Consts.Resources.HackManSprites,
       defaultFrame
     )
       .setDepth(4)

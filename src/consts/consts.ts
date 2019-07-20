@@ -1,7 +1,8 @@
 namespace Consts {
   export const enum Scenes {
-    GameScene = "GameScene",
+    TitleScene = "TitleScene",
     UIScene = "UIScene",
+    GameScene = "GameScene",
     LevelScene = "LevelScene",
   }
 
@@ -20,12 +21,17 @@ namespace Consts {
     Black = 0x000000,
     Red = 0xff0000,
     Green = 0x00ff00,
+    Cyan = 0x00ffff,
     Blue = 0x0000ff,
     White = 0xffffff,
   }
 
   export const enum Times {
     MilliSecondsInSecond = 1000.0,
+  }
+
+  export const enum Resources {
+    HackManSprites = "HackManSprites",
   }
 
   export const enum Game {

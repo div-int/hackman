@@ -1,7 +1,7 @@
 import "phaser";
 import { RIGHT } from "phaser";
 
-const hackmanSprites = "hackmanSprites";
+// const Consts.Resources.HackManSprites = "Consts.Resources.HackManSprites";
 const maxGhostNo = 3;
 const maxDirections = 3;
 const ghostFrameRate = 5;
@@ -138,222 +138,294 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     scene.load.on("complete", () => {
       scene.anims.create({
         key: "ghost0WalkRight",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkRightStart + 16 * ghost0,
-          end: walkRightEnd + 16 * ghost0,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghost0,
+            end: walkRightEnd + 16 * ghost0,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost0WalkDown",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkDownStart + 16 * ghost0,
-          end: walkDownEnd + 16 * ghost0,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghost0,
+            end: walkDownEnd + 16 * ghost0,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost0WalkLeft",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkLeftStart + 16 * ghost0,
-          end: walkLeftEnd + 16 * ghost0,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghost0,
+            end: walkLeftEnd + 16 * ghost0,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost0WalkUp",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkUpStart + 16 * ghost0,
-          end: walkUpEnd + 16 * ghost0,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghost0,
+            end: walkUpEnd + 16 * ghost0,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
 
       scene.anims.create({
         key: "ghost1WalkRight",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkRightStart + 16 * ghost1,
-          end: walkRightEnd + 16 * ghost1,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghost1,
+            end: walkRightEnd + 16 * ghost1,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost1WalkDown",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkDownStart + 16 * ghost1,
-          end: walkDownEnd + 16 * ghost1,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghost1,
+            end: walkDownEnd + 16 * ghost1,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost1WalkLeft",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkLeftStart + 16 * ghost1,
-          end: walkLeftEnd + 16 * ghost1,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghost1,
+            end: walkLeftEnd + 16 * ghost1,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost1WalkUp",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkUpStart + 16 * ghost1,
-          end: walkUpEnd + 16 * ghost1,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghost1,
+            end: walkUpEnd + 16 * ghost1,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
 
       scene.anims.create({
         key: "ghost2WalkRight",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkRightStart + 16 * ghost2,
-          end: walkRightEnd + 16 * ghost2,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghost2,
+            end: walkRightEnd + 16 * ghost2,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost2WalkDown",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkDownStart + 16 * ghost2,
-          end: walkDownEnd + 16 * ghost2,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghost2,
+            end: walkDownEnd + 16 * ghost2,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost2WalkLeft",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkLeftStart + 16 * ghost2,
-          end: walkLeftEnd + 16 * ghost2,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghost2,
+            end: walkLeftEnd + 16 * ghost2,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost2WalkUp",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkUpStart + 16 * ghost2,
-          end: walkUpEnd + 16 * ghost2,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghost2,
+            end: walkUpEnd + 16 * ghost2,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
 
       scene.anims.create({
         key: "ghost3WalkRight",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkRightStart + 16 * ghost3,
-          end: walkRightEnd + 16 * ghost3,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghost3,
+            end: walkRightEnd + 16 * ghost3,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost3WalkDown",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkDownStart + 16 * ghost3,
-          end: walkDownEnd + 16 * ghost3,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghost3,
+            end: walkDownEnd + 16 * ghost3,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost3WalkLeft",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkLeftStart + 16 * ghost3,
-          end: walkLeftEnd + 16 * ghost3,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghost3,
+            end: walkLeftEnd + 16 * ghost3,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghost3WalkUp",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkUpStart + 16 * ghost3,
-          end: walkUpEnd + 16 * ghost3,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghost3,
+            end: walkUpEnd + 16 * ghost3,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
 
       scene.anims.create({
         key: "ghostFrightenedWalkRight",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkRightStart + 16 * ghostFrightened,
-          end: walkRightEnd + 16 * ghostFrightened,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghostFrightened,
+            end: walkRightEnd + 16 * ghostFrightened,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghostFrightenedWalkDown",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkDownStart + 16 * ghostFrightened,
-          end: walkDownEnd + 16 * ghostFrightened,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghostFrightened,
+            end: walkDownEnd + 16 * ghostFrightened,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghostFrightenedWalkLeft",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkLeftStart + 16 * ghostFrightened,
-          end: walkLeftEnd + 16 * ghostFrightened,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghostFrightened,
+            end: walkLeftEnd + 16 * ghostFrightened,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghostFrightenedWalkUp",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkUpStart + 16 * ghostFrightened,
-          end: walkUpEnd + 16 * ghostFrightened,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghostFrightened,
+            end: walkUpEnd + 16 * ghostFrightened,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
 
       scene.anims.create({
         key: "ghostEatenWalkRight",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkRightStart + 16 * ghostEaten,
-          end: walkRightEnd + 16 * ghostEaten,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghostEaten,
+            end: walkRightEnd + 16 * ghostEaten,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghostEatenWalkDown",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkDownStart + 16 * ghostEaten,
-          end: walkDownEnd + 16 * ghostEaten,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghostEaten,
+            end: walkDownEnd + 16 * ghostEaten,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghostEatenWalkLeft",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkLeftStart + 16 * ghostEaten,
-          end: walkLeftEnd + 16 * ghostEaten,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghostEaten,
+            end: walkLeftEnd + 16 * ghostEaten,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
         key: "ghostEatenWalkUp",
-        frames: scene.anims.generateFrameNumbers(hackmanSprites, {
-          start: walkUpStart + 16 * ghostEaten,
-          end: walkUpEnd + 16 * ghostEaten,
-        }),
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghostEaten,
+            end: walkUpEnd + 16 * ghostEaten,
+          }
+        ),
         frameRate: ghostFrameRate,
         repeat: -1,
       });
@@ -368,13 +440,13 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     walkDirection: number,
     ghostState?: GhostState
   ) {
-    super(scene, x, y, hackmanSprites, defaultFrame[ghostNo]);
+    super(scene, x, y, Consts.Resources.HackManSprites, defaultFrame[ghostNo]);
 
     this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
       scene,
       x,
       y,
-      hackmanSprites,
+      Consts.Resources.HackManSprites,
       defaultFrame[ghostNo]
     )
       .setDepth(4)

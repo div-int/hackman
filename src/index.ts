@@ -1,16 +1,18 @@
 import "phaser";
 import "./consts/consts";
+import { Version } from "./version";
 import { config } from "./config/config";
 import { GameScene } from "./scenes/gamescene";
 import { UIScene } from "./scenes/uiscene";
 
-let game: Phaser.Game;
+export let hackManGame: HackManGame;
 
-class MyGame extends Phaser.Game {
-  private version: string;
+class HackManGame extends Phaser.Game {
+  private _version: string;
 
   get Version() {
-    return this.version;
+    if (!this._version) return (this._version = Version);
+    else return this._version;
   }
 
   constructor(config: Phaser.Types.Core.GameConfig) {
@@ -22,5 +24,5 @@ class MyGame extends Phaser.Game {
 }
 
 window.onload = function() {
-  game = new MyGame(config);
+  hackManGame = new HackManGame(config);
 };

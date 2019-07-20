@@ -1,17 +1,16 @@
 import "phaser";
 import "../consts/consts";
-import { Version } from "../version";
 import { UIScene } from "./uiscene";
 import { GameState } from "../gameobjects/gamestate";
 import { HackMan, HackManWalkDirection } from "../gameobjects/hackman";
 import { Ghost, GhostState, GhostWalkDirection } from "../gameobjects/ghost";
 import { config } from "../config/config";
+import { hackManGame } from "..";
 
-const hackmanSprites = "hackmanSprites";
+// const hackmanSprites = "hackmanSprites";
 
 let maxsprite: number;
 let scale: number;
-let button: Phaser.GameObjects.Image;
 
 export class GameScene extends Phaser.Scene {
   private _uiscene: UIScene;
@@ -33,18 +32,6 @@ export class GameScene extends Phaser.Scene {
       return (this._uiscene = <UIScene>this.scene.get(Consts.Scenes.UIScene));
     else return this._uiscene;
   }
-  constructor() {
-    super("GameScene");
-    console.log(`GameScene::constructor() : ${Version}`);
-
-    // this._uiscene = new UIScene();
-    this._gameState = new GameState();
-
-    window.onresize = () => {
-      this.physics.world.setBounds(0, 0, window.innerWidth, window.innerHeight);
-      button.setPosition(window.innerWidth - 4 * scale, 4 * scale);
-    };
-  }
 
   async FrightenGhosts(timeToFrighten: number) {
     this._ghostGroup.children.each((ghost: Ghost) => {
@@ -63,8 +50,19 @@ export class GameScene extends Phaser.Scene {
     );
   }
 
+  constructor() {
+    super(Consts.Scenes.GameScene);
+    console.log(`GameScene::constructor() : ${hackManGame.Version}`);
+
+    window.onresize = () => {
+      this.physics.world.setBounds(0, 0, window.innerWidth, window.innerHeight);
+    };
+  }
+
+  init() {}
+
   preload() {
-    console.log(`GameScene::preload() : ${Version}`);
+    console.log(`GameScene::preload() : ${hackManGame.Version}`);
 
     if (this.sys.game.device.os.desktop) {
       scale = Consts.Game.ScaleDesktop;
@@ -73,17 +71,6 @@ export class GameScene extends Phaser.Scene {
       scale = Consts.Game.ScaleMobile;
       maxsprite = Consts.Game.MaxSpriteMobile;
     }
-
-    this.load.spritesheet(
-      hackmanSprites,
-      require("../assets/images/sprites/hackman.padded.png"),
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-        margin: 1,
-        spacing: 2,
-      }
-    );
 
     HackMan.load(this);
     Ghost.load(this);
@@ -103,34 +90,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    console.log(`GameScene::create() : ${Version}`);
-
-    button = this.add
-      .image(
-        window.innerWidth - 4 * scale,
-        4 * scale,
-        hackmanSprites,
-        Consts.Game.GoFullScreen
-      )
-      .setDepth(256 * 256 * 256)
-      .setScale(scale)
-      .setScrollFactor(0, 0)
-      .setOrigin(1, 0)
-      .setInteractive();
-
-    button.on(
-      "pointerup",
-      () => {
-        if (this.scale.isFullscreen) {
-          button.setFrame(Consts.Game.LeaveFullScreen);
-          this.scale.stopFullscreen();
-        } else {
-          button.setFrame(Consts.Game.GoFullScreen);
-          this.scale.startFullscreen();
-        }
-      },
-      this
-    );
+    console.log(`GameScene::create() : ${hackManGame.Version}`);
 
     this._hackmanGroup = this.physics.add.group({
       immovable: true,
@@ -282,7 +242,7 @@ export class GameScene extends Phaser.Scene {
       this._hackmanGroup,
       this._ghostGroup,
       (hackman: HackMan, ghost: Ghost) => {
-        console.log("Collide : ", hackman, ghost);
+        // console.log("Collide : ", hackman, ghost);
 
         if (ghost.GhostState === GhostState.Eaten) return;
 
