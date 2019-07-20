@@ -11,13 +11,6 @@ export class UIScene extends Phaser.Scene {
   constructor() {
     super(Consts.Scenes.UIScene);
     console.log(`UIScene::constructor() : ${hackManGame.Version}`);
-
-    window.onresize = () => {
-      this._fullScreenButton.setPosition(
-        window.innerWidth - 4 * scale,
-        4 * scale
-      );
-    };
   }
 
   init() {
@@ -70,12 +63,22 @@ export class UIScene extends Phaser.Scene {
     this._fullScreenButton.on(
       "pointerup",
       () => {
+        console.log(`this.scale.isFullscreen=${this.scale.isFullscreen}`);
+
         if (this.scale.isFullscreen) {
-          this._fullScreenButton.setFrame(Consts.Game.LeaveFullScreen);
-          this.scale.stopFullscreen();
-        } else {
           this._fullScreenButton.setFrame(Consts.Game.GoFullScreen);
-          this.scale.startFullscreen();
+          try {
+            this.scale.stopFullscreen();
+          } catch (e) {
+            console.error(e);
+          }
+        } else {
+          this._fullScreenButton.setFrame(Consts.Game.LeaveFullScreen);
+          try {
+            this.scale.startFullscreen();
+          } catch (e) {
+            console.error(e);
+          }
         }
       },
       this
@@ -115,5 +118,9 @@ export class UIScene extends Phaser.Scene {
 
   update() {
     this._versionText.setPosition(4 * scale, window.innerHeight - 8 * scale);
+    this._fullScreenButton.setPosition(
+      window.innerWidth - 4 * scale,
+      4 * scale
+    );
   }
 }
