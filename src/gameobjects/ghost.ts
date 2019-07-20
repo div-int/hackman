@@ -39,16 +39,17 @@ export enum GhostState {
 }
 
 const ghostWalkDirectionValues = [
-  { direction: "Right", velocity: { x: 100, y: 0 } },
-  { direction: "Down", velocity: { x: 0, y: 100 } },
-  { direction: "Left", velocity: { x: -100, y: 0 } },
-  { direction: "Up", velocity: { x: 0, y: -100 } },
+  { direction: "Right", velocity: { x: 75, y: 0 } },
+  { direction: "Down", velocity: { x: 0, y: 75 } },
+  { direction: "Left", velocity: { x: -75, y: 0 } },
+  { direction: "Up", velocity: { x: 0, y: -75 } },
 ];
 
 export class Ghost extends Phaser.Physics.Arcade.Sprite {
   private _ghostNo: number;
   private _walkDirection: GhostWalkDirection;
   private _faceDirection: GhostWalkDirection;
+  private _speedMultiplier: number;
   private _animationPrefix: string;
   private _ghostState: GhostState;
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
@@ -89,6 +90,16 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     if (faceDirection < 0) this._faceDirection += Ghost.MaxDirections() + 1;
   }
 
+  get SpeedMultiplier() {
+    return this._speedMultiplier;
+  }
+
+  set SpeedMultiplier(speedMultiplier: number) {
+    Math.abs(speedMultiplier) <= 2
+      ? (this._speedMultiplier = Math.abs(speedMultiplier))
+      : 2;
+  }
+
   get GhostState() {
     return this._ghostState;
   }
@@ -99,6 +110,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     if (ghostState === GhostState.Frightened) {
       if (this._ghostState === GhostState.Eaten) return;
       this.setAlpha(Consts.MagicNumbers.ThreeQuarters);
+      this.SpeedMultiplier = Consts.MagicNumbers.Half;
       this._animationPrefix = "ghostFrightened";
       this._ghostState = ghostState;
       this.updateAnimation();
@@ -107,6 +119,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     }
     if (ghostState === GhostState.Eaten) {
       this.setAlpha(Consts.MagicNumbers.One);
+      this.SpeedMultiplier = 2;
       this._animationPrefix = "ghostEaten";
       this._ghostState = ghostState;
       this.updateAnimation();
@@ -115,6 +128,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     }
 
     this.setAlpha(Consts.MagicNumbers.One);
+    this.SpeedMultiplier = 1;
     this._animationPrefix = `ghost${this.GhostNo}`;
     this._ghostState = ghostState;
     this.updateAnimation();
@@ -402,8 +416,12 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     this.WalkDirection = walkDirection;
 
     this.setVelocity(
-      ghostWalkDirectionValues[this.WalkDirection].velocity.x * this.scaleX,
-      ghostWalkDirectionValues[this.WalkDirection].velocity.y * this.scaleY
+      ghostWalkDirectionValues[this.WalkDirection].velocity.x *
+        this.scaleX *
+        this.SpeedMultiplier,
+      ghostWalkDirectionValues[this.WalkDirection].velocity.y *
+        this.scaleY *
+        this.SpeedMultiplier
     );
     this.face(walkDirection);
   }

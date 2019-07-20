@@ -20,10 +20,10 @@ export enum HackManWalkDirection {
 }
 
 const hackManWalkDirectionValues = [
-  { direction: "Right", velocity: { x: 100, y: 0 } },
-  { direction: "Down", velocity: { x: 0, y: 100 } },
-  { direction: "Left", velocity: { x: -100, y: 0 } },
-  { direction: "Up", velocity: { x: 0, y: -100 } },
+  { direction: "Right", velocity: { x: 80, y: 0 } },
+  { direction: "Down", velocity: { x: 0, y: 80 } },
+  { direction: "Left", velocity: { x: -80, y: 0 } },
+  { direction: "Up", velocity: { x: 0, y: -80 } },
 ];
 export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _walkDirection: HackManWalkDirection;
