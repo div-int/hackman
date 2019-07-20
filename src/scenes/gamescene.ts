@@ -159,11 +159,13 @@ export class GameScene extends Phaser.Scene {
 
     this._maskShape.fillStyle(Consts.Colours.White);
     this._maskShape.beginPath();
-    this._maskShape.fillRect(0, 0, 32 * scale, 32 * scale);
-    this._maskShape.fillRect(64 * scale, 64 * scale, 32 * scale, 32 * scale);
-    this._maskShape.fillRect(128 * scale, 64 * scale, 32 * scale, 32 * scale);
-    this._maskShape.fillRect(64 * scale, 128 * scale, 32 * scale, 32 * scale);
-    this._maskShape.fillRect(256 * scale, 128 * scale, 64 * scale, 64 * scale);
+    this._maskShape.fillRect(
+      15 * 32 * scale,
+      15 * 32 * scale,
+      64 * scale,
+      64 * scale
+    );
+    this._maskShape.closePath();
     this._maskShape.setScrollFactor(Consts.MagicNumbers.Half);
 
     this._mask = this._maskShape.createGeometryMask();
@@ -174,13 +176,15 @@ export class GameScene extends Phaser.Scene {
       // .setAlpha(Consts.MagicNumbers.Half)
       .setMask(this._mask)
       .setScrollFactor(Consts.MagicNumbers.Quarter)
-      .setScale(scale >> 1);
+      .setScale(scale);
 
     let mapLayerBackground = attractLevel
       .createStaticLayer("Background", attractTiles)
       .setDepth(3)
       .setScale(scale)
       .setScrollFactor(Consts.MagicNumbers.Half);
+
+    mapLayerBackground.setPosition(-256 * scale, -256 * scale);
 
     let mapLayerWalls = attractLevel
       .createDynamicLayer("Walls", attractTiles)
@@ -247,6 +251,16 @@ export class GameScene extends Phaser.Scene {
       (hackman: HackMan, tile: any) => {
         if (tile.index != -1) {
           // console.log("Overlap : ", hackman, tile);
+
+          this._maskShape.fillStyle(Consts.Colours.White);
+          this._maskShape.beginPath();
+          this._maskShape.fillRect(
+            tile.x * 32 * scale,
+            tile.y * 32 * scale,
+            32 * scale,
+            32 * scale
+          );
+          this._maskShape.closePath();
 
           if (tile.index == Consts.Game.PowerPillTile) {
             this.FrightenGhosts(10 * Consts.Times.MilliSecondsInSecond);
