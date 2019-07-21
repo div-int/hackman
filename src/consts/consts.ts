@@ -47,10 +47,14 @@ namespace Consts {
 
     HackManXStart = 15,
     HackManYStart = 15,
-    HackmanFrameRate = 20,
-    HackmanSpeed = 64,
+    HackManFrameRate = 20,
+    HackManSpeed = 64,
+    HackManSpeedUpMultiplier = 1.5,
 
+    FoodPillTile = 49,
     PowerPillTile = 50,
+    SpeedPillTile = 51,
+
     GhostGateTileUp = 52,
     GhostGateTileRight = 53,
     GhostGateTileLeft = 54,

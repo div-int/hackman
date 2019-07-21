@@ -18,10 +18,10 @@ export enum HackManWalkDirection {
 }
 
 const hackManWalkDirectionValues = [
-  { direction: "Right", velocity: { x: Consts.Game.HackmanSpeed, y: 0 } },
-  { direction: "Down", velocity: { x: 0, y: Consts.Game.HackmanSpeed } },
-  { direction: "Left", velocity: { x: -Consts.Game.HackmanSpeed, y: 0 } },
-  { direction: "Up", velocity: { x: 0, y: -Consts.Game.HackmanSpeed } },
+  { direction: "Right", velocity: { x: Consts.Game.HackManSpeed, y: 0 } },
+  { direction: "Down", velocity: { x: 0, y: Consts.Game.HackManSpeed } },
+  { direction: "Left", velocity: { x: -Consts.Game.HackManSpeed, y: 0 } },
+  { direction: "Up", velocity: { x: 0, y: -Consts.Game.HackManSpeed } },
 ];
 
 export class HackMan extends Phaser.Physics.Arcade.Sprite {
@@ -29,6 +29,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _mapLayer: Phaser.Tilemaps.DynamicTilemapLayer;
   private _walkDirection: HackManWalkDirection;
   private _faceDirection: HackManWalkDirection;
+  private _speedMultiplier: number;
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
   private _hitWall: boolean;
   private _previousX: number;
@@ -68,7 +69,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
 
     this._scene = scene;
     this._mapLayer = mapLayer;
-
+    this._speedMultiplier = 1;
     this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
       scene,
       x,
@@ -89,7 +90,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           end: walkEnd + walkRight,
         }
       ),
-      frameRate: Consts.Game.HackmanFrameRate,
+      frameRate: Consts.Game.HackManFrameRate,
       yoyo: true,
       repeat: -1,
     });
@@ -103,7 +104,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           end: walkEnd + walkDown,
         }
       ),
-      frameRate: Consts.Game.HackmanFrameRate,
+      frameRate: Consts.Game.HackManFrameRate,
       yoyo: true,
       repeat: -1,
     });
@@ -116,7 +117,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           end: walkEnd + walkLeft,
         }
       ),
-      frameRate: Consts.Game.HackmanFrameRate,
+      frameRate: Consts.Game.HackManFrameRate,
       yoyo: true,
       repeat: -1,
     });
@@ -129,7 +130,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           end: walkEnd + walkUp,
         }
       ),
-      frameRate: Consts.Game.HackmanFrameRate,
+      frameRate: Consts.Game.HackManFrameRate,
       yoyo: true,
       repeat: -1,
     });
@@ -143,7 +144,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           end: 9,
         }
       ),
-      frameRate: Consts.Game.HackmanFrameRate,
+      frameRate: Consts.Game.HackManFrameRate,
       yoyo: true,
       repeat: 0,
     });
@@ -151,6 +152,41 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     scene.add.existing(this._shadowSprite);
+  }
+
+  speedUp(time: number) {
+    this._speedMultiplier = Consts.Game.HackManSpeedUpMultiplier;
+    this.setVelocity(
+      hackManWalkDirectionValues[this.WalkDirection].velocity.x *
+        this.scaleX *
+        this._speedMultiplier,
+      hackManWalkDirectionValues[this.WalkDirection].velocity.y *
+        this.scaleY *
+        this._speedMultiplier
+    );
+    this.anims.msPerFrame =
+      Consts.Times.MilliSecondsInSecond /
+      (Consts.Game.HackManFrameRate * this._speedMultiplier);
+
+    this.scene.time.delayedCall(
+      time,
+      () => {
+        this._speedMultiplier = 1;
+        this.setVelocity(
+          hackManWalkDirectionValues[this.WalkDirection].velocity.x *
+            this.scaleX *
+            this._speedMultiplier,
+          hackManWalkDirectionValues[this.WalkDirection].velocity.y *
+            this.scaleY *
+            this._speedMultiplier
+        );
+        this.anims.msPerFrame =
+          Consts.Times.MilliSecondsInSecond /
+          (Consts.Game.HackManFrameRate * this._speedMultiplier);
+      },
+      [],
+      this
+    );
   }
 
   hitWall(tile: Phaser.GameObjects.GameObject) {
@@ -163,8 +199,12 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
 
     this.WalkDirection = walkDirection;
     this.setVelocity(
-      hackManWalkDirectionValues[this.WalkDirection].velocity.x * this.scaleX,
-      hackManWalkDirectionValues[this.WalkDirection].velocity.y * this.scaleY
+      hackManWalkDirectionValues[this.WalkDirection].velocity.x *
+        this.scaleX *
+        this._speedMultiplier,
+      hackManWalkDirectionValues[this.WalkDirection].velocity.y *
+        this.scaleY *
+        this._speedMultiplier
     );
     this.face(this.WalkDirection);
   }
@@ -179,6 +219,9 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       true,
       0
     );
+    this.anims.msPerFrame =
+      Consts.Times.MilliSecondsInSecond /
+      (Consts.Game.HackManFrameRate * this._speedMultiplier);
   }
 
   update() {

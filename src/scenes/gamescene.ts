@@ -208,8 +208,14 @@ export class GameScene extends Phaser.Scene {
           );
           this._maskShape.closePath();
 
-          if (tile.index == Consts.Game.PowerPillTile) {
+          if (tile.index === Consts.Game.PowerPillTile) {
             this.FrightenGhosts(10 * Consts.Times.MilliSecondsInSecond);
+          }
+
+          if (tile.index === Consts.Game.SpeedPillTile) {
+            this._hackmanGroup.children.iterate((hackman: HackMan) =>
+              hackman.speedUp(5 * Consts.Times.MilliSecondsInSecond)
+            );
           }
 
           mapLayerPills.removeTileAt(tile.x, tile.y);
