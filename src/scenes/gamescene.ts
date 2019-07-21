@@ -195,7 +195,9 @@ export class GameScene extends Phaser.Scene {
       this._hackmanGroup,
       mapLayerPills,
       (hackman: HackMan, tile: any) => {
-        if (!hackman.anims.currentFrame.isFirst) return;
+        if (!hackman.anims.currentFrame.isFirst && !hackman.isJumping) return;
+        if (!hackman.OnFloor) return;
+
         if (tile.index != -1) {
           // console.log("Overlap : ", hackman, tile);
 
@@ -229,7 +231,6 @@ export class GameScene extends Phaser.Scene {
       this._hackmanGroup,
       mapLayerWalls,
       (hackman: HackMan, tile: Phaser.GameObjects.GameObject) => {
-        // hackman.walk(hackman.WalkDirection + Phaser.Math.Between(-1, 1));
         hackman.hitWall(tile);
       }
     );
@@ -248,6 +249,7 @@ export class GameScene extends Phaser.Scene {
       (hackman: HackMan, ghost: Ghost) => {
         // console.log("Collide : ", hackman, ghost);
 
+        if (!hackman.OnFloor) return;
         if (ghost.GhostState === GhostState.Eaten) return;
 
         if (ghost.GhostState === GhostState.Frightened) {
@@ -259,14 +261,6 @@ export class GameScene extends Phaser.Scene {
         }
       }
     );
-
-    // this.physics.add.collider(
-    //   this._ghostGroup,
-    //   this._ghostGroup,
-    //   (ghost1: Ghost, ghost2: Ghost) => {
-    //     // console.log("Collide : ", ghost1, ghost2);
-    //   }
-    // );
 
     this._hackman = new HackMan(
       this,
@@ -325,31 +319,6 @@ export class GameScene extends Phaser.Scene {
       );
     }
 
-    // this._ghosts.map((ghost: Ghost) => {
-    //   ghost
-    //     .setPosition(
-    //       (8 +
-    //         Phaser.Math.Between(
-    //           Consts.Game.GhostXStart - 1,
-    //           Consts.Game.GhostXStart + 2
-    //         ) *
-    //           16) *
-    //         scale,
-    //       (8 +
-    //         Phaser.Math.Between(
-    //           Consts.Game.GhostYStart - 1,
-    //           Consts.Game.GhostYStart + 1
-    //         ) *
-    //           16) *
-    //         scale
-    //     )
-    //     .setCollideWorldBounds(true)
-    //     .setOffset(1, 1);
-
-    //   ghost.setCircle(7);
-    //   ghost.walk(3);
-    // });
-
     this._ghostGroup.children.each((ghost: Ghost) => {
       ghost
         .setPosition(
@@ -371,6 +340,7 @@ export class GameScene extends Phaser.Scene {
         .setCollideWorldBounds(true)
         .setOffset(2, 2)
         .setCircle(6)
+        .add(this)
         .walk(3);
     }, this);
   }
@@ -386,8 +356,10 @@ export class GameScene extends Phaser.Scene {
       );
     }
 
-    // if (Phaser.Math.Between(0, 256) === 1) {
-    //   this._hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections));
-    // }
+    if (Phaser.Math.Between(0, 64) === 1) {
+      this._hackmanGroup.children.iterate((hackman: HackMan) => {
+        hackman.jump();
+      });
+    }
   }
 }

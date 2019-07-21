@@ -32,6 +32,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _faceDirection: HackManWalkDirection;
   private _speedMultiplier: number;
   private _jumpHeight: number;
+  private _isJumping: boolean;
   private _jumpSprite: Phaser.Physics.Arcade.Sprite;
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
   private _hitWall: boolean;
@@ -49,6 +50,15 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   set JumpHeight(height: number) {
     this._jumpHeight = height;
   }
+
+  get OnFloor() {
+    return this._jumpHeight < Consts.Game.HackManOnFloorHeight;
+  }
+
+  get isJumping() {
+    return this._isJumping;
+  }
+
   get WalkDirection() {
     return this._walkDirection;
   }
@@ -80,7 +90,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._scene = scene;
     this._mapLayer = mapLayer;
     this._speedMultiplier = 1;
-    this._jumpHeight = 32;
+    this._jumpHeight = 0;
     this._jumpSprite = new Phaser.Physics.Arcade.Sprite(
       scene,
       x,
@@ -172,15 +182,6 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     scene.add.existing(this._shadowSprite);
     scene.add.existing(this._jumpSprite);
-
-    scene.tweens.add({
-      targets: this,
-      JumpHeight: 128,
-      duration: 500,
-      ease: "Sine.easeOut",
-      yoyo: true,
-      loop: -1,
-    });
   }
 
   speedUp(time: number) {
@@ -216,6 +217,37 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       [],
       this
     );
+  }
+
+  jump(height?: number) {
+    if (this._isJumping) return;
+
+    this._isJumping = true;
+    this.scene.tweens.add({
+      targets: this,
+      JumpHeight: height
+        ? height * this.scale
+        : Consts.Game.HackManJumpHeight * this.scale,
+      duration: 500,
+      ease: "Sine.easeOut",
+      yoyo: true,
+      loop: 0,
+      onComplete: () => {
+        this.scene.tweens.add({
+          targets: this,
+          JumpHeight: height
+            ? (height / 4) * this.scale
+            : (Consts.Game.HackManJumpHeight / 4) * this.scale,
+          duration: 250,
+          ease: "Sine.easeOut",
+          yoyo: true,
+          loop: 0,
+          onComplete: () => {
+            this._isJumping = false;
+          },
+        });
+      },
+    });
   }
 
   hitWall(tile: Phaser.GameObjects.GameObject) {

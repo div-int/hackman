@@ -50,6 +50,8 @@ namespace Consts {
     HackManFrameRate = 20,
     HackManSpeed = 64,
     HackManSpeedUpMultiplier = 1.5,
+    HackManJumpHeight = 32,
+    HackManOnFloorHeight = 8,
 
     FoodPillTile = 49,
     PowerPillTile = 50,
@@ -64,6 +66,6 @@ namespace Consts {
 
     TileShadowOffset = 8,
 
-    ShadowOffset = 16,
+    ShadowOffset = 4,
   }
 }

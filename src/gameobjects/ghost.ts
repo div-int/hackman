@@ -470,13 +470,15 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     else this.GhostState = ghostState;
   }
 
-  add(scene: Phaser.Scene) {
+  add(scene: Phaser.Scene): Ghost {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     scene.add.existing(this._shadowSprite);
+
+    return this;
   }
 
-  updateAnimation() {
+  updateAnimation(): Ghost {
     this.anims.play(
       `${this._animationPrefix}Walk${
         ghostWalkDirectionValues[this.FaceDirection].direction
@@ -484,6 +486,8 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
       true,
       0
     );
+
+    return this;
   }
 
   hitWall(tile: Phaser.GameObjects.GameObject) {
@@ -491,7 +495,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     return;
   }
 
-  walk(walkDirection: GhostWalkDirection) {
+  walk(walkDirection: GhostWalkDirection): Ghost {
     if (!this.active) return;
     if (this.WalkDirection === walkDirection) return;
 
@@ -506,14 +510,18 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
         this.SpeedMultiplier
     );
     this.face(walkDirection);
+
+    return this;
   }
 
-  face(faceDirection: GhostWalkDirection) {
+  face(faceDirection: GhostWalkDirection): Ghost {
     if (!this.active) return;
     if (this.FaceDirection === faceDirection) return;
 
     this.FaceDirection = faceDirection;
     this.updateAnimation();
+
+    return this;
   }
 
   kill() {
@@ -525,8 +533,8 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     this.setDepth(this.x + this.y * window.innerWidth);
 
     this._shadowSprite.scale = this.scale;
-    this._shadowSprite.x = this.x + Consts.Game.ShadowOffset;
-    this._shadowSprite.y = this.y + Consts.Game.ShadowOffset;
+    this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;
+    this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
     this._shadowSprite.frame = this.frame;
 
     let x = this.x;
