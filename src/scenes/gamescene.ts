@@ -277,7 +277,6 @@ export class GameScene extends Phaser.Scene {
     this._hackmanGroup.add(this._hackman);
 
     this._hackman
-      .setBounce(Consts.MagicNumbers.Tenth)
       .setOffset(2, 2)
       .setCircle(6)
       .setCollideWorldBounds(true, 1, 1)

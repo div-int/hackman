@@ -30,6 +30,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _walkDirection: HackManWalkDirection;
   private _faceDirection: HackManWalkDirection;
   private _speedMultiplier: number;
+  private _jumpHeight: number;
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
   private _hitWall: boolean;
   private _previousX: number;

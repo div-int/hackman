@@ -63,8 +63,7 @@ export class UIScene extends Phaser.Scene {
     this._fullScreenButton.on(
       "pointerup",
       () => {
-        console.log(`this.scale.isFullscreen=${this.scale.isFullscreen}`);
-	this.scene.pause(Consts.Scenes.GameScene);
+        this.scene.pause(Consts.Scenes.GameScene);
         if (this.scale.isFullscreen) {
           this._fullScreenButton.setFrame(Consts.Game.GoFullScreen);
           try {
@@ -80,7 +79,7 @@ export class UIScene extends Phaser.Scene {
             console.error(e);
           }
         }
-	this.scene.resume(Consts.Scenes.GameScene);
+        this.scene.resume(Consts.Scenes.GameScene);
       },
       this
     );

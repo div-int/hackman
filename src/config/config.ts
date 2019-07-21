@@ -19,7 +19,7 @@ export const config = {
     default: "arcade",
 
     arcade: {
-      debug: false,
+      debug: true,
       gravity: { x: 0, y: 0 },
     },
   },
