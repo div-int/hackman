@@ -30,6 +30,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _walkDirection: HackManWalkDirection;
   private _faceDirection: HackManWalkDirection;
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
+  private _hitWall: boolean;
   private _previousX: number;
   private _previousY: number;
 
@@ -153,11 +154,8 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   }
 
   hitWall(tile: Phaser.GameObjects.GameObject) {
-    if (Math.random() >= Consts.MagicNumbers.Half) {
-      this.walk(this.WalkDirection + 1);
-    } else {
-      this.walk(this.WalkDirection - 1);
-    }
+    this._hitWall = true;
+    return;
   }
 
   walk(walkDirection: HackManWalkDirection) {
@@ -195,10 +193,53 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     let y = this.y;
     let w = (this.displayWidth >> 1) - 8;
     let h = (this.displayHeight >> 1) - 8;
+
+    let tile = this._mapLayer.getTileAtWorldXY(x, y, true);
+
+    if (
+      this.WalkDirection === HackManWalkDirection.Up ||
+      this.WalkDirection === HackManWalkDirection.Down
+    ) {
+      this.x =
+        ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
+    }
+
+    if (
+      this.WalkDirection === HackManWalkDirection.Left ||
+      this.WalkDirection === HackManWalkDirection.Right
+    ) {
+      this.y =
+        ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
+    }
+
     let tile1 = this._mapLayer.getTileAtWorldXY(x - w, y - h, true);
     let tile2 = this._mapLayer.getTileAtWorldXY(x + w, y - h, true);
     let tile3 = this._mapLayer.getTileAtWorldXY(x + w, y + h, true);
     let tile4 = this._mapLayer.getTileAtWorldXY(x - w, y + h, true);
+
+    let moveLeft =
+      this._mapLayer.getTileAt(tile.x - 1, tile.y, true).index === -1;
+    let moveRight =
+      this._mapLayer.getTileAt(tile.x + 1, tile.y, true).index === -1;
+    let moveUp =
+      this._mapLayer.getTileAt(tile.x, tile.y - 1, true).index === -1;
+    let moveDown =
+      this._mapLayer.getTileAt(tile.x, tile.y + 1, true).index === -1;
+
+    if (this._hitWall) {
+      this._hitWall = false;
+      if (Math.random() > Consts.MagicNumbers.Quarter && moveLeft)
+        this.walk(HackManWalkDirection.Left);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && moveRight)
+        this.walk(HackManWalkDirection.Right);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && moveUp)
+        this.walk(HackManWalkDirection.Up);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && moveDown)
+        this.walk(HackManWalkDirection.Down);
+      else this.walk(this.WalkDirection + Phaser.Math.Between(1, 3));
+
+      return;
+    }
 
     if (tile1.x === tile2.x && tile2.x === tile3.x && tile3.x === tile4.x) {
       if (tile1.y === tile2.y && tile2.y === tile3.y && tile3.y === tile4.y) {
@@ -212,12 +253,12 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
             this.WalkDirection == HackManWalkDirection.Up ||
             this.WalkDirection == HackManWalkDirection.Down
           ) {
-            if (this._mapLayer.getTileAt(x - 1, y, true).index === -1) {
+            if (moveLeft) {
               if (Math.random() >= Consts.MagicNumbers.Half)
                 this.walk(HackManWalkDirection.Left);
             } else {
-              if (this._mapLayer.getTileAt(x + 1, y, true).index === -1) {
-                if (Math.random() >= Consts.MagicNumbers.Half)
+              if (moveRight) {
+                if (Math.random() >= Consts.MagicNumbers.ThreeQuarters)
                   this.walk(HackManWalkDirection.Right);
               }
             }
@@ -226,12 +267,12 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
               this.WalkDirection == HackManWalkDirection.Left ||
               this.WalkDirection == HackManWalkDirection.Right
             ) {
-              if (this._mapLayer.getTileAt(x, y - 1, true).index === -1) {
+              if (moveUp) {
                 if (Math.random() >= Consts.MagicNumbers.Half)
                   this.walk(HackManWalkDirection.Up);
               } else {
-                if (this._mapLayer.getTileAt(x, y + 1, true).index === -1) {
-                  if (Math.random() >= Consts.MagicNumbers.Half)
+                if (moveDown) {
+                  if (Math.random() >= Consts.MagicNumbers.ThreeQuarters)
                     this.walk(HackManWalkDirection.Down);
                 }
               }

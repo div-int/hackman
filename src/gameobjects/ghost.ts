@@ -50,6 +50,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   private _mapLayer: Phaser.Tilemaps.DynamicTilemapLayer;
   private _walkDirection: GhostWalkDirection;
   private _faceDirection: GhostWalkDirection;
+  private _hitWall: boolean;
   private _speedMultiplier: number;
   private _animationPrefix: string;
   private _ghostState: GhostState;
@@ -486,6 +487,11 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     );
   }
 
+  hitWall(tile: Phaser.GameObjects.GameObject) {
+    this._hitWall = true;
+    return;
+  }
+
   walk(walkDirection: GhostWalkDirection) {
     if (!this.active) return;
     if (this.WalkDirection === walkDirection) return;
@@ -527,10 +533,36 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     this._shadowSprite.x = this.x + Consts.Game.ShadowOffset;
     this._shadowSprite.y = this.y + Consts.Game.ShadowOffset;
     this._shadowSprite.frame = this.frame;
+
     let x = this.x;
     let y = this.y;
     let w = (this.displayWidth >> 1) - 8;
     let h = (this.displayHeight >> 1) - 8;
+
+    let tile = this._mapLayer.getTileAtWorldXY(x, y, true);
+
+    if (
+      this.WalkDirection === GhostWalkDirection.Up ||
+      this.WalkDirection === GhostWalkDirection.Down
+    ) {
+      this.x =
+        ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
+    }
+
+    if (
+      this.WalkDirection === GhostWalkDirection.Left ||
+      this.WalkDirection === GhostWalkDirection.Right
+    ) {
+      this.y =
+        ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
+    }
+
+    if (this._hitWall) {
+      this._hitWall = false;
+      this.walk(this.WalkDirection + Phaser.Math.Between(1, 3));
+      return;
+    }
+
     let tile1 = this._mapLayer.getTileAtWorldXY(x - w, y - h, true);
     let tile2 = this._mapLayer.getTileAtWorldXY(x + w, y - h, true);
     let tile3 = this._mapLayer.getTileAtWorldXY(x + w, y + h, true);

@@ -231,9 +231,7 @@ export class GameScene extends Phaser.Scene {
       this._ghostGroup,
       mapLayerWalls,
       (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
-        if (Math.random() >= Consts.MagicNumbers.Half)
-          ghost.walk(ghost.WalkDirection + 1);
-        else ghost.walk(ghost.WalkDirection + -1);
+        ghost.hitWall(tile);
       }
     );
 
