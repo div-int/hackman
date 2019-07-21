@@ -59,11 +59,7 @@ export class GameScene extends Phaser.Scene {
     };
   }
 
-  init() {}
-
-  preload() {
-    console.log(`GameScene::preload() : ${hackManGame.Version}`);
-
+  init() {
     if (this.sys.game.device.os.desktop) {
       scale = Consts.Game.ScaleDesktop;
       maxsprite = Consts.Game.MaxSpriteDesktop;
@@ -71,8 +67,12 @@ export class GameScene extends Phaser.Scene {
       scale = Consts.Game.ScaleMobile;
       maxsprite = Consts.Game.MaxSpriteMobile;
     }
+  }
 
-    HackMan.load(this);
+  preload() {
+    console.log(`GameScene::preload() : ${hackManGame.Version}`);
+
+    // HackMan.load(this);
     Ghost.load(this);
 
     this.load.tilemapTiledJSON(
@@ -221,10 +221,9 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(
       this._hackmanGroup,
       mapLayerWalls,
-      (hackman: HackMan, tile: Phaser.GameObjects.TileSprite) => {
-        // console.log("Collide : ", hackman, tile);
-
-        hackman.walk(hackman.WalkDirection() + Phaser.Math.Between(-1, 1));
+      (hackman: HackMan, tile: Phaser.GameObjects.GameObject) => {
+        // hackman.walk(hackman.WalkDirection + Phaser.Math.Between(-1, 1));
+        hackman.hitWall(tile);
       }
     );
 
@@ -264,22 +263,22 @@ export class GameScene extends Phaser.Scene {
       }
     );
 
-    this._hackman = new HackMan(this, 0, 0);
-
-    this._hackman.add(this);
-    this._hackman
-      .setScale(scale)
-      .setPosition(
-        (8 + Consts.Game.HackManXStart * 16) * scale,
-        (8 + Consts.Game.HackManYStart * 16) * scale
-      )
-      .setCollideWorldBounds(true, 1, 1)
-      .setBounce(1)
-      .setOffset(1, 1);
-
-    this._hackman.body.setCircle(7);
+    this._hackman = new HackMan(
+      this,
+      mapLayerWalls,
+      (8 + Consts.Game.HackManXStart * 16) * scale,
+      (8 + Consts.Game.HackManYStart * 16) * scale
+    ).setScale(scale);
+    this._hackmanGroup.runChildUpdate = true;
     this._hackmanGroup.add(this._hackman);
-    this._hackman.walk(HackManWalkDirection.Right);
+
+    this._hackman
+      .setBounce(Consts.MagicNumbers.Tenth)
+      .setOffset(2, 2)
+      .setCircle(6)
+      .setCollideWorldBounds(true, 1, 1)
+      .walk(HackManWalkDirection.Right);
+
     this.physics.world.setBounds(
       0,
       0,
@@ -312,6 +311,7 @@ export class GameScene extends Phaser.Scene {
       this._ghostGroup.add(
         new Ghost(
           this,
+          mapLayerWalls,
           0,
           0,
           Phaser.Math.Between(0, Ghost.MaxGhostNo()),
@@ -365,10 +365,9 @@ export class GameScene extends Phaser.Scene {
             scale
         )
         .setCollideWorldBounds(true)
-        .setOffset(1, 1);
-
-      ghost.setCircle(7);
-      ghost.walk(3);
+        .setOffset(2, 2)
+        .setCircle(7)
+        .walk(3);
     }, this);
   }
 
@@ -383,11 +382,8 @@ export class GameScene extends Phaser.Scene {
       );
     }
 
-    if (Phaser.Math.Between(0, 256) === 1) {
-      this._hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections()));
-    }
-    this._hackman
-      .setDepth(this._hackman.x + this._hackman.y * window.innerWidth)
-      .update();
+    // if (Phaser.Math.Between(0, 256) === 1) {
+    //   this._hackman.walk(Phaser.Math.Between(0, HackMan.MaxDirections));
+    // }
   }
 }

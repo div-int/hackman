@@ -47,12 +47,15 @@ const ghostWalkDirectionValues = [
 
 export class Ghost extends Phaser.Physics.Arcade.Sprite {
   private _ghostNo: number;
+  private _mapLayer: Phaser.Tilemaps.DynamicTilemapLayer;
   private _walkDirection: GhostWalkDirection;
   private _faceDirection: GhostWalkDirection;
   private _speedMultiplier: number;
   private _animationPrefix: string;
   private _ghostState: GhostState;
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
+  private _previousX: number;
+  private _previousY: number;
 
   static MaxGhostNo() {
     return maxGhostNo;
@@ -434,6 +437,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
 
   constructor(
     scene: Phaser.Scene,
+    mapLayer: Phaser.Tilemaps.DynamicTilemapLayer,
     x: number,
     y: number,
     ghostNo: number,
@@ -442,6 +446,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   ) {
     super(scene, x, y, Consts.Resources.HackManSprites, defaultFrame[ghostNo]);
 
+    this._mapLayer = mapLayer;
     this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
       scene,
       x,
@@ -517,28 +522,66 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   update() {
     if (!this.active) return;
     this.setDepth(this.x + this.y * window.innerWidth);
-    let direction: GhostWalkDirection;
-    const { x, y } = this.body.velocity;
 
     this._shadowSprite.scale = this.scale;
     this._shadowSprite.x = this.x + Consts.Game.ShadowOffset;
     this._shadowSprite.y = this.y + Consts.Game.ShadowOffset;
     this._shadowSprite.frame = this.frame;
+    let x = this.x;
+    let y = this.y;
+    let w = (this.displayWidth >> 1) - 8;
+    let h = (this.displayHeight >> 1) - 8;
+    let tile1 = this._mapLayer.getTileAtWorldXY(x - w, y - h, true);
+    let tile2 = this._mapLayer.getTileAtWorldXY(x + w, y - h, true);
+    let tile3 = this._mapLayer.getTileAtWorldXY(x + w, y + h, true);
+    let tile4 = this._mapLayer.getTileAtWorldXY(x - w, y + h, true);
 
-    if (Math.abs(x) > Math.abs(y)) {
-      if (x <= 0) {
-        direction = GhostWalkDirection.Left;
-      } else {
-        direction = GhostWalkDirection.Right;
-      }
-    } else {
-      if (y <= 0) {
-        direction = GhostWalkDirection.Up;
-      } else {
-        direction = GhostWalkDirection.Down;
+    if (tile1.x === tile2.x && tile2.x === tile3.x && tile3.x === tile4.x) {
+      if (tile1.y === tile2.y && tile2.y === tile3.y && tile3.y === tile4.y) {
+        if (tile1.x != this._previousX || tile1.y != this._previousY) {
+          let x = tile1.x;
+          let y = tile1.y;
+          this._previousX = x;
+          this._previousY = y;
+
+          if (
+            this.WalkDirection == GhostWalkDirection.Up ||
+            this.WalkDirection == GhostWalkDirection.Down
+          ) {
+            if (this._mapLayer.getTileAt(x - 1, y, true).index === -1) {
+              if (Math.random() >= Consts.MagicNumbers.Half)
+                this.walk(GhostWalkDirection.Left);
+            } else {
+              if (this._mapLayer.getTileAt(x + 1, y, true).index === -1) {
+                if (Math.random() >= Consts.MagicNumbers.Half)
+                  this.walk(GhostWalkDirection.Right);
+              }
+            }
+          } else {
+            if (
+              this.WalkDirection == GhostWalkDirection.Left ||
+              this.WalkDirection == GhostWalkDirection.Right
+            ) {
+              if (this._mapLayer.getTileAt(x, y - 1, true).index === -1) {
+                if (Math.random() >= Consts.MagicNumbers.Half)
+                  this.walk(GhostWalkDirection.Up);
+              } else {
+                if (this._mapLayer.getTileAt(x, y + 1, true).index === -1) {
+                  if (Math.random() >= Consts.MagicNumbers.Half)
+                    this.walk(GhostWalkDirection.Down);
+                }
+              }
+            }
+          }
+
+          // console.log(
+          //   this._mapLayer.getTileAt(x - 1, y, true).index,
+          //   this._mapLayer.getTileAt(x + 1, y, true).index,
+          //   this._mapLayer.getTileAt(x, y - 1, true).index,
+          //   this._mapLayer.getTileAt(x, y + 1, true).index
+          // );
+        }
       }
     }
-
-    this.face(direction);
   }
 }
