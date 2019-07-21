@@ -34,7 +34,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   async FrightenGhosts(timeToFrighten: number) {
-    this._ghostGroup.children.each((ghost: Ghost) => {
+    this._ghostGroup.children.each(async (ghost: Ghost) => {
       ghost.GhostState = GhostState.Frightened;
     }, this);
 
