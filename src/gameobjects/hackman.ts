@@ -1,4 +1,5 @@
 import "phaser";
+import { runInThisContext } from "vm";
 
 const defaultFrame = 0;
 
@@ -31,6 +32,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _faceDirection: HackManWalkDirection;
   private _speedMultiplier: number;
   private _jumpHeight: number;
+  private _jumpSprite: Phaser.Physics.Arcade.Sprite;
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
   private _hitWall: boolean;
   private _previousX: number;
@@ -40,6 +42,13 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     return 3;
   }
 
+  get JumpHeight() {
+    return this._jumpHeight;
+  }
+
+  set JumpHeight(height: number) {
+    this._jumpHeight = height;
+  }
   get WalkDirection() {
     return this._walkDirection;
   }
@@ -71,6 +80,15 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._scene = scene;
     this._mapLayer = mapLayer;
     this._speedMultiplier = 1;
+    this._jumpHeight = 32;
+    this._jumpSprite = new Phaser.Physics.Arcade.Sprite(
+      scene,
+      x,
+      y,
+      Consts.Resources.HackManSprites,
+      defaultFrame
+    ).setVisible(false);
+
     this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
       scene,
       x,
@@ -153,6 +171,16 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     scene.add.existing(this._shadowSprite);
+    scene.add.existing(this._jumpSprite);
+
+    scene.tweens.add({
+      targets: this,
+      JumpHeight: 128,
+      duration: 500,
+      ease: "Sine.easeOut",
+      yoyo: true,
+      loop: -1,
+    });
   }
 
   speedUp(time: number) {
@@ -228,9 +256,27 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   update() {
     this.depth = this.x + this.y * window.innerWidth;
 
-    this._shadowSprite.scale = this.scale;
-    this._shadowSprite.x = this.x + Consts.Game.ShadowOffset;
-    this._shadowSprite.y = this.y + Consts.Game.ShadowOffset;
+    if (this._jumpHeight > 0) {
+      this._jumpSprite.scale = this.scale;
+      this._jumpSprite.x = this.x;
+      this._jumpSprite.y = this.y - this._jumpHeight;
+      this._jumpSprite.frame = this.frame;
+      this._jumpSprite.depth = this.depth;
+      this.visible = false;
+      this._jumpSprite.visible = true;
+      this._shadowSprite.scale = this.scale * (1 - this._jumpHeight / 128);
+      this._shadowSprite.setAlpha(
+        (1 - this._jumpHeight / 128) * Consts.MagicNumbers.Quarter
+      );
+    } else {
+      this.visible = true;
+      this._jumpSprite.visible = false;
+      this._shadowSprite.scale = this.scale;
+      this._shadowSprite.setAlpha(Consts.MagicNumbers.Quarter);
+    }
+
+    this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;
+    this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
     this._shadowSprite.frame = this.frame;
 
     let x = this.x;
