@@ -4,7 +4,6 @@ import { RIGHT } from "phaser";
 // const Consts.Resources.HackManSprites = "Consts.Resources.HackManSprites";
 const maxGhostNo = 3;
 const maxDirections = 3;
-const ghostFrameRate = 5;
 
 const ghost0 = 5;
 const ghost1 = 6;
@@ -39,10 +38,10 @@ export enum GhostState {
 }
 
 const ghostWalkDirectionValues = [
-  { direction: "Right", velocity: { x: 75, y: 0 } },
-  { direction: "Down", velocity: { x: 0, y: 75 } },
-  { direction: "Left", velocity: { x: -75, y: 0 } },
-  { direction: "Up", velocity: { x: 0, y: -75 } },
+  { direction: "Right", velocity: { x: Consts.Game.GhostSpeed, y: 0 } },
+  { direction: "Down", velocity: { x: 0, y: Consts.Game.GhostSpeed } },
+  { direction: "Left", velocity: { x: -Consts.Game.GhostSpeed, y: 0 } },
+  { direction: "Up", velocity: { x: 0, y: -Consts.Game.GhostSpeed } },
 ];
 
 export class Ghost extends Phaser.Physics.Arcade.Sprite {
@@ -149,7 +148,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkRightEnd + 16 * ghost0,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -161,7 +160,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkDownEnd + 16 * ghost0,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -173,7 +172,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkLeftEnd + 16 * ghost0,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -185,7 +184,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkUpEnd + 16 * ghost0,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
 
@@ -198,7 +197,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkRightEnd + 16 * ghost1,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -210,7 +209,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkDownEnd + 16 * ghost1,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -222,7 +221,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkLeftEnd + 16 * ghost1,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -234,7 +233,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkUpEnd + 16 * ghost1,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
 
@@ -247,7 +246,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkRightEnd + 16 * ghost2,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -259,7 +258,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkDownEnd + 16 * ghost2,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -271,7 +270,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkLeftEnd + 16 * ghost2,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -283,7 +282,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkUpEnd + 16 * ghost2,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
 
@@ -296,7 +295,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkRightEnd + 16 * ghost3,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -308,7 +307,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkDownEnd + 16 * ghost3,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -320,7 +319,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkLeftEnd + 16 * ghost3,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -332,7 +331,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkUpEnd + 16 * ghost3,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
 
@@ -345,7 +344,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkRightEnd + 16 * ghostFrightened,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -357,7 +356,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkDownEnd + 16 * ghostFrightened,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -369,7 +368,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkLeftEnd + 16 * ghostFrightened,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -381,7 +380,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkUpEnd + 16 * ghostFrightened,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
 
@@ -394,7 +393,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkRightEnd + 16 * ghostEaten,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -406,7 +405,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkDownEnd + 16 * ghostEaten,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -418,7 +417,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkLeftEnd + 16 * ghostEaten,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
@@ -430,7 +429,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
             end: walkUpEnd + 16 * ghostEaten,
           }
         ),
-        frameRate: ghostFrameRate,
+        frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
     });
@@ -518,15 +517,11 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   }
 
   kill() {
-    if (!this.active) return;
     this.anims.stop();
-    this._shadowSprite.setActive(false);
     this._shadowSprite.destroy();
-    this.setActive(false);
   }
 
   update() {
-    if (!this.active) return;
     this.setDepth(this.x + this.y * window.innerWidth);
 
     this._shadowSprite.scale = this.scale;
@@ -556,17 +551,34 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
       this.y =
         ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
     }
-
-    if (this._hitWall) {
-      this._hitWall = false;
-      this.walk(this.WalkDirection + Phaser.Math.Between(1, 3));
-      return;
-    }
-
     let tile1 = this._mapLayer.getTileAtWorldXY(x - w, y - h, true);
     let tile2 = this._mapLayer.getTileAtWorldXY(x + w, y - h, true);
     let tile3 = this._mapLayer.getTileAtWorldXY(x + w, y + h, true);
     let tile4 = this._mapLayer.getTileAtWorldXY(x - w, y + h, true);
+
+    let moveLeft =
+      this._mapLayer.getTileAt(tile.x - 1, tile.y, true).index === -1;
+    let moveRight =
+      this._mapLayer.getTileAt(tile.x + 1, tile.y, true).index === -1;
+    let moveUp =
+      this._mapLayer.getTileAt(tile.x, tile.y - 1, true).index === -1;
+    let moveDown =
+      this._mapLayer.getTileAt(tile.x, tile.y + 1, true).index === -1;
+
+    if (this._hitWall) {
+      this._hitWall = false;
+      if (Math.random() > Consts.MagicNumbers.Quarter && moveLeft)
+        this.walk(GhostWalkDirection.Left);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && moveRight)
+        this.walk(GhostWalkDirection.Right);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && moveUp)
+        this.walk(GhostWalkDirection.Up);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && moveDown)
+        this.walk(GhostWalkDirection.Down);
+      else this.walk(this.WalkDirection + Phaser.Math.Between(1, 3));
+
+      return;
+    }
 
     if (tile1.x === tile2.x && tile2.x === tile3.x && tile3.x === tile4.x) {
       if (tile1.y === tile2.y && tile2.y === tile3.y && tile3.y === tile4.y) {

@@ -42,11 +42,13 @@ namespace Consts {
 
     GhostXStart = 15,
     GhostYStart = 12,
+    GhostFrameRate = 5,
+    GhostSpeed = 48,
 
     HackManXStart = 15,
     HackManYStart = 15,
-
     HackmanFrameRate = 20,
+    HackmanSpeed = 64,
 
     PowerPillTile = 50,
     GhostGateTileUp = 52,
@@ -58,6 +60,6 @@ namespace Consts {
 
     TileShadowOffset = 8,
 
-    ShadowOffset = 8,
+    ShadowOffset = 16,
   }
 }
