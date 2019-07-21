@@ -195,6 +195,7 @@ export class GameScene extends Phaser.Scene {
       this._hackmanGroup,
       mapLayerPills,
       (hackman: HackMan, tile: any) => {
+        if (!hackman.anims.currentFrame.isFirst) return;
         if (tile.index != -1) {
           // console.log("Overlap : ", hackman, tile);
 
