@@ -5,9 +5,13 @@ import { hackManGame } from "../index";
 let scale: number;
 
 export class UIScene extends Phaser.Scene {
+  private _isMobile: boolean;
   private _fullScreenButton: Phaser.GameObjects.Image;
   private _versionText: Phaser.GameObjects.BitmapText;
 
+  get isMobile() {
+    return this._isMobile;
+  }
   constructor() {
     super(Consts.Scenes.UIScene);
     console.log(`UIScene::constructor() : ${hackManGame.Version}`);
@@ -16,8 +20,10 @@ export class UIScene extends Phaser.Scene {
   init() {
     if (this.sys.game.device.os.desktop) {
       scale = Consts.Game.ScaleDesktop;
+      this._isMobile = false;
     } else {
       scale = Consts.Game.ScaleMobile;
+      this._isMobile = true;
     }
   }
 
@@ -47,42 +53,44 @@ export class UIScene extends Phaser.Scene {
 
     this.scene.bringToTop();
 
-    this._fullScreenButton = this.add
-      .image(
-        window.innerWidth - 4 * scale,
-        4 * scale,
-        Consts.Resources.HackManSprites,
-        Consts.Game.GoFullScreen
-      )
-      .setDepth(256 * 256 * 256)
-      .setScale(scale)
-      .setScrollFactor(0, 0)
-      .setOrigin(1, 0)
-      .setInteractive();
+    if (this.isMobile) {
+      this._fullScreenButton = this.add
+        .image(
+          window.innerWidth - 4 * scale,
+          4 * scale,
+          Consts.Resources.HackManSprites,
+          Consts.Game.GoFullScreen
+        )
+        .setDepth(256 * 256 * 256)
+        .setScale(scale)
+        .setScrollFactor(0, 0)
+        .setOrigin(1, 0)
+        .setInteractive();
 
-    this._fullScreenButton.on(
-      "pointerup",
-      () => {
-        this.scene.pause(Consts.Scenes.GameScene);
-        if (this.scale.isFullscreen) {
-          this._fullScreenButton.setFrame(Consts.Game.GoFullScreen);
-          try {
-            this.scale.stopFullscreen();
-          } catch (e) {
-            console.error(e);
+      this._fullScreenButton.on(
+        "pointerup",
+        () => {
+          this.scene.pause(Consts.Scenes.GameScene);
+          if (this.scale.isFullscreen) {
+            this._fullScreenButton.setFrame(Consts.Game.GoFullScreen);
+            try {
+              this.scale.stopFullscreen();
+            } catch (e) {
+              console.error(e);
+            }
+          } else {
+            this._fullScreenButton.setFrame(Consts.Game.LeaveFullScreen);
+            try {
+              this.scale.startFullscreen();
+            } catch (e) {
+              console.error(e);
+            }
           }
-        } else {
-          this._fullScreenButton.setFrame(Consts.Game.LeaveFullScreen);
-          try {
-            this.scale.startFullscreen();
-          } catch (e) {
-            console.error(e);
-          }
-        }
-        this.scene.resume(Consts.Scenes.GameScene);
-      },
-      this
-    );
+          this.scene.resume(Consts.Scenes.GameScene);
+        },
+        this
+      );
+    }
 
     this._versionText = this.add
       .bitmapText(
@@ -118,9 +126,12 @@ export class UIScene extends Phaser.Scene {
 
   update() {
     this._versionText.setPosition(4 * scale, window.innerHeight - 8 * scale);
-    this._fullScreenButton.setPosition(
-      window.innerWidth - 4 * scale,
-      4 * scale
-    );
+
+    if (this.isMobile) {
+      this._fullScreenButton.setPosition(
+        window.innerWidth - 4 * scale,
+        4 * scale
+      );
+    }
   }
 }
