@@ -94,14 +94,14 @@ export class GameScene extends Phaser.Scene {
 
     this._hackmanGroup = this.physics.add.group({
       immovable: true,
-      bounceX: 1,
-      bounceY: 1,
+      bounceX: 0,
+      bounceY: 0,
     });
 
     this._ghostGroup = this.physics.add.group({
       immovable: true,
-      bounceX: 1,
-      bounceY: 1,
+      bounceX: 0,
+      bounceY: 0,
     });
 
     let attractLevel = this.add.tilemap("attractLevel");
