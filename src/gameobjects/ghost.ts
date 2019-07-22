@@ -46,7 +46,7 @@ const ghostWalkDirectionValues = [
 
 export class Ghost extends Phaser.Physics.Arcade.Sprite {
   private _ghostNo: number;
-  private _mapLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+  private _mapLayer: Phaser.Tilemaps.StaticTilemapLayer;
   private _walkDirection: GhostWalkDirection;
   private _faceDirection: GhostWalkDirection;
   private _hitWall: boolean;
@@ -437,7 +437,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
 
   constructor(
     scene: Phaser.Scene,
-    mapLayer: Phaser.Tilemaps.DynamicTilemapLayer,
+    mapLayer: Phaser.Tilemaps.StaticTilemapLayer,
     x: number,
     y: number,
     ghostNo: number,

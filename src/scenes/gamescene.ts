@@ -23,7 +23,7 @@ export class GameScene extends Phaser.Scene {
   private _mask: Phaser.Display.Masks.GeometryMask;
   private _backgroundImage: Phaser.GameObjects.Image;
   private _mapLayerBackgroundMask: Phaser.Tilemaps.DynamicTilemapLayer;
-  private _mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
+  private _mapLayerWalls: Phaser.Tilemaps.StaticTilemapLayer;
 
   get UIScene(): UIScene {
     if (!this._uiscene)
@@ -100,14 +100,14 @@ export class GameScene extends Phaser.Scene {
 
     this._hackmanGroup = this.physics.add.group({
       immovable: true,
-      bounceX: 1,
-      bounceY: 1,
+      bounceX: 0,
+      bounceY: 0,
     });
 
     this._ghostGroup = this.physics.add.group({
       immovable: true,
-      bounceX: 1,
-      bounceY: 1,
+      bounceX: 0,
+      bounceY: 0,
     });
 
     let attractLevel = this.add.tilemap("attractLevel");
@@ -139,7 +139,7 @@ export class GameScene extends Phaser.Scene {
       .setScrollFactor(Consts.MagicNumbers.Half);
 
     let mapLayerWalls = attractLevel
-      .createDynamicLayer("Walls", attractTiles, 0, 0)
+      .createStaticLayer("Walls", attractTiles, 0, 0)
       .setDepth(5)
       .setScale(scale)
       .setCollisionByExclusion([-1], true, true);
@@ -240,7 +240,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(
       this._hackmanGroup,
       mapLayerWalls,
-      (hackman: HackMan, tile: Phaser.GameObjects.GameObject) => {
+      (hackman: HackMan, tile: any) => {
         hackman.hitWall(tile);
       }
     );
@@ -280,11 +280,7 @@ export class GameScene extends Phaser.Scene {
     this._hackmanGroup.runChildUpdate = true;
     this._hackmanGroup.add(this._hackman);
 
-    this._hackman
-      .setOffset(2, 2)
-      .setCircle(6)
-      .setCollideWorldBounds(true, 1, 1)
-      .walk(HackManWalkDirection.Right);
+    this._hackman.walk(HackManWalkDirection.Right);
 
     this.physics.world.setBounds(
       0,

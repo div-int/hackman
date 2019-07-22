@@ -20,6 +20,7 @@ export const config = {
 
     arcade: {
       debug: false,
+      tileBias: 8,
       gravity: { x: 0, y: 0 },
     },
   },
