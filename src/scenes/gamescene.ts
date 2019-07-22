@@ -115,7 +115,7 @@ export class GameScene extends Phaser.Scene {
     let attractLevel = this.add.tilemap("attractLevel");
     let attractTiles = attractLevel.addTilesetImage(
       "default",
-      "blockTiles",
+      "defaultTiles",
       16,
       16,
       1,
@@ -263,9 +263,7 @@ export class GameScene extends Phaser.Scene {
         if (ghost.GhostState === GhostState.Frightened) {
           ghost.GhostState = GhostState.Eaten;
         } else {
-          this._ghostGroup.remove(ghost);
-          ghost.kill();
-          ghost.destroy();
+          this.scene.restart();
         }
       }
     );
