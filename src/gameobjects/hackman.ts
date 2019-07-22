@@ -231,8 +231,10 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       this._collideGroup,
       this._mapLayer,
       (colliderSprite: Phaser.Physics.Arcade.Sprite, tile: any) => {
-        if (tile.index != -1)
+        if (tile.index != -1) {
           colliderSprite.body.debugBodyColor = Consts.Colours.Red;
+          colliderSprite.setData("blocked", true);
+        }
       },
       null,
       this
@@ -411,14 +413,10 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     // let tileUp = this._mapLayer.getTileAtWorldXY(this.x + w, this.y + h, true);
     // let tileDown = this._mapLayer.getTileAtWorldXY(this.x - w, this.y + h, true);
 
-    let moveLeft =
-      this._mapLayer.getTileAt(tile.x - 1, tile.y, true).index === -1;
-    let moveRight =
-      this._mapLayer.getTileAt(tile.x + 1, tile.y, true).index === -1;
-    let moveUp =
-      this._mapLayer.getTileAt(tile.x, tile.y - 1, true).index === -1;
-    let moveDown =
-      this._mapLayer.getTileAt(tile.x, tile.y + 1, true).index === -1;
+    let moveLeft = !this._collideLeftSprite.getData("blocked");
+    let moveRight = !this._collideRightSprite.getData("blocked");
+    let moveUp = !this._collideUpSprite.getData("blocked");
+    let moveDown = !this._collideDownSprite.getData("blocked");
 
     if (moveLeft || moveRight || moveDown || moveUp)
       console.log(moveLeft, moveRight, moveDown, moveUp);
@@ -485,5 +483,10 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     //     }
     //   }
     // }
+
+    this._collideLeftSprite.setData("blocked", false);
+    this._collideRightSprite.setData("blocked", false);
+    this._collideUpSprite.setData("blocked", false);
+    this._collideDownSprite.setData("blocked", false);
   }
 }
