@@ -5,7 +5,7 @@ import { GameState } from "../gameobjects/gamestate";
 import { HackMan, HackManWalkDirection } from "../gameobjects/hackman";
 import { Ghost, GhostState, GhostWalkDirection } from "../gameobjects/ghost";
 import { config } from "../config/config";
-import { hackManGame } from "..";
+import { hackManGame } from "../index";
 
 // const hackmanSprites = "hackmanSprites";
 
@@ -14,9 +14,7 @@ let scale: number;
 
 export class GameScene extends Phaser.Scene {
   private _uiscene: UIScene;
-  private _gameState: GameState;
 
-  private _statusText: Phaser.GameObjects.BitmapText;
   private _hackman: HackMan;
   private _hackmanGroup: Phaser.Physics.Arcade.Group;
   private _ghostGroup: Phaser.Physics.Arcade.Group;
@@ -52,7 +50,7 @@ export class GameScene extends Phaser.Scene {
 
   constructor() {
     super(Consts.Scenes.GameScene);
-    console.log(`GameScene::constructor() : ${hackManGame.Version}`);
+    console.log(`GameScene::constructor() : ${hackManGame.version}`);
 
     window.onresize = () => {
       this.physics.world.setBounds(0, 0, window.innerWidth, window.innerHeight);
@@ -70,7 +68,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    console.log(`GameScene::preload() : ${hackManGame.Version}`);
+    console.log(`GameScene::preload() : ${hackManGame.version}`);
 
     // HackMan.load(this);
     Ghost.load(this);
@@ -98,7 +96,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    console.log(`GameScene::create() : ${hackManGame.Version}`);
+    console.log(`GameScene::create() : ${hackManGame.version}`);
 
     this._hackmanGroup = this.physics.add.group({
       immovable: true,
@@ -219,7 +217,11 @@ export class GameScene extends Phaser.Scene {
           );
           this._maskShape.closePath();
 
+          if (tile.index === Consts.Game.FoodPillTile)
+            hackManGame.gameState.score += 100;
+
           if (tile.index === Consts.Game.PowerPillTile) {
+            hackManGame.gameState.score += 500;
             this.FrightenGhosts(10 * Consts.Times.MilliSecondsInSecond);
           }
 
@@ -263,6 +265,7 @@ export class GameScene extends Phaser.Scene {
         if (ghost.GhostState === GhostState.Frightened) {
           ghost.GhostState = GhostState.Eaten;
         } else {
+          hackManGame.gameState.lives--;
           this.scene.restart();
         }
       }
@@ -299,15 +302,6 @@ export class GameScene extends Phaser.Scene {
     );
 
     // this._ghosts = new Array<Ghost>(maxsprite);
-
-    /** Add bitmap text object to ui scene for our status text. */
-    this._statusText = this.UIScene.addBitmapText(
-      4 * scale,
-      4 * scale,
-      "<Placeholder>",
-      8,
-      0
-    );
 
     this._ghostGroup.runChildUpdate = true;
 
@@ -352,15 +346,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(timestamp: number, elapsed: number) {
-    if (this._statusText) {
-      this._statusText.setText(
-        `${(timestamp / Consts.Times.MilliSecondsInSecond).toFixed(
-          0
-        )}s ${elapsed.toFixed(2)}ms ${
-          this.sys.game.device.os.desktop ? "Desktop" : "Mobile"
-        }`
-      );
-    }
+    this.UIScene.statusText = `${(
+      timestamp / Consts.Times.MilliSecondsInSecond
+    ).toFixed(0)}s ${elapsed.toFixed(2)}ms ${
+      this.sys.game.device.os.desktop ? "Desktop" : "Mobile"
+    }`;
 
     if (Phaser.Math.Between(0, 64) === 1) {
       this._hackmanGroup.children.iterate((hackman: HackMan) => {

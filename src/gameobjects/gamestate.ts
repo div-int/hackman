@@ -2,6 +2,7 @@ import "../consts/consts";
 
 export class GameState {
   private _playing: boolean;
+  private _attract: boolean;
   private _level: number;
   private _score: number;
   private _lives: number;
@@ -9,6 +10,10 @@ export class GameState {
 
   public get playing(): boolean {
     return this._playing;
+  }
+
+  public get attract(): boolean {
+    return this._attract;
   }
   public get level(): number {
     return this._level;
@@ -23,23 +28,29 @@ export class GameState {
     return this._highScore;
   }
 
-  public set playing(playing: boolean) {
-    this._playing = playing;
+  public set playing(value: boolean) {
+    this._playing = value;
+    this._attract = !value;
   }
 
-  public set level(level: number) {
-    if (level > 0) this._level = level;
+  public set attract(value: boolean) {
+    this._attract = value;
+    this._playing = !value;
   }
 
-  public set score(score: number) {
-    if (score > 0) {
-      this._score = score;
+  public set level(value: number) {
+    if (value > 0) this._level = value;
+  }
+
+  public set score(value: number) {
+    if (value > 0) {
+      this._score = value;
       if (this.score > this.highScore) this._highScore = this.score;
     }
   }
 
-  public set lives(lives: number) {
-    if (lives >= 0) this._lives = lives;
+  public set lives(value: number) {
+    if (value >= 0) this._lives = value;
   }
 
   constructor() {
@@ -48,6 +59,7 @@ export class GameState {
 
   public reset() {
     this._playing = false;
+    this._attract = true;
     this._level = 0;
     this._score = 0;
     this._lives = Consts.Game.StartLives;

@@ -8,13 +8,39 @@ export class UIScene extends Phaser.Scene {
   private _isMobile: boolean;
   private _fullScreenButton: Phaser.GameObjects.Image;
   private _versionText: Phaser.GameObjects.BitmapText;
+  private _statusText: Phaser.GameObjects.BitmapText;
+  private _score1UPText: Phaser.GameObjects.BitmapText;
+  private _score2UPText: Phaser.GameObjects.BitmapText;
+  private _highScoreText: Phaser.GameObjects.BitmapText;
+  private _gameStateContainer: Phaser.GameObjects.Container;
 
-  get isMobile() {
+  public get isMobile() {
     return this._isMobile;
   }
+
+  public get versionText() {
+    return this._versionText.text;
+  }
+
+  public get statusText() {
+    return this._statusText.text;
+  }
+
+  public set statusText(value: string | string[]) {
+    this._statusText.setText(value);
+  }
+
+  public set score1UPText(value: number) {
+    this._score1UPText.text = value.toFixed(0).padStart(6, "000000");
+  }
+
+  public set highScoreText(value: number) {
+    this._highScoreText.text = value.toFixed(0).padStart(6, "000000");
+  }
+
   constructor() {
     super(Consts.Scenes.UIScene);
-    console.log(`UIScene::constructor() : ${hackManGame.Version}`);
+    console.log(`UIScene::constructor() : ${hackManGame.version}`);
   }
 
   init() {
@@ -28,7 +54,7 @@ export class UIScene extends Phaser.Scene {
   }
 
   preload() {
-    console.log(`UIScene::preload() : ${hackManGame.Version}`);
+    console.log(`UIScene::preload() : ${hackManGame.version}`);
 
     this.load.bitmapFont(
       "press-start-2p",
@@ -49,7 +75,7 @@ export class UIScene extends Phaser.Scene {
   }
 
   create() {
-    console.log(`UIScene::create() : ${hackManGame.Version}`);
+    console.log(`UIScene::create() : ${hackManGame.version}`);
 
     this.scene.bringToTop();
 
@@ -92,23 +118,61 @@ export class UIScene extends Phaser.Scene {
       );
     }
 
-    this._versionText = this.add
-      .bitmapText(
-        8 * scale,
-        window.innerHeight - 8 * scale,
-        "press-start-2p",
-        `Version : ${hackManGame.Version}`,
-        8,
-        Phaser.GameObjects.BitmapText.ALIGN_RIGHT
-      )
+    this._versionText = this.addBitmapText(
+      8 * scale,
+      window.innerHeight - 8 * scale,
+      `${hackManGame.version}`,
+      8,
+      0
+    )
       .setScrollFactor(0, 0)
       .setTint(
         Consts.Colours.Green,
         Consts.Colours.Green,
         Consts.Colours.Cyan,
         Consts.Colours.Cyan
-      )
-      .setScale(scale >> 1);
+      );
+
+    this._statusText = this.addBitmapText(
+      window.innerWidth >> 1,
+      window.innerHeight - 8 * scale,
+      "<Placeholder>",
+      8,
+      1
+    );
+
+    this._gameStateContainer = this.scene.scene.add.container(
+      window.innerWidth >> 1,
+      0
+    );
+
+    this._gameStateContainer.visible = false;
+    this._gameStateContainer.add([
+      this.addBitmapText(0, 4 * scale, "HIGH SCORE", 16, 1),
+      (this._highScoreText = this.addBitmapText(
+        0,
+        16 * scale,
+        "000000",
+        16,
+        1
+      )),
+      this.addBitmapText(-window.innerWidth >> 2, 4 * scale, "1UP", 16, 1),
+      (this._score1UPText = this.addBitmapText(
+        -window.innerWidth >> 2,
+        16 * scale,
+        "000000",
+        16,
+        1
+      )),
+      this.addBitmapText(window.innerWidth >> 2, 4 * scale, "2UP", 16, 1),
+      (this._score2UPText = this.addBitmapText(
+        window.innerWidth >> 2,
+        16 * scale,
+        "000000",
+        16,
+        1
+      )),
+    ]);
   }
 
   addBitmapText(
@@ -118,10 +182,17 @@ export class UIScene extends Phaser.Scene {
     size?: number,
     align?: number
   ): Phaser.GameObjects.BitmapText {
-    return this.add
+    let value = this.add
       .bitmapText(x, y, "press-start-2p", text, size, align)
       .setScrollFactor(0, 0)
       .setScale(scale >> 1);
+
+    if (align === 1)
+      value.setX(x - (value.getTextBounds(false).global.width >> 1));
+    else if (align === 2)
+      value.setX(x - value.getTextBounds(false).global.width);
+
+    return value;
   }
 
   update() {
@@ -132,6 +203,16 @@ export class UIScene extends Phaser.Scene {
         window.innerWidth - 4 * scale,
         4 * scale
       );
+    }
+
+    this.score1UPText = hackManGame.gameState.score;
+    this.highScoreText = hackManGame.gameState.highScore;
+
+    this._gameStateContainer.setPosition(window.innerWidth >> 1, 0);
+    if (hackManGame.gameState.playing || hackManGame.gameState.attract) {
+      this._gameStateContainer.visible = true;
+    } else {
+      this._gameStateContainer.visible = false;
     }
   }
 }
