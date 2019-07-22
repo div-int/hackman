@@ -4,6 +4,7 @@ import { Version } from "./version";
 import { config } from "./config/config";
 import { GameScene } from "./scenes/gamescene";
 import { UIScene } from "./scenes/uiscene";
+import "./gameobjects/gamestate";
 
 export let hackManGame: HackManGame;
 

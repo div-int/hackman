@@ -35,15 +35,26 @@ namespace Consts {
   }
 
   export const enum Game {
+    StartLives = 3,
+    StartHighScore = 10000,
+
     MaxSpriteDesktop = 16,
     MaxSpriteMobile = 16,
     ScaleDesktop = 4,
     ScaleMobile = 2,
 
+    TileShadowOffset = 8,
+
+    ShadowOffset = 4,
+
     GhostXStart = 15,
     GhostYStart = 12,
     GhostFrameRate = 5,
     GhostSpeed = 48,
+
+    GhostGateTileUp = 52,
+    GhostGateTileRight = 53,
+    GhostGateTileLeft = 54,
 
     HackManXStart = 15,
     HackManYStart = 15,
@@ -57,15 +68,7 @@ namespace Consts {
     PowerPillTile = 50,
     SpeedPillTile = 51,
 
-    GhostGateTileUp = 52,
-    GhostGateTileRight = 53,
-    GhostGateTileLeft = 54,
-
     GoFullScreen = 254,
     LeaveFullScreen = 255,
-
-    TileShadowOffset = 8,
-
-    ShadowOffset = 4,
   }
 }
