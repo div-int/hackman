@@ -84,6 +84,14 @@ export class GameScene extends Phaser.Scene {
       require("../assets/images/tiles/default.padded.png")
     );
     this.load.image(
+      "pyramidTiles",
+      require("../assets/images/tiles/pyramids.padded.png")
+    );
+    this.load.image(
+      "blockTiles",
+      require("../assets/images/tiles/blocks.padded.png")
+    );
+    this.load.image(
       "stars1",
       require("../assets/images/backgrounds/stars1.jpg")
     );
@@ -107,7 +115,7 @@ export class GameScene extends Phaser.Scene {
     let attractLevel = this.add.tilemap("attractLevel");
     let attractTiles = attractLevel.addTilesetImage(
       "default",
-      "defaultTiles",
+      "blockTiles",
       16,
       16,
       1,
