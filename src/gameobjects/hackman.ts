@@ -27,12 +27,17 @@ const hackManWalkDirectionValues = [
 
 export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _scene: Phaser.Scene;
-  private _mapLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+  private _mapLayer: Phaser.Tilemaps.StaticTilemapLayer;
   private _walkDirection: HackManWalkDirection;
   private _faceDirection: HackManWalkDirection;
   private _speedMultiplier: number;
   private _jumpHeight: number;
   private _isJumping: boolean;
+  private _collideGroup: Phaser.Physics.Arcade.Group;
+  private _collideLeftSprite: Phaser.Physics.Arcade.Sprite;
+  private _collideRightSprite: Phaser.Physics.Arcade.Sprite;
+  private _collideUpSprite: Phaser.Physics.Arcade.Sprite;
+  private _collideDownSprite: Phaser.Physics.Arcade.Sprite;
   private _jumpSprite: Phaser.Physics.Arcade.Sprite;
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
   private _hitWall: boolean;
@@ -81,7 +86,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
 
   constructor(
     scene: Phaser.Scene,
-    mapLayer: Phaser.Tilemaps.DynamicTilemapLayer,
+    mapLayer: Phaser.Tilemaps.StaticTilemapLayer,
     x: number,
     y: number
   ) {
@@ -90,6 +95,17 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._scene = scene;
     this._mapLayer = mapLayer;
     this._speedMultiplier = 1;
+
+    this._collideLeftSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, "");
+    this._collideRightSprite = new Phaser.Physics.Arcade.Sprite(
+      scene,
+      x,
+      y,
+      ""
+    );
+    this._collideUpSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, "");
+    this._collideDownSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, "");
+
     this._jumpHeight = 0;
     this._jumpSprite = new Phaser.Physics.Arcade.Sprite(
       scene,
@@ -178,10 +194,49 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       repeat: 0,
     });
 
+    this._collideGroup = scene.physics.add.group({
+      immovable: true,
+      bounceX: 0,
+      bounceY: 0,
+    });
+
     scene.add.existing(this);
     scene.physics.add.existing(this);
     scene.add.existing(this._shadowSprite);
     scene.add.existing(this._jumpSprite);
+
+    scene.physics.add.existing(this._collideLeftSprite);
+    scene.physics.add.existing(this._collideRightSprite);
+    scene.physics.add.existing(this._collideUpSprite);
+    scene.physics.add.existing(this._collideDownSprite);
+
+    this._collideGroup.addMultiple([
+      this._collideLeftSprite,
+      this._collideRightSprite,
+      this._collideUpSprite,
+      this._collideDownSprite,
+    ]);
+
+    this.setOffset(0, 0)
+      //.setCircle((this.width + this.height) >> 2)
+      .setSize(this.width - 2, this.height - 2)
+      .setCollideWorldBounds(true, 1, 1);
+
+    this._collideLeftSprite.setSize(this.width - 2, this.height - 2);
+    this._collideRightSprite.setSize(this.width - 2, this.height - 2);
+    this._collideUpSprite.setSize(this.width - 2, this.height - 2);
+    this._collideDownSprite.setSize(this.width - 2, this.height - 2);
+
+    scene.physics.add.overlap(
+      this._collideGroup,
+      this._mapLayer,
+      (colliderSprite: Phaser.Physics.Arcade.Sprite, tile: any) => {
+        if (tile.index != -1)
+          colliderSprite.body.debugBodyColor = Consts.Colours.Red;
+      },
+      null,
+      this
+    );
   }
 
   speedUp(time: number) {
@@ -311,12 +366,29 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
     this._shadowSprite.frame = this.frame;
 
-    let x = this.x;
-    let y = this.y;
-    let w = (this.displayWidth >> 1) - 8;
-    let h = (this.displayHeight >> 1) - 8;
+    this._collideLeftSprite.scale = this._collideRightSprite.scale = this._collideUpSprite.scale = this._collideDownSprite.scale = this.scale;
 
-    let tile = this._mapLayer.getTileAtWorldXY(x, y, true);
+    this._collideLeftSprite.x = this.x - this.displayWidth;
+    this._collideRightSprite.x = this.x + this.displayWidth;
+    this._collideUpSprite.x = this.x;
+    this._collideDownSprite.x = this.x;
+
+    this._collideLeftSprite.y = this.y;
+    this._collideRightSprite.y = this.y;
+    this._collideUpSprite.y = this.y - this.displayHeight;
+    this._collideDownSprite.y = this.y + this.displayHeight;
+
+    this._collideLeftSprite.body.debugBodyColor = Consts.Colours.Green;
+    this._collideRightSprite.body.debugBodyColor = Consts.Colours.Green;
+    this._collideUpSprite.body.debugBodyColor = Consts.Colours.Green;
+    this._collideDownSprite.body.debugBodyColor = Consts.Colours.Green;
+
+    // let x = this.x;
+    // let y = this.y;
+    let w = this.displayWidth >> 1;
+    let h = this.displayHeight >> 1;
+
+    let tile = this._mapLayer.getTileAtWorldXY(this.x, this.y, true);
 
     if (
       this.WalkDirection === HackManWalkDirection.Up ||
@@ -334,10 +406,10 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
         ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
     }
 
-    let tile1 = this._mapLayer.getTileAtWorldXY(x - w, y - h, true);
-    let tile2 = this._mapLayer.getTileAtWorldXY(x + w, y - h, true);
-    let tile3 = this._mapLayer.getTileAtWorldXY(x + w, y + h, true);
-    let tile4 = this._mapLayer.getTileAtWorldXY(x - w, y + h, true);
+    // let tileLeft = this._mapLayer.getTileAtWorldXY(this.x - w, this.y - h, true);
+    // let tileRight = this._mapLayer.getTileAtWorldXY(this.x + w, this.y - h, true);
+    // let tileUp = this._mapLayer.getTileAtWorldXY(this.x + w, this.y + h, true);
+    // let tileDown = this._mapLayer.getTileAtWorldXY(this.x - w, this.y + h, true);
 
     let moveLeft =
       this._mapLayer.getTileAt(tile.x - 1, tile.y, true).index === -1;
@@ -347,6 +419,9 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       this._mapLayer.getTileAt(tile.x, tile.y - 1, true).index === -1;
     let moveDown =
       this._mapLayer.getTileAt(tile.x, tile.y + 1, true).index === -1;
+
+    if (moveLeft || moveRight || moveDown || moveUp)
+      console.log(moveLeft, moveRight, moveDown, moveUp);
 
     if (this._hitWall) {
       this._hitWall = false;
@@ -358,57 +433,57 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
         this.walk(HackManWalkDirection.Up);
       else if (Math.random() > Consts.MagicNumbers.Quarter && moveDown)
         this.walk(HackManWalkDirection.Down);
-      else this.walk(this.WalkDirection + Phaser.Math.Between(1, 3));
+      else this.walk(this.WalkDirection + 2);
 
       return;
     }
 
-    if (tile1.x === tile2.x && tile2.x === tile3.x && tile3.x === tile4.x) {
-      if (tile1.y === tile2.y && tile2.y === tile3.y && tile3.y === tile4.y) {
-        if (tile1.x != this._previousX || tile1.y != this._previousY) {
-          let x = tile1.x;
-          let y = tile1.y;
-          this._previousX = x;
-          this._previousY = y;
+    // if (tile1.x === tile2.x && tile2.x === tile3.x && tile3.x === tile4.x) {
+    //   if (tile1.y === tile2.y && tile2.y === tile3.y && tile3.y === tile4.y) {
+    //     if (tile1.x != this._previousX || tile1.y != this._previousY) {
+    //       let x = tile1.x;
+    //       let y = tile1.y;
+    //       this._previousX = x;
+    //       this._previousY = y;
 
-          if (
-            this.WalkDirection == HackManWalkDirection.Up ||
-            this.WalkDirection == HackManWalkDirection.Down
-          ) {
-            if (moveLeft) {
-              if (Math.random() >= Consts.MagicNumbers.Half)
-                this.walk(HackManWalkDirection.Left);
-            } else {
-              if (moveRight) {
-                if (Math.random() >= Consts.MagicNumbers.ThreeQuarters)
-                  this.walk(HackManWalkDirection.Right);
-              }
-            }
-          } else {
-            if (
-              this.WalkDirection == HackManWalkDirection.Left ||
-              this.WalkDirection == HackManWalkDirection.Right
-            ) {
-              if (moveUp) {
-                if (Math.random() >= Consts.MagicNumbers.Half)
-                  this.walk(HackManWalkDirection.Up);
-              } else {
-                if (moveDown) {
-                  if (Math.random() >= Consts.MagicNumbers.ThreeQuarters)
-                    this.walk(HackManWalkDirection.Down);
-                }
-              }
-            }
-          }
+    //       if (
+    //         this.WalkDirection == HackManWalkDirection.Up ||
+    //         this.WalkDirection == HackManWalkDirection.Down
+    //       ) {
+    //         if (moveLeft) {
+    //           if (Math.random() >= Consts.MagicNumbers.Half)
+    //             this.walk(HackManWalkDirection.Left);
+    //         } else {
+    //           if (moveRight) {
+    //             if (Math.random() >= Consts.MagicNumbers.ThreeQuarters)
+    //               this.walk(HackManWalkDirection.Right);
+    //           }
+    //         }
+    //       } else {
+    //         if (
+    //           this.WalkDirection == HackManWalkDirection.Left ||
+    //           this.WalkDirection == HackManWalkDirection.Right
+    //         ) {
+    //           if (moveUp) {
+    //             if (Math.random() >= Consts.MagicNumbers.Half)
+    //               this.walk(HackManWalkDirection.Up);
+    //           } else {
+    //             if (moveDown) {
+    //               if (Math.random() >= Consts.MagicNumbers.ThreeQuarters)
+    //                 this.walk(HackManWalkDirection.Down);
+    //             }
+    //           }
+    //         }
+    //       }
 
-          // console.log(
-          //   this._mapLayer.getTileAt(x - 1, y, true).index,
-          //   this._mapLayer.getTileAt(x + 1, y, true).index,
-          //   this._mapLayer.getTileAt(x, y - 1, true).index,
-          //   this._mapLayer.getTileAt(x, y + 1, true).index
-          // );
-        }
-      }
-    }
+    // console.log(
+    //   this._mapLayer.getTileAt(x - 1, y, true).index,
+    //   this._mapLayer.getTileAt(x + 1, y, true).index,
+    //   this._mapLayer.getTileAt(x, y - 1, true).index,
+    //   this._mapLayer.getTileAt(x, y + 1, true).index
+    // );
+    //     }
+    //   }
+    // }
   }
 }
