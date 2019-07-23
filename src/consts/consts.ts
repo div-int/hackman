@@ -67,6 +67,7 @@ namespace Consts {
     HackManSpeed = 64,
     HackManSpeedUpMultiplier = 1.5,
     HackManJumpHeight = 32,
+    HackManJumpZoom = 1.25,
     HackManOnFloorHeight = 8,
 
     FoodPillTile = 49,
