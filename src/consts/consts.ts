@@ -6,6 +6,10 @@ namespace Consts {
     LevelScene = "LevelScene",
   }
 
+  export const enum Scores {
+    FoodPill = 100,
+  }
+
   export const enum MagicNumbers {
     Zero = 0,
     Tenth = 0.1,
