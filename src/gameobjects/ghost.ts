@@ -2,17 +2,24 @@ import "phaser";
 import { RIGHT } from "phaser";
 
 // const Consts.Resources.HackManSprites = "Consts.Resources.HackManSprites";
-const maxGhostNo = 3;
+const maxGhostNo = 4;
 const maxDirections = 3;
 
 const ghost0 = 5;
 const ghost1 = 6;
 const ghost2 = 7;
 const ghost3 = 8;
+const ghost4 = 12;
 const ghostFrightened = 9;
 const ghostEaten = 10;
 
-const defaultFrame = [ghost0 * 16, ghost1 * 16, ghost2 * 16, ghost3 * 16];
+const defaultFrame = [
+  ghost0 * 16,
+  ghost1 * 16,
+  ghost2 * 16,
+  ghost3 * 16,
+  ghost4 * 16,
+];
 
 const walkRightStart = 0;
 const walkRightEnd = 1;
@@ -329,6 +336,55 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
           {
             start: walkUpStart + 16 * ghost3,
             end: walkUpEnd + 16 * ghost3,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+
+      scene.anims.create({
+        key: "ghost4WalkRight",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghost4,
+            end: walkRightEnd + 16 * ghost4,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghost4WalkDown",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghost4,
+            end: walkDownEnd + 16 * ghost4,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghost4WalkLeft",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghost4,
+            end: walkLeftEnd + 16 * ghost4,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghost4WalkUp",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghost4,
+            end: walkUpEnd + 16 * ghost4,
           }
         ),
         frameRate: Consts.Game.GhostFrameRate,
