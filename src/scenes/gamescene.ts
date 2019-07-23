@@ -2,7 +2,11 @@ import "phaser";
 import "../consts/consts";
 import { UIScene } from "./uiscene";
 import { GameState } from "../gameobjects/gamestate";
-import { HackMan, HackManWalkDirection } from "../gameobjects/hackman";
+import {
+  HackMan,
+  HackManWalkDirection,
+  HackManState,
+} from "../gameobjects/hackman";
 import { Ghost, GhostState, GhostWalkDirection } from "../gameobjects/ghost";
 import { config } from "../config/config";
 import { hackManGame } from "../index";
@@ -18,11 +22,13 @@ export class GameScene extends Phaser.Scene {
   private _hackman: HackMan;
   private _hackmanGroup: Phaser.Physics.Arcade.Group;
   private _ghostGroup: Phaser.Physics.Arcade.Group;
-
   private _maskShape: Phaser.GameObjects.Graphics;
   private _mask: Phaser.Display.Masks.GeometryMask;
   private _backgroundImage: Phaser.GameObjects.Image;
+  private _mapLayerBackground: Phaser.Tilemaps.StaticTilemapLayer;
   private _mapLayerBackgroundMask: Phaser.Tilemaps.DynamicTilemapLayer;
+  private _mapLayerShadows: Phaser.Tilemaps.DynamicTilemapLayer;
+  private _mapLayerPills: Phaser.Tilemaps.DynamicTilemapLayer;
   private _mapLayerWalls: Phaser.Tilemaps.StaticTilemapLayer;
 
   get UIScene(): UIScene {
@@ -132,19 +138,19 @@ export class GameScene extends Phaser.Scene {
       .setScrollFactor(Consts.MagicNumbers.Quarter)
       .setScale(scale / 2);
 
-    let mapLayerBackground = attractLevel
+    this._mapLayerBackground = attractLevel
       .createStaticLayer("Background", attractTiles, -256 * scale, -256 * scale)
       .setDepth(3)
       .setScale(scale)
       .setScrollFactor(Consts.MagicNumbers.Half);
 
-    let mapLayerWalls = attractLevel
+    this._mapLayerWalls = attractLevel
       .createStaticLayer("Walls", attractTiles, 0, 0)
       .setDepth(5)
       .setScale(scale)
       .setCollisionByExclusion([-1], true, true);
 
-    let mapLayerShadows = attractLevel
+    this._mapLayerShadows = attractLevel
       .createBlankDynamicLayer(
         "Shadows",
         attractTiles,
@@ -155,7 +161,7 @@ export class GameScene extends Phaser.Scene {
       .setDepth(4)
       .setScale(scale);
 
-    let wallTiles = mapLayerWalls.getTilesWithin(0, 0);
+    let wallTiles = this._mapLayerWalls.getTilesWithin(0, 0);
 
     wallTiles.map((tile: Phaser.Tilemaps.Tile) => {
       if (tile.index == -1) return;
@@ -178,28 +184,28 @@ export class GameScene extends Phaser.Scene {
         return;
       }
 
-      mapLayerShadows.putTileAt(tile, tile.x, tile.y).index +=
+      this._mapLayerShadows.putTileAt(tile, tile.x, tile.y).index +=
         Consts.Game.TileShadowOffset;
     });
 
-    let mapLayerPills = attractLevel
+    this._mapLayerPills = attractLevel
       .createDynamicLayer("Pills", attractTiles, 0, 0)
       .setOriginFromFrame()
       .setDepth(7)
       .setScale(scale);
 
-    let pillTiles = mapLayerPills.getTilesWithin(0, 0);
+    let pillTiles = this._mapLayerPills.getTilesWithin(0, 0);
 
     pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
       if (tile.index != -1) {
-        mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index +=
+        this._mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index +=
           Consts.Game.TileShadowOffset;
       }
     });
 
     this.physics.add.overlap(
       this._hackmanGroup,
-      mapLayerPills,
+      this._mapLayerPills,
       (hackman: HackMan, tile: any) => {
         if (!hackman.anims.currentFrame.isFirst && !hackman.isJumping) return;
         if (!hackman.OnFloor) return;
@@ -231,15 +237,15 @@ export class GameScene extends Phaser.Scene {
             );
           }
 
-          mapLayerPills.removeTileAt(tile.x, tile.y);
-          mapLayerShadows.removeTileAt(tile.x, tile.y);
+          this._mapLayerPills.removeTileAt(tile.x, tile.y);
+          this._mapLayerShadows.removeTileAt(tile.x, tile.y);
         }
       }
     );
 
     this.physics.add.collider(
       this._hackmanGroup,
-      mapLayerWalls,
+      this._mapLayerWalls,
       (hackman: HackMan, tile: any) => {
         hackman.hitWall(tile);
       }
@@ -247,7 +253,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(
       this._ghostGroup,
-      mapLayerWalls,
+      this._mapLayerWalls,
       (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
         ghost.hitWall(tile);
       }
@@ -266,14 +272,39 @@ export class GameScene extends Phaser.Scene {
           ghost.GhostState = GhostState.Eaten;
         } else {
           hackManGame.gameState.lives--;
-          this.scene.restart();
+          hackman.HackManState = HackManState.Paused;
+          this._ghostGroup.children.iterate((ghost: Ghost) => {
+            ghost.GhostState = GhostState.Paused;
+          });
+          this.time.delayedCall(
+            250,
+            () => {
+              this._ghostGroup.children.iterate((ghost: Ghost) => {
+                ghost.visible = false;
+
+                hackman.HackManState = HackManState.Dead;
+                this.tweens.add({
+                  targets: hackman,
+                  scale: 0,
+                  alpha: 0,
+                  duration: 1000,
+                  ease: "Cubic",
+                  onComplete: () => {
+                    this.scene.restart();
+                  },
+                });
+              });
+            },
+            [],
+            this
+          );
         }
       }
     );
 
     this._hackman = new HackMan(
       this,
-      mapLayerWalls,
+      this._mapLayerWalls,
       (8 + Consts.Game.HackManXStart * 16) * scale,
       (8 + Consts.Game.HackManYStart * 16) * scale
     ).setScale(scale);
@@ -305,7 +336,7 @@ export class GameScene extends Phaser.Scene {
       this._ghostGroup.add(
         new Ghost(
           this,
-          mapLayerWalls,
+          this._mapLayerWalls,
           0,
           0,
           Phaser.Math.Between(0, Ghost.MaxGhostNo()),

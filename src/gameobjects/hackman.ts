@@ -18,6 +18,12 @@ export enum HackManWalkDirection {
   Up,
 }
 
+export enum HackManState {
+  Paused,
+  Invincible,
+  Dead,
+}
+
 const hackManWalkDirectionValues = [
   { direction: "Right", velocity: { x: Consts.Game.HackManSpeed, y: 0 } },
   { direction: "Down", velocity: { x: 0, y: Consts.Game.HackManSpeed } },
@@ -30,6 +36,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _mapLayer: Phaser.Tilemaps.StaticTilemapLayer;
   private _walkDirection: HackManWalkDirection;
   private _faceDirection: HackManWalkDirection;
+  private _hackManState: HackManState;
   private _speedMultiplier: number;
   private _jumpHeight: number;
   private _isJumping: boolean;
@@ -83,6 +90,29 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     if (faceDirection < 0) this._faceDirection += HackMan.MaxDirections + 1;
   }
 
+  get HackManState() {
+    return this._hackManState;
+  }
+
+  set HackManState(hackManState: HackManState) {
+    if (hackManState === this._hackManState) return;
+
+    if (hackManState === HackManState.Paused) {
+      this._hackManState = hackManState;
+      this.body.stop();
+      this.anims.pause();
+      return;
+    }
+
+    if (hackManState === HackManState.Dead) {
+      this._hackManState = hackManState;
+      this.anims.resume();
+      this.anims.stop();
+      this.anims.play("hackmanDead");
+      return;
+    }
+  }
+
   constructor(
     scene: Phaser.Scene,
     mapLayer: Phaser.Tilemaps.StaticTilemapLayer,
@@ -125,6 +155,18 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       .setDepth(4)
       .setTint(0)
       .setAlpha(Consts.MagicNumbers.Quarter);
+
+    scene.anims.create({
+      key: "hackmanDead",
+      frames: scene.anims.generateFrameNumbers(
+        Consts.Resources.HackManSprites,
+        {
+          frames: [4, 20, 36, 40],
+        }
+      ),
+      frameRate: Consts.Game.HackManFrameRate,
+      repeat: -1,
+    });
 
     scene.anims.create({
       key: "hackmanWalkRight",
@@ -374,6 +416,17 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   update() {
     this.depth = this.x + this.y * window.innerWidth;
 
+    this._shadowSprite.visible = this.visible;
+    this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;
+    this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
+    this._shadowSprite.frame = this.frame;
+
+    if (this.HackManState === HackManState.Paused) return;
+    if (this.HackManState === HackManState.Dead) {
+      this._shadowSprite.scale = this.scale;
+      return;
+    }
+
     let tile = this._mapLayer.getTileAtWorldXY(this.x, this.y, true);
 
     if (
@@ -410,10 +463,6 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       this._shadowSprite.scale = this.scale;
       this._shadowSprite.setAlpha(Consts.MagicNumbers.Quarter);
     }
-
-    this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;
-    this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
-    this._shadowSprite.frame = this.frame;
 
     this._collideLeftSprite.scale = this._collideRightSprite.scale = this._collideUpSprite.scale = this._collideDownSprite.scale = this.scale;
 
