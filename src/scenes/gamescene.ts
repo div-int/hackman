@@ -218,7 +218,7 @@ export class GameScene extends Phaser.Scene {
           this._maskShape.closePath();
 
           if (tile.index === Consts.Game.FoodPillTile)
-            hackManGame.gameState.score += 100;
+            hackManGame.gameState.score += Consts.Scores.FoodPill;
 
           if (tile.index === Consts.Game.PowerPillTile) {
             hackManGame.gameState.score += 500;
