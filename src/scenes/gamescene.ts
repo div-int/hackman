@@ -221,7 +221,7 @@ export class GameScene extends Phaser.Scene {
             hackManGame.gameState.score += Consts.Scores.FoodPill;
 
           if (tile.index === Consts.Game.PowerPillTile) {
-            hackManGame.gameState.score += 500;
+            hackManGame.gameState.score += Consts.Scores.PowerPill;
             this.FrightenGhosts(10 * Consts.Times.MilliSecondsInSecond);
           }
 
