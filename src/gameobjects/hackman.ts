@@ -40,6 +40,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _speedMultiplier: number;
   private _jumpHeight: number;
   private _isJumping: boolean;
+  private _jumpingTween: Phaser.Tweens.Tween;
   private _collideGroup: Phaser.Physics.Arcade.Group;
   private _collideLeftSprite: Phaser.Physics.Arcade.Sprite;
   private _collideRightSprite: Phaser.Physics.Arcade.Sprite;
@@ -106,8 +107,8 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
 
     if (hackManState === HackManState.Dead) {
       this._hackManState = hackManState;
+      this.stopJump();
       this.anims.resume();
-      this.anims.stop();
       this.anims.play("hackmanDead");
       return;
     }
@@ -164,7 +165,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
           frames: [4, 20, 36, 40],
         }
       ),
-      frameRate: Consts.Game.HackManFrameRate,
+      frameRate: Consts.Game.HackManFrameRate / 4,
       repeat: -1,
     });
 
@@ -333,11 +334,13 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
 
   jump(height?: number) {
     if (this._isJumping) return;
+    if (this.HackManState === HackManState.Paused) return;
+    if (this.HackManState === HackManState.Dead) return;
 
     height = height ? height : Consts.Game.HackManJumpHeight;
 
     this._isJumping = true;
-    this.scene.tweens.add({
+    this._jumpingTween = this.scene.tweens.add({
       targets: this,
       JumpHeight: height * this.scale,
       scale:
@@ -367,6 +370,13 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
         });
       },
     });
+  }
+
+  stopJump() {
+    if (this._isJumping) this._jumpingTween.stop();
+
+    this._isJumping = false;
+    this.JumpHeight = 0;
   }
 
   hitWall(tile: Phaser.GameObjects.GameObject) {
@@ -422,6 +432,26 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._shadowSprite.frame = this.frame;
 
     if (this.HackManState === HackManState.Paused) return;
+
+    if (this._jumpHeight > 0) {
+      this._jumpSprite.scale = this.scale;
+      this._jumpSprite.x = this.x;
+      this._jumpSprite.y = this.y - this._jumpHeight;
+      this._jumpSprite.frame = this.frame;
+      this._jumpSprite.depth = this.depth;
+      this.visible = false;
+      this._jumpSprite.visible = true;
+      this._shadowSprite.scale = this.scale * (1 - this._jumpHeight / 128);
+      this._shadowSprite.setAlpha(
+        (1 - this._jumpHeight / 128) * Consts.MagicNumbers.Quarter
+      );
+    } else {
+      this.visible = true;
+      this._jumpSprite.visible = false;
+      this._shadowSprite.scale = this.scale;
+      this._shadowSprite.setAlpha(Consts.MagicNumbers.Quarter);
+    }
+
     if (this.HackManState === HackManState.Dead) {
       this._shadowSprite.scale = this.scale;
       return;
@@ -443,25 +473,6 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     ) {
       this.y =
         ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
-    }
-
-    if (this._jumpHeight > 0) {
-      this._jumpSprite.scale = this.scale;
-      this._jumpSprite.x = this.x;
-      this._jumpSprite.y = this.y - this._jumpHeight;
-      this._jumpSprite.frame = this.frame;
-      this._jumpSprite.depth = this.depth;
-      this.visible = false;
-      this._jumpSprite.visible = true;
-      this._shadowSprite.scale = this.scale * (1 - this._jumpHeight / 128);
-      this._shadowSprite.setAlpha(
-        (1 - this._jumpHeight / 128) * Consts.MagicNumbers.Quarter
-      );
-    } else {
-      this.visible = true;
-      this._jumpSprite.visible = false;
-      this._shadowSprite.scale = this.scale;
-      this._shadowSprite.setAlpha(Consts.MagicNumbers.Quarter);
     }
 
     this._collideLeftSprite.scale = this._collideRightSprite.scale = this._collideUpSprite.scale = this._collideDownSprite.scale = this.scale;

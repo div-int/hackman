@@ -277,27 +277,27 @@ export class GameScene extends Phaser.Scene {
             ghost.GhostState = GhostState.Paused;
           });
           this.time.delayedCall(
-            250,
+            1000,
             () => {
               this._ghostGroup.children.iterate((ghost: Ghost) => {
                 ghost.visible = false;
-
-                hackman.HackManState = HackManState.Dead;
-                this.tweens.add({
-                  targets: hackman,
-                  scale: 0,
-                  alpha: 0,
-                  duration: 1000,
-                  ease: "Cubic",
-                  onComplete: () => {
-                    this.scene.restart();
-                  },
-                });
               });
             },
             [],
             this
           );
+          hackman.HackManState = HackManState.Dead;
+          this.tweens.add({
+            targets: hackman,
+            scale: scale / 4,
+            alpha: 0,
+            delay: 1000,
+            duration: 2000,
+            ease: "Power2",
+            onComplete: () => {
+              this.scene.restart();
+            },
+          });
         }
       }
     );
@@ -379,7 +379,7 @@ export class GameScene extends Phaser.Scene {
       this.sys.game.device.os.desktop ? "Desktop" : "Mobile"
     }`;
 
-    if (Phaser.Math.Between(0, 64) === 1) {
+    if (Phaser.Math.Between(0, 256) === 1) {
       this._hackmanGroup.children.iterate((hackman: HackMan) => {
         hackman.jump();
       });
