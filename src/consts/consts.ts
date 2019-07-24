@@ -34,7 +34,7 @@ namespace Consts {
   export const enum UI {
     Margin = 2,
     StatusTextSize = 8,
-    TextSize = 16,
+    TextSize = 12,
   }
 
   export const enum Times {
