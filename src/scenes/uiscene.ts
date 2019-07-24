@@ -10,6 +10,7 @@ export class UIScene extends Phaser.Scene {
   private _statusContainer: Phaser.GameObjects.Container;
   private _versionText: Phaser.GameObjects.BitmapText;
   private _statusText: Phaser.GameObjects.BitmapText;
+  private _windowText: Phaser.GameObjects.BitmapText;
   private _score1UPLabel: Phaser.GameObjects.BitmapText;
   private _score2UPLabel: Phaser.GameObjects.BitmapText;
   private _score1UPText: Phaser.GameObjects.BitmapText;
@@ -29,6 +30,14 @@ export class UIScene extends Phaser.Scene {
     return this._statusText.text;
   }
 
+  public get windowText() {
+    return this._windowText.text;
+  }
+
+  public set versionPosition(value: number) {
+    this._versionText.setX(value);
+  }
+
   public set statusText(value: string | string[]) {
     this._statusText.setText(value);
     this._statusText.setX(
@@ -36,8 +45,45 @@ export class UIScene extends Phaser.Scene {
     );
   }
 
+  public set windowText(value: string | string[]) {
+    this._windowText.setText(value);
+    this._windowText.setX(
+      window.innerWidth -
+        Consts.UI.Margin -
+        this._statusText.getTextBounds(false).global.width
+    );
+  }
+
+  public set windowPosition(value: number) {
+    this._windowText.setX(
+      value - this._windowText.getTextBounds(false).global.width
+    );
+  }
+
   public set score1UPText(value: number) {
     this._score1UPText.text = value.toFixed(0).padStart(8, "00000000");
+  }
+
+  public set score1UPPosition(value: number) {
+    this._score1UPLabel.setPosition(
+      value - (this._score1UPLabel.getTextBounds(false).global.width >> 1),
+      2 * scale
+    );
+    this._score1UPText.setPosition(
+      value - (this._score1UPText.getTextBounds(false).global.width >> 1),
+      Consts.UI.TextSize * scale
+    );
+  }
+
+  public set score2UPPosition(value: number) {
+    this._score2UPLabel.setPosition(
+      value - (this._score2UPLabel.getTextBounds(false).global.width >> 1),
+      2 * scale
+    );
+    this._score2UPText.setPosition(
+      value - (this._score2UPText.getTextBounds(false).global.width >> 1),
+      Consts.UI.TextSize * scale
+    );
   }
 
   public set score2UPText(value: number) {
@@ -156,25 +202,25 @@ export class UIScene extends Phaser.Scene {
 
     this._statusContainer.add([
       (this._versionText = this.addBitmapText(
-        -(window.innerWidth >> 1) + 2 * scale,
-        -6 * scale,
+        -(window.innerWidth >> 1) + Consts.UI.Margin * scale,
+        -(Consts.UI.StatusTextSize - Consts.UI.Margin) * scale,
         `${hackManGame.version}`,
-        8,
-        0
-      )
-        .setScrollFactor(0, 0)
-        .setTint(
-          Consts.Colours.Green,
-          Consts.Colours.Green,
-          Consts.Colours.Cyan,
-          Consts.Colours.Cyan
-        )),
+        Consts.UI.StatusTextSize,
+        Phaser.GameObjects.BitmapText.ALIGN_LEFT
+      )),
       (this._statusText = this.addBitmapText(
         0,
-        -6 * scale,
+        -(Consts.UI.StatusTextSize - Consts.UI.Margin) * scale,
         "<Placeholder>",
-        8,
-        1
+        Consts.UI.StatusTextSize,
+        Phaser.GameObjects.BitmapText.ALIGN_CENTER
+      )),
+      (this._windowText = this.addBitmapText(
+        (window.innerWidth >> 1) - Consts.UI.Margin * scale,
+        -(Consts.UI.StatusTextSize - Consts.UI.Margin) * scale,
+        "<Placeholder>",
+        Consts.UI.StatusTextSize,
+        Phaser.GameObjects.BitmapText.ALIGN_RIGHT
       )),
     ]);
 
@@ -185,40 +231,40 @@ export class UIScene extends Phaser.Scene {
 
     this._gameStateContainer.visible = false;
     this._gameStateContainer.add([
-      this.addBitmapText(0, 2 * scale, "HIGH SCORE", 16, 1),
+      this.addBitmapText(0, 2 * scale, "HIGH SCORE", Consts.UI.TextSize, 1),
       (this._highScoreText = this.addBitmapText(
         0,
-        16 * scale,
+        Consts.UI.TextSize * scale,
         "00000000",
-        16,
+        Consts.UI.TextSize,
         1
       )),
       (this._score1UPLabel = this.addBitmapText(
         -window.innerWidth >> 2,
-        2 * scale,
+        Consts.UI.TextSize * scale,
         "1-UP",
-        16,
+        Consts.UI.TextSize,
         1
       )),
       (this._score1UPText = this.addBitmapText(
         -window.innerWidth >> 2,
-        16 * scale,
+        Consts.UI.TextSize * scale,
         "00000000",
-        16,
+        Consts.UI.TextSize,
         1
       )),
       (this._score2UPLabel = this.addBitmapText(
         window.innerWidth >> 2,
         2 * scale,
         "2-UP",
-        16,
+        Consts.UI.TextSize,
         1
       )),
       (this._score2UPText = this.addBitmapText(
         window.innerWidth >> 2,
-        16 * scale,
+        Consts.UI.TextSize * scale,
         "00000000",
-        16,
+        Consts.UI.TextSize,
         1
       )),
     ]);
@@ -237,30 +283,13 @@ export class UIScene extends Phaser.Scene {
       window.innerHeight
     );
 
-    this._versionText.setX(-(window.innerWidth >> 1) + 2 * scale);
-
+    this.windowText = `${window.innerWidth} x ${window.innerHeight}`;
+    this.versionPosition - (window.innerWidth >> 1) + Consts.UI.Margin * scale;
+    this.windowPosition = (window.innerWidth >> 1) - Consts.UI.Margin * scale;
     this._gameStateContainer.setPosition(window.innerWidth >> 1, 0);
 
-    this._score1UPLabel.setPosition(
-      (-window.innerWidth >> 2) -
-        (this._score1UPLabel.getTextBounds(false).global.width >> 1),
-      16 * scale
-    );
-    this._score1UPText.setPosition(
-      (-window.innerWidth >> 2) -
-        (this._score1UPText.getTextBounds(false).global.width >> 1),
-      30 * scale
-    );
-    this._score2UPLabel.setPosition(
-      (window.innerWidth >> 2) -
-        (this._score2UPLabel.getTextBounds(false).global.width >> 1),
-      16 * scale
-    );
-    this._score2UPText.setPosition(
-      (window.innerWidth >> 2) -
-        (this._score2UPText.getTextBounds(false).global.width >> 1),
-      30 * scale
-    );
+    this.score1UPPosition = -window.innerWidth >> 2;
+    this.score2UPPosition = window.innerWidth >> 2;
   }
 
   update() {

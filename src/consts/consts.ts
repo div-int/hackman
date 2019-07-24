@@ -31,6 +31,12 @@ namespace Consts {
     White = 0xffffff,
   }
 
+  export const enum UI {
+    Margin = 2,
+    StatusTextSize = 8,
+    TextSize = 16,
+  }
+
   export const enum Times {
     MilliSecondsInSecond = 1000.0,
   }
