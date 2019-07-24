@@ -41,6 +41,7 @@ export enum GhostState {
   Chase,
   Scatter,
   Frightened,
+  Flashing,
   Eaten,
 }
 
@@ -61,6 +62,8 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   private _animationPrefix: string;
   private _ghostState: GhostState;
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
+  private _flashing: boolean;
+  private _flashState: boolean;
   private _previousX: number;
   private _previousY: number;
 
@@ -117,6 +120,15 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   set GhostState(ghostState: GhostState) {
     if (ghostState === this._ghostState) return;
 
+    if (ghostState === GhostState.Flashing) {
+      this._ghostState = ghostState;
+      this._flashing = true;
+      this._flashState = true;
+      return;
+    } else {
+      this._flashing = false;
+    }
+
     if (ghostState === GhostState.Frightened) {
       if (this._ghostState === GhostState.Eaten) return;
       this.setAlpha(Consts.MagicNumbers.ThreeQuarters);
@@ -142,6 +154,21 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     this._animationPrefix = `ghost${this.GhostNo}`;
     this._ghostState = ghostState;
     this.updateAnimation();
+  }
+
+  public async AsyncGhostState(ghostState: GhostState, delay?: number) {
+    delay = delay ? delay : 0;
+    console.log(`AsyncGhostState(ghostState: ${ghostState}, delay?: ${delay}`);
+
+    this.GhostState = ghostState;
+    console.log(`AsyncGhostState(ghostState: ${ghostState}, delay?: ${delay}`);
+
+    if (delay) {
+      let promise = new Promise((res, rej) => {
+        setTimeout(() => res(true), delay);
+      });
+      let result = await promise;
+    }
   }
 
   static load(scene: Phaser.Scene) {
@@ -587,6 +614,17 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
 
   update() {
     this.setDepth(this.x + this.y * window.innerWidth);
+
+    if (this._flashing) {
+      if (this._flashState) {
+        this.setTint(Consts.Colours.Red);
+      } else {
+        this.setTint(Consts.Colours.White);
+      }
+      this._flashState = !this._flashState;
+    } else {
+      this.setTint(Consts.Colours.White);
+    }
 
     this._shadowSprite.scale = this.scale;
     this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;

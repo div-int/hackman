@@ -33,19 +33,10 @@ export class GameScene extends Phaser.Scene {
 
   async FrightenGhosts(timeToFrighten: number) {
     this._ghostGroup.children.each(async (ghost: Ghost) => {
-      ghost.GhostState = GhostState.Frightened;
+      await ghost.AsyncGhostState(GhostState.Frightened, timeToFrighten - 3000);
+      await ghost.AsyncGhostState(GhostState.Flashing, 3000);
+      await ghost.AsyncGhostState(GhostState.Chase);
     }, this);
-
-    this.time.delayedCall(
-      timeToFrighten,
-      () => {
-        this._ghostGroup.children.each((ghost: Ghost) => {
-          ghost.GhostState = GhostState.Chase;
-        });
-      },
-      [],
-      this
-    );
   }
 
   constructor() {
