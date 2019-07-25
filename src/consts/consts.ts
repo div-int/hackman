@@ -7,8 +7,8 @@ namespace Consts {
   }
 
   export const enum Scores {
-    FoodPill = 100,
-    PowerPill = 500,
+    FoodPill = 10,
+    PowerPill = 50,
   }
 
   export const enum MagicNumbers {
