@@ -38,13 +38,23 @@ export enum GhostWalkDirection {
 }
 
 export enum GhostState {
+  Waiting,
   Chase,
   Scatter,
   Frightened,
   Eaten,
 }
 
-const ghostState = new Typed.FSM<GhostState>(GhostState.Chase);
+export enum GhostAction {
+  Wait,
+  Chase,
+  Scatter,
+  Frighten,
+  Eat,
+  Pause,
+}
+
+const ghostState = new Typed.FSM<GhostState, GhostAction>(GhostState.Chase);
 
 const ghostWalkDirectionValues = [
   { direction: "Right", velocity: { x: Consts.Game.GhostSpeed, y: 0 } },
