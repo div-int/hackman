@@ -1,5 +1,5 @@
 import "phaser";
-import { RIGHT } from "phaser";
+import { Typed } from "@div-int/typedfsm";
 
 // const Consts.Resources.HackManSprites = "Consts.Resources.HackManSprites";
 const maxGhostNo = 4;
@@ -38,11 +38,23 @@ export enum GhostWalkDirection {
 }
 
 export enum GhostState {
+  Waiting,
   Chase,
   Scatter,
   Frightened,
   Eaten,
 }
+
+export enum GhostAction {
+  Wait,
+  Chase,
+  Scatter,
+  Frighten,
+  Eat,
+  Pause,
+}
+
+const ghostState = new Typed.FSM<GhostState, GhostAction>(GhostState.Chase);
 
 const ghostWalkDirectionValues = [
   { direction: "Right", velocity: { x: Consts.Game.GhostSpeed, y: 0 } },
