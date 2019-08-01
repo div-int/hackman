@@ -298,7 +298,11 @@ export class GameScene extends Phaser.Scene {
     let pillTiles = this._mapLayerPills.getTilesWithin(0, 0);
 
     pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
-      if (tile.index === Consts.Game.FoodPillTile) {
+      if (
+        tile.index === Consts.Game.FoodPillTile ||
+        tile.index === Consts.Game.PowerPillTile ||
+        tile.index === Consts.Game.SpeedPillTile
+      ) {
         tile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
         tile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
       }
