@@ -1,11 +1,17 @@
-import "phaser";
-import "../consts/consts";
-import { hackManGame } from "../index";
+import 'phaser';
+import '../consts/consts';
+import { hackManGame } from '../index';
 
 let scale: number;
 
+const enum Orientation {
+  Portrait,
+  Landscape,
+}
+
 export class UIScene extends Phaser.Scene {
   private _isMobile: boolean;
+  private _orientation: Orientation;
   private _fullScreenButton: Phaser.GameObjects.Image;
   private _statusContainer: Phaser.GameObjects.Container;
   private _versionText: Phaser.GameObjects.BitmapText;
@@ -22,6 +28,10 @@ export class UIScene extends Phaser.Scene {
     return this._isMobile;
   }
 
+  public get orientation(): Orientation {
+    return this._orientation;
+  }
+
   public get versionText() {
     return this._versionText.text;
   }
@@ -34,64 +44,60 @@ export class UIScene extends Phaser.Scene {
     return this._windowText.text;
   }
 
+  public set orientation(orientation: Orientation) {
+    this._orientation = orientation;
+  }
+
   public set versionPosition(value: number) {
     this._versionText.setX(value);
   }
 
   public set statusText(value: string | string[]) {
     this._statusText.setText(value);
-    this._statusText.setX(
-      -(this._statusText.getTextBounds(false).global.width >> 1)
-    );
+    this._statusText.setX(-(this._statusText.getTextBounds(false).global.width >> 1));
   }
 
   public set windowText(value: string | string[]) {
     this._windowText.setText(value);
-    this._windowText.setX(
-      window.innerWidth -
-        Consts.UI.Margin -
-        this._statusText.getTextBounds(false).global.width
-    );
+    this._windowText.setX(window.innerWidth - Consts.UI.Margin - this._statusText.getTextBounds(false).global.width);
   }
 
   public set windowPosition(value: number) {
-    this._windowText.setX(
-      value - this._windowText.getTextBounds(false).global.width
-    );
+    this._windowText.setX(value - this._windowText.getTextBounds(false).global.width);
   }
 
   public set score1UPText(value: number) {
-    this._score1UPText.text = value.toFixed(0).padStart(8, "00000000");
+    this._score1UPText.text = value.toFixed(0).padStart(8, '00000000');
   }
 
   public set score1UPPosition(value: number) {
     this._score1UPLabel.setPosition(
       value - (this._score1UPLabel.getTextBounds(false).global.width >> 1),
-      2 * scale
+      2 * scale + (this.orientation === Orientation.Portrait ? Consts.UI.TextSize * scale : 0)
     );
     this._score1UPText.setPosition(
       value - (this._score1UPText.getTextBounds(false).global.width >> 1),
-      Consts.UI.TextSize * scale
+      Consts.UI.TextSize * scale + (this.orientation === Orientation.Portrait ? Consts.UI.TextSize * scale : 0)
     );
   }
 
   public set score2UPPosition(value: number) {
     this._score2UPLabel.setPosition(
       value - (this._score2UPLabel.getTextBounds(false).global.width >> 1),
-      2 * scale
+      2 * scale + (this.orientation === Orientation.Portrait ? Consts.UI.TextSize * scale : 0)
     );
     this._score2UPText.setPosition(
       value - (this._score2UPText.getTextBounds(false).global.width >> 1),
-      Consts.UI.TextSize * scale
+      Consts.UI.TextSize * scale + (this.orientation === Orientation.Portrait ? Consts.UI.TextSize * scale : 0)
     );
   }
 
   public set score2UPText(value: number) {
-    this._score2UPText.text = value.toFixed(0).padStart(8, "00000000");
+    this._score2UPText.text = value.toFixed(0).padStart(8, '00000000');
   }
 
   public set highScoreText(value: number) {
-    this._highScoreText.text = value.toFixed(0).padStart(8, "00000000");
+    this._highScoreText.text = value.toFixed(0).padStart(8, '00000000');
   }
 
   public addBitmapText(
@@ -102,14 +108,12 @@ export class UIScene extends Phaser.Scene {
     align?: number
   ): Phaser.GameObjects.BitmapText {
     let value = this.add
-      .bitmapText(x, y, "press-start-2p", text, size, align)
+      .bitmapText(x, y, 'press-start-2p', text, size, align)
       .setScrollFactor(0, 0)
       .setScale(scale >> 1);
 
-    if (align === 1)
-      value.setX(x - (value.getTextBounds(false).global.width >> 1));
-    else if (align === 2)
-      value.setX(x - value.getTextBounds(false).global.width);
+    if (align === 1) value.setX(x - (value.getTextBounds(false).global.width >> 1));
+    else if (align === 2) value.setX(x - value.getTextBounds(false).global.width);
 
     return value;
   }
@@ -133,21 +137,17 @@ export class UIScene extends Phaser.Scene {
     console.log(`UIScene::preload() : ${hackManGame.version}`);
 
     this.load.bitmapFont(
-      "press-start-2p",
-      require("../assets/fonts/press-start-2p_0.png"),
-      require("../assets/fonts/press-start-2p.xml")
+      'press-start-2p',
+      require('../assets/fonts/press-start-2p_0.png'),
+      require('../assets/fonts/press-start-2p.xml')
     );
 
-    this.load.spritesheet(
-      Consts.Resources.HackManSprites,
-      require("../assets/images/sprites/hackman.padded.png"),
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-        margin: 1,
-        spacing: 2,
-      }
-    );
+    this.load.spritesheet(Consts.Resources.HackManSprites, require('../assets/images/sprites/hackman.padded.png'), {
+      frameWidth: 16,
+      frameHeight: 16,
+      margin: 1,
+      spacing: 2,
+    });
   }
 
   create() {
@@ -157,12 +157,7 @@ export class UIScene extends Phaser.Scene {
 
     if (this.isMobile) {
       this._fullScreenButton = this.add
-        .image(
-          window.innerWidth - 4 * scale,
-          4 * scale,
-          Consts.Resources.HackManSprites,
-          Consts.Game.GoFullScreen
-        )
+        .image(window.innerWidth - 4 * scale, 4 * scale, Consts.Resources.HackManSprites, Consts.Game.GoFullScreen)
         .setDepth(256 * 256 * 256)
         .setScale(scale)
         .setScrollFactor(0, 0)
@@ -170,7 +165,7 @@ export class UIScene extends Phaser.Scene {
         .setInteractive();
 
       this._fullScreenButton.on(
-        "pointerup",
+        'pointerup',
         () => {
           this.scene.pause(Consts.Scenes.GameScene);
           if (this.scale.isFullscreen) {
@@ -194,10 +189,7 @@ export class UIScene extends Phaser.Scene {
       );
     }
 
-    this._statusContainer = this.scene.scene.add.container(
-      window.innerWidth >> 1,
-      window.innerHeight
-    );
+    this._statusContainer = this.scene.scene.add.container(window.innerWidth >> 1, window.innerHeight);
     this._statusContainer.visible = true;
 
     this._statusContainer.add([
@@ -211,59 +203,44 @@ export class UIScene extends Phaser.Scene {
       (this._statusText = this.addBitmapText(
         0,
         -(Consts.UI.StatusTextSize - Consts.UI.Margin) * scale,
-        "<Placeholder>",
+        '<Placeholder>',
         Consts.UI.StatusTextSize,
         Phaser.GameObjects.BitmapText.ALIGN_CENTER
       )),
       (this._windowText = this.addBitmapText(
         (window.innerWidth >> 1) - Consts.UI.Margin * scale,
         -(Consts.UI.StatusTextSize - Consts.UI.Margin) * scale,
-        "<Placeholder>",
+        '<Placeholder>',
         Consts.UI.StatusTextSize,
         Phaser.GameObjects.BitmapText.ALIGN_RIGHT
       )),
     ]);
 
-    this._gameStateContainer = this.scene.scene.add.container(
-      window.innerWidth >> 1,
-      0
-    );
+    this._gameStateContainer = this.scene.scene.add.container(window.innerWidth >> 1, 0);
 
     this._gameStateContainer.visible = false;
     this._gameStateContainer.add([
-      this.addBitmapText(0, 2 * scale, "HIGH SCORE", Consts.UI.TextSize, 1),
-      (this._highScoreText = this.addBitmapText(
-        0,
-        Consts.UI.TextSize * scale,
-        "00000000",
-        Consts.UI.TextSize,
-        1
-      )),
+      this.addBitmapText(0, 2 * scale, 'HIGH SCORE', Consts.UI.TextSize, 1),
+      (this._highScoreText = this.addBitmapText(0, Consts.UI.TextSize * scale, '00000000', Consts.UI.TextSize, 1)),
       (this._score1UPLabel = this.addBitmapText(
         -window.innerWidth >> 2,
         Consts.UI.TextSize * scale,
-        "1-UP",
+        '1-UP',
         Consts.UI.TextSize,
         1
       )),
       (this._score1UPText = this.addBitmapText(
         -window.innerWidth >> 2,
         Consts.UI.TextSize * scale,
-        "00000000",
+        '00000000',
         Consts.UI.TextSize,
         1
       )),
-      (this._score2UPLabel = this.addBitmapText(
-        window.innerWidth >> 2,
-        2 * scale,
-        "2-UP",
-        Consts.UI.TextSize,
-        1
-      )),
+      (this._score2UPLabel = this.addBitmapText(window.innerWidth >> 2, 2 * scale, '2-UP', Consts.UI.TextSize, 1)),
       (this._score2UPText = this.addBitmapText(
         window.innerWidth >> 2,
         Consts.UI.TextSize * scale,
-        "00000000",
+        '00000000',
         Consts.UI.TextSize,
         1
       )),
@@ -272,16 +249,18 @@ export class UIScene extends Phaser.Scene {
 
   resize() {
     if (this.isMobile) {
-      this._fullScreenButton.setPosition(
-        window.innerWidth - 4 * scale,
-        4 * scale
-      );
+      this._fullScreenButton.setPosition(window.innerWidth - 4 * scale, 4 * scale);
     }
 
-    this._statusContainer.setPosition(
-      window.innerWidth >> 1,
-      window.innerHeight
-    );
+    if (window.innerWidth < window.innerHeight) {
+      // portrait mode
+      this.orientation = Orientation.Portrait;
+    } else {
+      // landscape mode
+      this.orientation = Orientation.Landscape;
+    }
+
+    this._statusContainer.setPosition(window.innerWidth >> 1, window.innerHeight);
 
     this.windowText = `${window.innerWidth} x ${window.innerHeight}`;
     this.versionPosition - (window.innerWidth >> 1) + Consts.UI.Margin * scale;
