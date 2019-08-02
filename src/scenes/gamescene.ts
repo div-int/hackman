@@ -1,11 +1,11 @@
-import "phaser";
-import "../consts/consts";
-import { UIScene } from "./uiscene";
-import { GameState } from "../gameobjects/gamestate";
-import { HackMan, HackManWalkDirection } from "../gameobjects/hackman";
-import { Ghost, GhostState, GhostWalkDirection } from "../gameobjects/ghost";
-import { config } from "../config/config";
-import { hackManGame } from "../index";
+import 'phaser';
+import '../consts/consts';
+import { UIScene } from './uiscene';
+import { GameState } from '../gameobjects/gamestate';
+import { HackMan, HackManWalkDirection } from '../gameobjects/hackman';
+import { Ghost, GhostState, GhostWalkDirection } from '../gameobjects/ghost';
+import { config } from '../config/config';
+import { hackManGame } from '../index';
 
 // const hackmanSprites = "hackmanSprites";
 
@@ -24,10 +24,11 @@ export class GameScene extends Phaser.Scene {
   private _backgroundImage: Phaser.GameObjects.Image;
   private _mapLayerBackgroundMask: Phaser.Tilemaps.DynamicTilemapLayer;
   private _mapLayerWalls: Phaser.Tilemaps.StaticTilemapLayer;
+  private _mapLayerPills: Phaser.Tilemaps.DynamicTilemapLayer;
+  private _mapLayerShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 
   get UIScene(): UIScene {
-    if (!this._uiscene)
-      return (this._uiscene = <UIScene>this.scene.get(Consts.Scenes.UIScene));
+    if (!this._uiscene) return (this._uiscene = <UIScene>this.scene.get(Consts.Scenes.UIScene));
     else return this._uiscene;
   }
 
@@ -73,26 +74,11 @@ export class GameScene extends Phaser.Scene {
     // HackMan.load(this);
     Ghost.load(this);
 
-    this.load.tilemapTiledJSON(
-      "attractLevel",
-      require("../assets/levels/attract.json")
-    );
-    this.load.image(
-      "defaultTiles",
-      require("../assets/images/tiles/default.padded.png")
-    );
-    this.load.image(
-      "pyramidTiles",
-      require("../assets/images/tiles/pyramids.padded.png")
-    );
-    this.load.image(
-      "blockTiles",
-      require("../assets/images/tiles/blocks.padded.png")
-    );
-    this.load.image(
-      "stars1",
-      require("../assets/images/backgrounds/stars1.jpg")
-    );
+    this.load.tilemapTiledJSON('attractLevel', require('../assets/levels/attract.json'));
+    this.load.image('defaultTiles', require('../assets/images/tiles/default.padded.png'));
+    this.load.image('pyramidTiles', require('../assets/images/tiles/pyramids.padded.png'));
+    this.load.image('blockTiles', require('../assets/images/tiles/blocks.padded.png'));
+    this.load.image('stars1', require('../assets/images/backgrounds/stars1.jpg'));
   }
 
   create() {
@@ -110,22 +96,15 @@ export class GameScene extends Phaser.Scene {
       bounceY: 0,
     });
 
-    let attractLevel = this.add.tilemap("attractLevel");
-    let attractTiles = attractLevel.addTilesetImage(
-      "default",
-      "defaultTiles",
-      16,
-      16,
-      1,
-      2
-    );
+    let attractLevel = this.add.tilemap('attractLevel');
+    let attractTiles = attractLevel.addTilesetImage('default', 'defaultTiles', 16, 16, 1, 2);
 
     this._maskShape = this.make.graphics(config);
     this._maskShape.setScrollFactor(Consts.MagicNumbers.Half);
     this._mask = this._maskShape.createGeometryMask();
 
     this._backgroundImage = this.add
-      .image(0, 0, "stars1")
+      .image(0, 0, 'stars1')
       .setDepth(5)
       // .setAlpha(Consts.MagicNumbers.Half)
       .setMask(this._mask)
@@ -133,20 +112,20 @@ export class GameScene extends Phaser.Scene {
       .setScale(scale / 2);
 
     let mapLayerBackground = attractLevel
-      .createStaticLayer("Background", attractTiles, -256 * scale, -256 * scale)
+      .createStaticLayer('Background', attractTiles, -256 * scale, -256 * scale)
       .setDepth(3)
       .setScale(scale)
       .setScrollFactor(Consts.MagicNumbers.Half);
 
     let mapLayerWalls = attractLevel
-      .createStaticLayer("Walls", attractTiles, 0, 0)
+      .createStaticLayer('Walls', attractTiles, 0, 0)
       .setDepth(5)
       .setScale(scale)
       .setCollisionByExclusion([-1], true, true);
 
-    let mapLayerShadows = attractLevel
+    this._mapLayerShadows = attractLevel
       .createBlankDynamicLayer(
-        "Shadows",
+        'Shadows',
         attractTiles,
         Consts.Game.ShadowOffset * scale,
         Consts.Game.ShadowOffset * scale
@@ -178,98 +157,80 @@ export class GameScene extends Phaser.Scene {
         return;
       }
 
-      mapLayerShadows.putTileAt(tile, tile.x, tile.y).index +=
-        Consts.Game.TileShadowOffset;
+      this._mapLayerShadows.putTileAt(tile, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
     });
 
-    let mapLayerPills = attractLevel
-      .createDynamicLayer("Pills", attractTiles, 0, 0)
+    this._mapLayerPills = attractLevel
+      .createDynamicLayer('Pills', attractTiles, 0, 0)
       .setOriginFromFrame()
       .setDepth(7)
       .setScale(scale);
 
-    let pillTiles = mapLayerPills.getTilesWithin(0, 0);
+    let pillTiles = this._mapLayerPills.getTilesWithin(0, 0);
 
     pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
       if (tile.index != -1) {
-        mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index +=
-          Consts.Game.TileShadowOffset;
+        this._mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
+
+        if (tile.index === Consts.Game.FoodPillTile) {
+          console.log(tile);
+        }
       }
     });
 
-    this.physics.add.overlap(
-      this._hackmanGroup,
-      mapLayerPills,
-      (hackman: HackMan, tile: any) => {
-        if (!hackman.anims.currentFrame.isFirst && !hackman.isJumping) return;
-        if (!hackman.OnFloor) return;
+    //this.animatedTiles.init(attractLevel);
 
-        if (tile.index != -1) {
-          // console.log("Overlap : ", hackman, tile);
+    this.physics.add.overlap(this._hackmanGroup, this._mapLayerPills, (hackman: HackMan, tile: any) => {
+      if (!hackman.anims.currentFrame.isFirst && !hackman.isJumping) return;
+      if (!hackman.OnFloor) return;
 
-          this._maskShape.fillStyle(Consts.Colours.White);
-          this._maskShape.beginPath();
-          this._maskShape.fillRect(
-            (tile.x - 8) * 32 * scale,
-            (tile.y - 8) * 32 * scale,
-            32 * scale,
-            32 * scale
+      if (tile.index != -1) {
+        // console.log("Overlap : ", hackman, tile);
+
+        this._maskShape.fillStyle(Consts.Colours.White);
+        this._maskShape.beginPath();
+        this._maskShape.fillRect((tile.x - 8) * 32 * scale, (tile.y - 8) * 32 * scale, 32 * scale, 32 * scale);
+        this._maskShape.closePath();
+
+        if (tile.index === Consts.Game.FoodPillTile) hackManGame.gameState.score += Consts.Scores.FoodPill;
+
+        if (tile.index === Consts.Game.PowerPillTile) {
+          hackManGame.gameState.score += Consts.Scores.PowerPill;
+          this.FrightenGhosts(10 * Consts.Times.MilliSecondsInSecond);
+        }
+
+        if (tile.index === Consts.Game.SpeedPillTile) {
+          this._hackmanGroup.children.iterate((hackman: HackMan) =>
+            hackman.speedUp(5 * Consts.Times.MilliSecondsInSecond)
           );
-          this._maskShape.closePath();
-
-          if (tile.index === Consts.Game.FoodPillTile)
-            hackManGame.gameState.score += Consts.Scores.FoodPill;
-
-          if (tile.index === Consts.Game.PowerPillTile) {
-            hackManGame.gameState.score += Consts.Scores.PowerPill;
-            this.FrightenGhosts(10 * Consts.Times.MilliSecondsInSecond);
-          }
-
-          if (tile.index === Consts.Game.SpeedPillTile) {
-            this._hackmanGroup.children.iterate((hackman: HackMan) =>
-              hackman.speedUp(5 * Consts.Times.MilliSecondsInSecond)
-            );
-          }
-
-          mapLayerPills.removeTileAt(tile.x, tile.y);
-          mapLayerShadows.removeTileAt(tile.x, tile.y);
         }
+
+        this._mapLayerPills.removeTileAt(tile.x, tile.y);
+        this._mapLayerShadows.removeTileAt(tile.x, tile.y);
       }
-    );
+    });
 
-    this.physics.add.collider(
-      this._hackmanGroup,
-      mapLayerWalls,
-      (hackman: HackMan, tile: any) => {
-        hackman.hitWall(tile);
+    this.physics.add.collider(this._hackmanGroup, mapLayerWalls, (hackman: HackMan, tile: any) => {
+      hackman.hitWall(tile);
+    });
+
+    this.physics.add.collider(this._ghostGroup, mapLayerWalls, (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
+      ghost.hitWall(tile);
+    });
+
+    this.physics.add.collider(this._hackmanGroup, this._ghostGroup, (hackman: HackMan, ghost: Ghost) => {
+      // console.log("Collide : ", hackman, ghost);
+
+      if (!hackman.OnFloor) return;
+      if (ghost.GhostState === GhostState.Eaten) return;
+
+      if (ghost.GhostState === GhostState.Frightened) {
+        ghost.GhostState = GhostState.Eaten;
+      } else {
+        hackManGame.gameState.lives--;
+        this.scene.restart();
       }
-    );
-
-    this.physics.add.collider(
-      this._ghostGroup,
-      mapLayerWalls,
-      (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
-        ghost.hitWall(tile);
-      }
-    );
-
-    this.physics.add.collider(
-      this._hackmanGroup,
-      this._ghostGroup,
-      (hackman: HackMan, ghost: Ghost) => {
-        // console.log("Collide : ", hackman, ghost);
-
-        if (!hackman.OnFloor) return;
-        if (ghost.GhostState === GhostState.Eaten) return;
-
-        if (ghost.GhostState === GhostState.Frightened) {
-          ghost.GhostState = GhostState.Eaten;
-        } else {
-          hackManGame.gameState.lives--;
-          this.scene.restart();
-        }
-      }
-    );
+    });
 
     this._hackman = new HackMan(
       this,
@@ -290,12 +251,7 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.cameras.main.setBackgroundColor(Consts.Colours.Black);
-    this.cameras.main.startFollow(
-      this._hackman,
-      false,
-      Consts.MagicNumbers.Tenth,
-      Consts.MagicNumbers.Tenth
-    );
+    this.cameras.main.startFollow(this._hackman, false, Consts.MagicNumbers.Tenth, Consts.MagicNumbers.Tenth);
 
     // this._ghosts = new Array<Ghost>(maxsprite);
 
@@ -318,20 +274,8 @@ export class GameScene extends Phaser.Scene {
     this._ghostGroup.children.each((ghost: Ghost) => {
       ghost
         .setPosition(
-          (8 +
-            Phaser.Math.Between(
-              Consts.Game.GhostXStart - 1,
-              Consts.Game.GhostXStart + 2
-            ) *
-              16) *
-            scale,
-          (8 +
-            Phaser.Math.Between(
-              Consts.Game.GhostYStart - 1,
-              Consts.Game.GhostYStart + 1
-            ) *
-              16) *
-            scale
+          (8 + Phaser.Math.Between(Consts.Game.GhostXStart - 1, Consts.Game.GhostXStart + 2) * 16) * scale,
+          (8 + Phaser.Math.Between(Consts.Game.GhostYStart - 1, Consts.Game.GhostYStart + 1) * 16) * scale
         )
         .setCollideWorldBounds(true)
         .setOffset(2, 2)
@@ -341,11 +285,30 @@ export class GameScene extends Phaser.Scene {
     }, this);
   }
 
+  animatePillTiles(timestamp: number): void {
+    let pillTiles = this._mapLayerPills.getTilesWithin(0, 0);
+
+    pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
+      if (
+        tile.index === Consts.Game.FoodPillTile ||
+        tile.index === Consts.Game.PowerPillTile ||
+        tile.index === Consts.Game.SpeedPillTile
+      ) {
+        tile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        tile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        //tile.pixelY += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+
+        let shadowTile = this._mapLayerShadows.getTileAt(tile.x, tile.y, true);
+
+        shadowTile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        shadowTile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+      }
+    });
+  }
+
   update(timestamp: number, elapsed: number) {
-    this.UIScene.statusText = `${(
-      timestamp / Consts.Times.MilliSecondsInSecond
-    ).toFixed(0)}s ${elapsed.toFixed(2)}ms ${
-      this.sys.game.device.os.desktop ? "Desktop" : "Mobile"
+    this.UIScene.statusText = `${(timestamp / Consts.Times.MilliSecondsInSecond).toFixed(0)}s ${elapsed.toFixed(2)}ms ${
+      this.sys.game.device.os.desktop ? 'Desktop' : 'Mobile'
     }`;
 
     if (Phaser.Math.Between(0, 64) === 1) {
@@ -353,5 +316,7 @@ export class GameScene extends Phaser.Scene {
         hackman.jump();
       });
     }
+
+    this.animatePillTiles(timestamp);
   }
 }
