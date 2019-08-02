@@ -294,14 +294,14 @@ export class GameScene extends Phaser.Scene {
         tile.index === Consts.Game.PowerPillTile ||
         tile.index === Consts.Game.SpeedPillTile
       ) {
-        tile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
-        tile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
-        tile.pixelY += Math.sin((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
+        tile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        tile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        tile.pixelY += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
 
         let shadowTile = this._mapLayerShadows.getTileAt(tile.x, tile.y, true);
 
-        shadowTile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
-        shadowTile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
+        shadowTile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        shadowTile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
       }
     });
   }
