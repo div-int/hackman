@@ -296,7 +296,7 @@ export class GameScene extends Phaser.Scene {
       ) {
         tile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
         tile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
-        tile.pixelY += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        //tile.pixelY += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
 
         let shadowTile = this._mapLayerShadows.getTileAt(tile.x, tile.y, true);
 
