@@ -53,9 +53,9 @@ export class GameScene extends Phaser.Scene {
     super(Consts.Scenes.GameScene);
     console.log(`GameScene::constructor() : ${hackManGame.version}`);
 
-    window.onresize = () => {
-      this.physics.world.setBounds(0, 0, window.innerWidth, window.innerHeight);
-    };
+    // window.onresize = () => {
+    //   this.physics.world.setBounds(0, 0, window.innerWidth, window.innerHeight);
+    // };
   }
 
   init() {
@@ -66,6 +66,8 @@ export class GameScene extends Phaser.Scene {
       scale = Consts.Game.ScaleMobile;
       maxsprite = Consts.Game.MaxSpriteMobile;
     }
+
+    hackManGame.gameState.reset();
   }
 
   preload() {
@@ -117,7 +119,7 @@ export class GameScene extends Phaser.Scene {
       .setScale(scale)
       .setScrollFactor(Consts.MagicNumbers.Half);
 
-    let mapLayerWalls = attractLevel
+    this._mapLayerWalls = attractLevel
       .createStaticLayer('Walls', attractTiles, 0, 0)
       .setDepth(5)
       .setScale(scale)
@@ -134,7 +136,7 @@ export class GameScene extends Phaser.Scene {
       .setDepth(4)
       .setScale(scale);
 
-    let wallTiles = mapLayerWalls.getTilesWithin(0, 0);
+    let wallTiles = this._mapLayerWalls.getTilesWithin(0, 0);
 
     wallTiles.map((tile: Phaser.Tilemaps.Tile) => {
       if (tile.index == -1) return;
@@ -171,10 +173,6 @@ export class GameScene extends Phaser.Scene {
     pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
       if (tile.index != -1) {
         this._mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
-
-        if (tile.index === Consts.Game.FoodPillTile) {
-          console.log(tile);
-        }
       }
     });
 
@@ -185,8 +183,6 @@ export class GameScene extends Phaser.Scene {
       if (!hackman.OnFloor) return;
 
       if (tile.index != -1) {
-        // console.log("Overlap : ", hackman, tile);
-
         this._maskShape.fillStyle(Consts.Colours.White);
         this._maskShape.beginPath();
         this._maskShape.fillRect((tile.x - 8) * 32 * scale, (tile.y - 8) * 32 * scale, 32 * scale, 32 * scale);
@@ -210,17 +206,19 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
-    this.physics.add.collider(this._hackmanGroup, mapLayerWalls, (hackman: HackMan, tile: any) => {
+    this.physics.add.collider(this._hackmanGroup, this._mapLayerWalls, (hackman: HackMan, tile: any) => {
       hackman.hitWall(tile);
     });
 
-    this.physics.add.collider(this._ghostGroup, mapLayerWalls, (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
-      ghost.hitWall(tile);
-    });
+    this.physics.add.collider(
+      this._ghostGroup,
+      this._mapLayerWalls,
+      (ghost: Ghost, tile: Phaser.GameObjects.TileSprite) => {
+        ghost.hitWall(tile);
+      }
+    );
 
     this.physics.add.collider(this._hackmanGroup, this._ghostGroup, (hackman: HackMan, ghost: Ghost) => {
-      // console.log("Collide : ", hackman, ghost);
-
       if (!hackman.OnFloor) return;
       if (ghost.GhostState === GhostState.Eaten) return;
 
@@ -228,13 +226,13 @@ export class GameScene extends Phaser.Scene {
         ghost.GhostState = GhostState.Eaten;
       } else {
         hackManGame.gameState.lives--;
-        this.scene.restart();
+        this.lostLife(hackManGame.gameState.lives);
       }
     });
 
     this._hackman = new HackMan(
       this,
-      mapLayerWalls,
+      this._mapLayerWalls,
       (8 + Consts.Game.HackManXStart * 16) * scale,
       (8 + Consts.Game.HackManYStart * 16) * scale
     ).setScale(scale);
@@ -253,15 +251,13 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(Consts.Colours.Black);
     this.cameras.main.startFollow(this._hackman, false, Consts.MagicNumbers.Tenth, Consts.MagicNumbers.Tenth);
 
-    // this._ghosts = new Array<Ghost>(maxsprite);
-
     this._ghostGroup.runChildUpdate = true;
 
     for (let i = 0; i < maxsprite; i++) {
       this._ghostGroup.add(
         new Ghost(
           this,
-          mapLayerWalls,
+          this._mapLayerWalls,
           0,
           0,
           Phaser.Math.Between(0, Ghost.MaxGhostNo()),
@@ -285,6 +281,57 @@ export class GameScene extends Phaser.Scene {
     }, this);
   }
 
+  removeGhosts() {
+    this._ghostGroup.children.each((ghost: Ghost) => {
+      ghost.destroyGhost();
+      this._ghostGroup.remove(ghost, true, true);
+    });
+  }
+
+  addGhosts() {
+    for (let i = 0; i < maxsprite; i++) {
+      this._ghostGroup.add(
+        new Ghost(
+          this,
+          this._mapLayerWalls,
+          0,
+          0,
+          Phaser.Math.Between(0, Ghost.MaxGhostNo()),
+          GhostWalkDirection.Down
+        ).setScale(scale),
+        true
+      );
+    }
+
+    this._ghostGroup.children.each((ghost: Ghost) => {
+      ghost
+        .setPosition(
+          (8 + Phaser.Math.Between(Consts.Game.GhostXStart - 1, Consts.Game.GhostXStart + 2) * 16) * scale,
+          (8 + Phaser.Math.Between(Consts.Game.GhostYStart - 1, Consts.Game.GhostYStart + 1) * 16) * scale
+        )
+        .setCollideWorldBounds(true)
+        .setOffset(2, 2)
+        .setCircle(6)
+        .add(this)
+        .walk(3);
+    }, this);
+  }
+
+  lostLife(lives: number) {
+    if (lives === 0) {
+      this.scene.pause();
+      this.scene.launch(Consts.Scenes.GameOverScene);
+      return;
+    }
+
+    this.cameras.main.stopFollow();
+    this._hackman.reset();
+    this.cameras.main.startFollow(this._hackman, false, Consts.MagicNumbers.Tenth, Consts.MagicNumbers.Tenth);
+
+    this.removeGhosts();
+    this.addGhosts();
+  }
+
   animatePillTiles(timestamp: number): void {
     let pillTiles = this._mapLayerPills.getTilesWithin(0, 0);
 
@@ -296,7 +343,6 @@ export class GameScene extends Phaser.Scene {
       ) {
         tile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
         tile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
-        //tile.pixelY += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
 
         let shadowTile = this._mapLayerShadows.getTileAt(tile.x, tile.y, true);
 

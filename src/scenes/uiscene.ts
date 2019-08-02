@@ -67,7 +67,7 @@ export class UIScene extends Phaser.Scene {
   }
 
   public set score1UPText(value: number) {
-    this._score1UPText.text = value.toFixed(0).padStart(8, '00000000');
+    this._score1UPText.text = value.toFixed(0).padStart(6, '000000');
   }
 
   public set score1UPPosition(value: number) {
@@ -93,11 +93,11 @@ export class UIScene extends Phaser.Scene {
   }
 
   public set score2UPText(value: number) {
-    this._score2UPText.text = value.toFixed(0).padStart(8, '00000000');
+    this._score2UPText.text = value.toFixed(0).padStart(6, '000000');
   }
 
   public set highScoreText(value: number) {
-    this._highScoreText.text = value.toFixed(0).padStart(8, '00000000');
+    this._highScoreText.text = value.toFixed(0).padStart(6, '000000');
   }
 
   public addBitmapText(
@@ -221,7 +221,7 @@ export class UIScene extends Phaser.Scene {
     this._gameStateContainer.visible = false;
     this._gameStateContainer.add([
       this.addBitmapText(0, 2 * scale, 'HIGH SCORE', Consts.UI.TextSize, 1),
-      (this._highScoreText = this.addBitmapText(0, Consts.UI.TextSize * scale, '00000000', Consts.UI.TextSize, 1)),
+      (this._highScoreText = this.addBitmapText(0, Consts.UI.TextSize * scale, '000000', Consts.UI.TextSize, 1)),
       (this._score1UPLabel = this.addBitmapText(
         -window.innerWidth >> 2,
         Consts.UI.TextSize * scale,
@@ -232,7 +232,7 @@ export class UIScene extends Phaser.Scene {
       (this._score1UPText = this.addBitmapText(
         -window.innerWidth >> 2,
         Consts.UI.TextSize * scale,
-        '00000000',
+        '000000',
         Consts.UI.TextSize,
         1
       )),
@@ -240,7 +240,7 @@ export class UIScene extends Phaser.Scene {
       (this._score2UPText = this.addBitmapText(
         window.innerWidth >> 2,
         Consts.UI.TextSize * scale,
-        '00000000',
+        '000000',
         Consts.UI.TextSize,
         1
       )),
@@ -263,7 +263,7 @@ export class UIScene extends Phaser.Scene {
     this._statusContainer.setPosition(window.innerWidth >> 1, window.innerHeight);
 
     this.windowText = `${window.innerWidth} x ${window.innerHeight}`;
-    this.versionPosition - (window.innerWidth >> 1) + Consts.UI.Margin * scale;
+    this.versionPosition = -(window.innerWidth >> 1) + Consts.UI.Margin * scale;
     this.windowPosition = (window.innerWidth >> 1) - Consts.UI.Margin * scale;
     this._gameStateContainer.setPosition(window.innerWidth >> 1, 0);
 

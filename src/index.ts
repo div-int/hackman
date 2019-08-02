@@ -1,10 +1,11 @@
-import "phaser";
-import "./consts/consts";
-import { Version } from "./version";
-import { config } from "./config/config";
-import { GameScene } from "./scenes/gamescene";
-import { UIScene } from "./scenes/uiscene";
-import { GameState } from "./gameobjects/gamestate";
+import 'phaser';
+import './consts/consts';
+import { Version } from './version';
+import { config } from './config/config';
+import { GameScene } from './scenes/gamescene';
+import { UIScene } from './scenes/uiscene';
+import { GameState } from './gameobjects/gamestate';
+import { GameOverScene } from './scenes/gameover';
 
 export let hackManGame: HackManGame;
 
@@ -26,7 +27,10 @@ class HackManGame extends Phaser.Game {
     super(config);
 
     this.scene.add(Consts.Scenes.UIScene, UIScene, true);
-    this.scene.add(Consts.Scenes.GameScene, GameScene, true);
+    this.scene.add(Consts.Scenes.GameScene, GameScene, false);
+    this.scene.add(Consts.Scenes.GameOverScene, GameOverScene, false);
+
+    this.scene.start(Consts.Scenes.GameScene);
   }
 }
 

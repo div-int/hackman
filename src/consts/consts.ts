@@ -1,9 +1,10 @@
 namespace Consts {
   export const enum Scenes {
-    TitleScene = "TitleScene",
-    UIScene = "UIScene",
-    GameScene = "GameScene",
-    LevelScene = "LevelScene",
+    TitleScene = 'TitleScene',
+    UIScene = 'UIScene',
+    GameScene = 'GameScene',
+    LevelScene = 'LevelScene',
+    GameOverScene = 'GameOver',
   }
 
   export const enum Scores {
@@ -42,7 +43,7 @@ namespace Consts {
   }
 
   export const enum Resources {
-    HackManSprites = "HackManSprites",
+    HackManSprites = 'HackManSprites',
   }
 
   export const enum Game {
