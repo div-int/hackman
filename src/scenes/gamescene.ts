@@ -25,6 +25,7 @@ export class GameScene extends Phaser.Scene {
   private _mapLayerBackgroundMask: Phaser.Tilemaps.DynamicTilemapLayer;
   private _mapLayerWalls: Phaser.Tilemaps.StaticTilemapLayer;
   private _mapLayerPills: Phaser.Tilemaps.DynamicTilemapLayer;
+  private _mapLayerShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 
   get UIScene(): UIScene {
     if (!this._uiscene) return (this._uiscene = <UIScene>this.scene.get(Consts.Scenes.UIScene));
@@ -122,7 +123,7 @@ export class GameScene extends Phaser.Scene {
       .setScale(scale)
       .setCollisionByExclusion([-1], true, true);
 
-    let mapLayerShadows = attractLevel
+    this._mapLayerShadows = attractLevel
       .createBlankDynamicLayer(
         'Shadows',
         attractTiles,
@@ -156,7 +157,7 @@ export class GameScene extends Phaser.Scene {
         return;
       }
 
-      mapLayerShadows.putTileAt(tile, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
+      this._mapLayerShadows.putTileAt(tile, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
     });
 
     this._mapLayerPills = attractLevel
@@ -169,7 +170,7 @@ export class GameScene extends Phaser.Scene {
 
     pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
       if (tile.index != -1) {
-        mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
+        this._mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
 
         if (tile.index === Consts.Game.FoodPillTile) {
           console.log(tile);
@@ -205,7 +206,7 @@ export class GameScene extends Phaser.Scene {
         }
 
         this._mapLayerPills.removeTileAt(tile.x, tile.y);
-        mapLayerShadows.removeTileAt(tile.x, tile.y);
+        this._mapLayerShadows.removeTileAt(tile.x, tile.y);
       }
     });
 
@@ -284,6 +285,27 @@ export class GameScene extends Phaser.Scene {
     }, this);
   }
 
+  animatePillTiles(timestamp: number): void {
+    let pillTiles = this._mapLayerPills.getTilesWithin(0, 0);
+
+    pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
+      if (
+        tile.index === Consts.Game.FoodPillTile ||
+        tile.index === Consts.Game.PowerPillTile ||
+        tile.index === Consts.Game.SpeedPillTile
+      ) {
+        tile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
+        tile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
+        tile.pixelY += Math.sin((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
+
+        let shadowTile = this._mapLayerShadows.getTileAt(tile.x, tile.y, true);
+
+        shadowTile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
+        shadowTile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
+      }
+    });
+  }
+
   update(timestamp: number, elapsed: number) {
     this.UIScene.statusText = `${(timestamp / Consts.Times.MilliSecondsInSecond).toFixed(0)}s ${elapsed.toFixed(2)}ms ${
       this.sys.game.device.os.desktop ? 'Desktop' : 'Mobile'
@@ -295,17 +317,6 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
-    let pillTiles = this._mapLayerPills.getTilesWithin(0, 0);
-
-    pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
-      if (
-        tile.index === Consts.Game.FoodPillTile ||
-        tile.index === Consts.Game.PowerPillTile ||
-        tile.index === Consts.Game.SpeedPillTile
-      ) {
-        tile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
-        tile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 250) / 250) / 16;
-      }
-    });
+    this.animatePillTiles(timestamp);
   }
 }
