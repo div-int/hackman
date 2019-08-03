@@ -1,14 +1,15 @@
 namespace Consts {
   export const enum Scenes {
-    TitleScene = "TitleScene",
-    UIScene = "UIScene",
-    GameScene = "GameScene",
-    LevelScene = "LevelScene",
+    TitleScene = 'TitleScene',
+    UIScene = 'UIScene',
+    GameScene = 'GameScene',
+    LevelScene = 'LevelScene',
+    GameOverScene = 'GameOver',
   }
 
   export const enum Scores {
-    FoodPill = 100,
-    PowerPill = 500,
+    FoodPill = 10,
+    PowerPill = 50,
   }
 
   export const enum MagicNumbers {
@@ -31,17 +32,25 @@ namespace Consts {
     White = 0xffffff,
   }
 
+  export const enum UI {
+    Margin = 2,
+    StatusTextSize = 8,
+    TextSize = 12,
+  }
+
   export const enum Times {
     MilliSecondsInSecond = 1000.0,
   }
 
   export const enum Resources {
-    HackManSprites = "HackManSprites",
+    HackManSprites = 'HackManSprites',
   }
 
   export const enum Game {
     StartLives = 3,
     StartHighScore = 10000,
+
+    GameOverFlashRate = 0.5,
 
     MaxSpriteDesktop = 16,
     MaxSpriteMobile = 16,

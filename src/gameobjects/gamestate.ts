@@ -1,4 +1,4 @@
-import "../consts/consts";
+import '../consts/consts';
 
 export class GameState {
   private _playing: boolean;

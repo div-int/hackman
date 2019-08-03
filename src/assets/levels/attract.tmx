@@ -2,7 +2,11 @@
 <map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="1">
  <tileset firstgid="1" name="default" tilewidth="16" tileheight="16" spacing="2" margin="1" tilecount="256" columns="16">
   <image source="../images/tiles/default.padded.png" width="288" height="288"/>
-  <tile id="48" type="FoodPill"/>
+  <tile id="48" type="FoodPill">
+   <properties>
+    <property name="pillAnimationOffset" type="int" value="0"/>
+   </properties>
+  </tile>
   <tile id="49" type="PowerPill"/>
   <tile id="50" type="SpeedPill"/>
  </tileset>

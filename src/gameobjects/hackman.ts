@@ -1,5 +1,5 @@
-import "phaser";
-import { runInThisContext } from "vm";
+import 'phaser';
+import { runInThisContext } from 'vm';
 
 const defaultFrame = 0;
 
@@ -25,14 +25,16 @@ export enum HackManState {
 }
 
 const hackManWalkDirectionValues = [
-  { direction: "Right", velocity: { x: Consts.Game.HackManSpeed, y: 0 } },
-  { direction: "Down", velocity: { x: 0, y: Consts.Game.HackManSpeed } },
-  { direction: "Left", velocity: { x: -Consts.Game.HackManSpeed, y: 0 } },
-  { direction: "Up", velocity: { x: 0, y: -Consts.Game.HackManSpeed } },
+  { direction: 'Right', velocity: { x: Consts.Game.HackManSpeed, y: 0 } },
+  { direction: 'Down', velocity: { x: 0, y: Consts.Game.HackManSpeed } },
+  { direction: 'Left', velocity: { x: -Consts.Game.HackManSpeed, y: 0 } },
+  { direction: 'Up', velocity: { x: 0, y: -Consts.Game.HackManSpeed } },
 ];
 
 export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _scene: Phaser.Scene;
+  private _startX: number;
+  private _startY: number;
   private _mapLayer: Phaser.Tilemaps.StaticTilemapLayer;
   private _walkDirection: HackManWalkDirection;
   private _faceDirection: HackManWalkDirection;
@@ -109,33 +111,30 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       this._hackManState = hackManState;
       this.stopJump();
       this.anims.resume();
-      this.anims.play("hackmanDead");
+      this.anims.play('hackmanDead');
       return;
     }
   }
 
-  constructor(
-    scene: Phaser.Scene,
-    mapLayer: Phaser.Tilemaps.StaticTilemapLayer,
-    x: number,
-    y: number
-  ) {
+  reset() {
+    this.x = this._startX;
+    this.y = this._startY;
+  }
+
+  constructor(scene: Phaser.Scene, mapLayer: Phaser.Tilemaps.StaticTilemapLayer, x: number, y: number) {
     super(scene, x, y, Consts.Resources.HackManSprites, defaultFrame);
 
+    this._startX = x;
+    this._startY = y;
     this._scene = scene;
     this._mapLayer = mapLayer;
     this._speedMultiplier = 1;
     this._canTurnCount = 0;
 
-    this._collideLeftSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, "");
-    this._collideRightSprite = new Phaser.Physics.Arcade.Sprite(
-      scene,
-      x,
-      y,
-      ""
-    );
-    this._collideUpSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, "");
-    this._collideDownSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, "");
+    this._collideLeftSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, '');
+    this._collideRightSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, '');
+    this._collideUpSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, '');
+    this._collideDownSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, '');
 
     this._jumpHeight = 0;
     this._jumpSprite = new Phaser.Physics.Arcade.Sprite(
@@ -146,92 +145,68 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       defaultFrame
     ).setVisible(false);
 
-    this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
-      scene,
-      x,
-      y,
-      Consts.Resources.HackManSprites,
-      defaultFrame
-    )
+    this._shadowSprite = new Phaser.Physics.Arcade.Sprite(scene, x, y, Consts.Resources.HackManSprites, defaultFrame)
       .setDepth(4)
       .setTint(0)
       .setAlpha(Consts.MagicNumbers.Quarter);
 
     scene.anims.create({
-      key: "hackmanDead",
-      frames: scene.anims.generateFrameNumbers(
-        Consts.Resources.HackManSprites,
-        {
-          frames: [4, 20, 36, 40],
-        }
-      ),
+      key: 'hackmanDead',
+      frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
+        frames: [4, 20, 36, 40],
+      }),
       frameRate: Consts.Game.HackManFrameRate / 4,
       repeat: -1,
     });
 
     scene.anims.create({
-      key: "hackmanWalkRight",
-      frames: scene.anims.generateFrameNumbers(
-        Consts.Resources.HackManSprites,
-        {
-          start: walkStart + walkRight,
-          end: walkEnd + walkRight,
-        }
-      ),
+      key: 'hackmanWalkRight',
+      frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
+        start: walkStart + walkRight,
+        end: walkEnd + walkRight,
+      }),
       frameRate: Consts.Game.HackManFrameRate,
       yoyo: true,
       repeat: -1,
     });
 
     scene.anims.create({
-      key: "hackmanWalkDown",
-      frames: scene.anims.generateFrameNumbers(
-        Consts.Resources.HackManSprites,
-        {
-          start: walkStart + walkDown,
-          end: walkEnd + walkDown,
-        }
-      ),
+      key: 'hackmanWalkDown',
+      frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
+        start: walkStart + walkDown,
+        end: walkEnd + walkDown,
+      }),
       frameRate: Consts.Game.HackManFrameRate,
       yoyo: true,
       repeat: -1,
     });
     scene.anims.create({
-      key: "hackmanWalkLeft",
-      frames: scene.anims.generateFrameNumbers(
-        Consts.Resources.HackManSprites,
-        {
-          start: walkStart + walkLeft,
-          end: walkEnd + walkLeft,
-        }
-      ),
+      key: 'hackmanWalkLeft',
+      frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
+        start: walkStart + walkLeft,
+        end: walkEnd + walkLeft,
+      }),
       frameRate: Consts.Game.HackManFrameRate,
       yoyo: true,
       repeat: -1,
     });
     scene.anims.create({
-      key: "hackmanWalkUp",
-      frames: scene.anims.generateFrameNumbers(
-        Consts.Resources.HackManSprites,
-        {
-          start: walkStart + walkUp,
-          end: walkEnd + walkUp,
-        }
-      ),
+      key: 'hackmanWalkUp',
+      frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
+        start: walkStart + walkUp,
+        end: walkEnd + walkUp,
+      }),
       frameRate: Consts.Game.HackManFrameRate,
       yoyo: true,
       repeat: -1,
     });
 
     scene.anims.create({
-      key: "hackmanWalkRightBlink",
-      frames: scene.anims.generateFrameNumbers(
-        Consts.Resources.HackManSprites,
-        {
-          start: 5,
-          end: 9,
-        }
-      ),
+      key: 'hackmanWalkRightBlink',
+      frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
+        start: 5,
+        end: 9,
+      }),
       frameRate: Consts.Game.HackManFrameRate,
       yoyo: true,
       repeat: 0,
@@ -269,19 +244,19 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._collideLeftSprite
       .setOffset(10, 10)
       .setCircle(((this.width + this.height) >> 2) - 2)
-      .setData("blocked", false);
+      .setData('blocked', false);
     this._collideRightSprite
       .setOffset(10, 10)
       .setCircle(((this.width + this.height) >> 2) - 2)
-      .setData("blocked", false);
+      .setData('blocked', false);
     this._collideUpSprite
       .setOffset(10, 10)
       .setCircle(((this.width + this.height) >> 2) - 2)
-      .setData("blocked", false);
+      .setData('blocked', false);
     this._collideDownSprite
       .setOffset(10, 10)
       .setCircle(((this.width + this.height) >> 2) - 2)
-      .setData("blocked", false);
+      .setData('blocked', false);
 
     scene.physics.add.overlap(
       this._collideGroup,
@@ -289,7 +264,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       (colliderSprite: Phaser.Physics.Arcade.Sprite, tile: any) => {
         if (tile.index != -1) {
           colliderSprite.body.debugBodyColor = Consts.Colours.Red;
-          colliderSprite.setData("blocked", true);
+          colliderSprite.setData('blocked', true);
         }
       },
       null,
@@ -300,32 +275,21 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   speedUp(time: number) {
     this._speedMultiplier = Consts.Game.HackManSpeedUpMultiplier;
     this.setVelocity(
-      hackManWalkDirectionValues[this.WalkDirection].velocity.x *
-        this.scaleX *
-        this._speedMultiplier,
-      hackManWalkDirectionValues[this.WalkDirection].velocity.y *
-        this.scaleY *
-        this._speedMultiplier
+      hackManWalkDirectionValues[this.WalkDirection].velocity.x * this.scaleX * this._speedMultiplier,
+      hackManWalkDirectionValues[this.WalkDirection].velocity.y * this.scaleY * this._speedMultiplier
     );
-    this.anims.msPerFrame =
-      Consts.Times.MilliSecondsInSecond /
-      (Consts.Game.HackManFrameRate * this._speedMultiplier);
+    this.anims.msPerFrame = Consts.Times.MilliSecondsInSecond / (Consts.Game.HackManFrameRate * this._speedMultiplier);
 
     this.scene.time.delayedCall(
       time,
       () => {
         this._speedMultiplier = 1;
         this.setVelocity(
-          hackManWalkDirectionValues[this.WalkDirection].velocity.x *
-            this.scaleX *
-            this._speedMultiplier,
-          hackManWalkDirectionValues[this.WalkDirection].velocity.y *
-            this.scaleY *
-            this._speedMultiplier
+          hackManWalkDirectionValues[this.WalkDirection].velocity.x * this.scaleX * this._speedMultiplier,
+          hackManWalkDirectionValues[this.WalkDirection].velocity.y * this.scaleY * this._speedMultiplier
         );
         this.anims.msPerFrame =
-          Consts.Times.MilliSecondsInSecond /
-          (Consts.Game.HackManFrameRate * this._speedMultiplier);
+          Consts.Times.MilliSecondsInSecond / (Consts.Game.HackManFrameRate * this._speedMultiplier);
       },
       [],
       this
@@ -343,16 +307,11 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._jumpingTween = this.scene.tweens.add({
       targets: this,
       JumpHeight: height * this.scale,
-      scale:
-        (height / Consts.Game.HackManJumpHeight) *
-        (this.scale * Consts.Game.HackManJumpZoom),
+      scale: (height / Consts.Game.HackManJumpHeight) * (this.scale * Consts.Game.HackManJumpZoom),
       duration: 500,
-      ease: "Sine.easeOut",
+      ease: 'Sine.easeOut',
       yoyo: true,
       loop: 0,
-      onUpdate: () => {
-        console.log(height, this.scale);
-      },
       onComplete: () => {
         this.scene.tweens.add({
           targets: this,
@@ -361,7 +320,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
             (height / Consts.Game.HackManJumpHeight) *
             (this.scale * Consts.Game.HackManJumpZoom), */
           duration: 250,
-          ease: "Sine.easeOut",
+          ease: 'Sine.easeOut',
           yoyo: true,
           loop: 0,
           onComplete: () => {
@@ -380,7 +339,6 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   }
 
   hitWall(tile: Phaser.GameObjects.GameObject) {
-    console.log(`HackMan.hitWall(tile=${tile})`);
     this._hitWall = true;
     return;
   }
@@ -397,12 +355,8 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this.WalkDirection = walkDirection;
 
     this.setVelocity(
-      hackManWalkDirectionValues[this.WalkDirection].velocity.x *
-        this.scaleX *
-        this._speedMultiplier,
-      hackManWalkDirectionValues[this.WalkDirection].velocity.y *
-        this.scaleY *
-        this._speedMultiplier
+      hackManWalkDirectionValues[this.WalkDirection].velocity.x * this.scaleX * this._speedMultiplier,
+      hackManWalkDirectionValues[this.WalkDirection].velocity.y * this.scaleY * this._speedMultiplier
     );
 
     this.face(this.WalkDirection);
@@ -413,14 +367,8 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       faceDirection = faceDirection % (HackMan.MaxDirections + 1);
     }
     this._faceDirection = faceDirection;
-    this.anims.play(
-      `hackmanWalk${hackManWalkDirectionValues[faceDirection].direction}`,
-      true,
-      0
-    );
-    this.anims.msPerFrame =
-      Consts.Times.MilliSecondsInSecond /
-      (Consts.Game.HackManFrameRate * this._speedMultiplier);
+    this.anims.play(`hackmanWalk${hackManWalkDirectionValues[faceDirection].direction}`, true, 0);
+    this.anims.msPerFrame = Consts.Times.MilliSecondsInSecond / (Consts.Game.HackManFrameRate * this._speedMultiplier);
   }
 
   update() {
@@ -432,6 +380,15 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._shadowSprite.frame = this.frame;
 
     if (this.HackManState === HackManState.Paused) return;
+    let tile = this._mapLayer.getTileAtWorldXY(this.x, this.y, true);
+
+    if (this.WalkDirection === HackManWalkDirection.Up || this.WalkDirection === HackManWalkDirection.Down) {
+      this.x = ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
+    }
+
+    if (this.WalkDirection === HackManWalkDirection.Left || this.WalkDirection === HackManWalkDirection.Right) {
+      this.y = ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
+    }
 
     if (this._jumpHeight > 0) {
       this._jumpSprite.scale = this.scale;
@@ -442,9 +399,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       this.visible = false;
       this._jumpSprite.visible = true;
       this._shadowSprite.scale = this.scale * (1 - this._jumpHeight / 128);
-      this._shadowSprite.setAlpha(
-        (1 - this._jumpHeight / 128) * Consts.MagicNumbers.Quarter
-      );
+      this._shadowSprite.setAlpha((1 - this._jumpHeight / 128) * Consts.MagicNumbers.Quarter);
     } else {
       this.visible = true;
       this._jumpSprite.visible = false;
@@ -457,22 +412,12 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       return;
     }
 
-    let tile = this._mapLayer.getTileAtWorldXY(this.x, this.y, true);
-
-    if (
-      this.WalkDirection === HackManWalkDirection.Up ||
-      this.WalkDirection === HackManWalkDirection.Down
-    ) {
-      this.x =
-        ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
+    if (this.WalkDirection === HackManWalkDirection.Up || this.WalkDirection === HackManWalkDirection.Down) {
+      this.x = ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
     }
 
-    if (
-      this.WalkDirection === HackManWalkDirection.Left ||
-      this.WalkDirection === HackManWalkDirection.Right
-    ) {
-      this.y =
-        ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
+    if (this.WalkDirection === HackManWalkDirection.Left || this.WalkDirection === HackManWalkDirection.Right) {
+      this.y = ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
     }
 
     this._collideLeftSprite.scale = this._collideRightSprite.scale = this._collideUpSprite.scale = this._collideDownSprite.scale = this.scale;
@@ -486,16 +431,6 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._collideRightSprite.y = this.y;
     this._collideUpSprite.y = this.y - this.displayHeight;
     this._collideDownSprite.y = this.y + this.displayHeight;
-
-    // let x = this.x;
-    // let y = this.y;
-    // let w = this.displayWidth >> 1;
-    // let h = this.displayHeight >> 1;
-
-    // let tileLeft = this._mapLayer.getTileAtWorldXY(this.x - w, this.y - h, true);
-    // let tileRight = this._mapLayer.getTileAtWorldXY(this.x + w, this.y - h, true);
-    // let tileUp = this._mapLayer.getTileAtWorldXY(this.x + w, this.y + h, true);
-    // let tileDown = this._mapLayer.getTileAtWorldXY(this.x - w, this.y + h, true);
 
     let moveLeft = !this._collideLeftSprite.data.values.blocked;
     let moveRight = !this._collideRightSprite.data.values.blocked;
@@ -521,52 +456,29 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._collideDownSprite.data.values.blocked = false;
 
     if (this._hitWall) {
-      console.log(`HackMan.update() : _hitWall === true`);
       this._hitWall = false;
       this._canTurnCount = 0;
-      if (Math.random() > Consts.MagicNumbers.Quarter && moveLeft)
-        this.walk(HackManWalkDirection.Left);
-      else if (Math.random() > Consts.MagicNumbers.Quarter && moveRight)
-        this.walk(HackManWalkDirection.Right);
-      else if (Math.random() > Consts.MagicNumbers.Quarter && moveUp)
-        this.walk(HackManWalkDirection.Up);
-      else if (Math.random() > Consts.MagicNumbers.Quarter && moveDown)
-        this.walk(HackManWalkDirection.Down);
+      if (Math.random() > Consts.MagicNumbers.Quarter && moveLeft) this.walk(HackManWalkDirection.Left);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && moveRight) this.walk(HackManWalkDirection.Right);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && moveUp) this.walk(HackManWalkDirection.Up);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && moveDown) this.walk(HackManWalkDirection.Down);
       else this.walk(this.WalkDirection + 2);
     }
 
-    // if (tile1.x === tile2.x && tile2.x === tile3.x && tile3.x === tile4.x) {
-    //   if (tile1.y === tile2.y && tile2.y === tile3.y && tile3.y === tile4.y) {
-    //     if (tile1.x != this._previousX || tile1.y != this._previousY) {
-    //       let x = tile1.x;
-    //       let y = tile1.y;
-    //       this._previousX = x;
-    //       this._previousY = y;
-
-    if (
-      this.WalkDirection == HackManWalkDirection.Up ||
-      this.WalkDirection == HackManWalkDirection.Down
-    ) {
+    if (this.WalkDirection == HackManWalkDirection.Up || this.WalkDirection == HackManWalkDirection.Down) {
       if (moveLeft) {
         if (Math.random() >= Consts.MagicNumbers.Half) {
-          //this.y =
-          //  ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
           this.walk(HackManWalkDirection.Left);
         }
       } else {
         if (moveRight) {
           if (Math.random() >= Consts.MagicNumbers.Quarter) {
-            //this.y =
-            //  ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
             this.walk(HackManWalkDirection.Right);
           }
         }
       }
     } else {
-      if (
-        this.WalkDirection == HackManWalkDirection.Left ||
-        this.WalkDirection == HackManWalkDirection.Right
-      ) {
+      if (this.WalkDirection == HackManWalkDirection.Left || this.WalkDirection == HackManWalkDirection.Right) {
         if (moveUp) {
           if (Math.random() >= Consts.MagicNumbers.Half) {
             //this.x =
@@ -584,15 +496,5 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
         }
       }
     }
-
-    // console.log(
-    //   this._mapLayer.getTileAt(x - 1, y, true).index,
-    //   this._mapLayer.getTileAt(x + 1, y, true).index,
-    //   this._mapLayer.getTileAt(x, y - 1, true).index,
-    //   this._mapLayer.getTileAt(x, y + 1, true).index
-    // );
-    //     }
-    //   }
-    // }
   }
 }
