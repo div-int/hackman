@@ -24,7 +24,7 @@ export class GameOverScene extends Phaser.Scene {
   preload() {
     console.log(`GameOverScene::preload() : ${hackManGame.version}`);
 
-    this._gameOverText = this.UIScene.addBitmapText(innerWidth >> 1, innerHeight >> 1, 'G A M E  O V E R', 32, 1);
+    this._gameOverText = this.UIScene.addBitmapText(innerWidth >> 1, innerHeight >> 1, 'G A M E\nO V E R', 32, 1);
   }
 
   create() {
@@ -36,14 +36,13 @@ export class GameOverScene extends Phaser.Scene {
       this.sys.game.device.os.desktop ? 'Desktop' : 'Mobile'
     }`;
 
-    console.log(Math.round(timestamp / Consts.Times.MilliSecondsInSecond) % 2);
-    if (Math.round(timestamp / Consts.Times.MilliSecondsInSecond) % 2) {
+    if (Math.round(timestamp / (Consts.Times.MilliSecondsInSecond * Consts.Game.GameOverFlashRate)) % 2) {
       this._gameOverText.visible = true;
     } else {
       this._gameOverText.visible = false;
     }
 
     this._gameOverText.setX((innerWidth >> 1) - (this._gameOverText.getTextBounds(false).global.width >> 1));
-    this._gameOverText.setY(innerHeight >> 1);
+    this._gameOverText.setY((innerHeight >> 1) - (this._gameOverText.getTextBounds(false).global.height >> 1));
   }
 }

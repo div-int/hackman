@@ -50,6 +50,8 @@ namespace Consts {
     StartLives = 3,
     StartHighScore = 10000,
 
+    GameOverFlashRate = 0.5,
+
     MaxSpriteDesktop = 16,
     MaxSpriteMobile = 16,
     ScaleDesktop = 4,
