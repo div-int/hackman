@@ -19,8 +19,10 @@ export enum HackManWalkDirection {
 }
 
 export enum HackManState {
+  Moving,
   Paused,
   Invincible,
+  Dieing,
   Dead,
 }
 
@@ -52,6 +54,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
   private _hitWall: boolean;
   private _canTurnCount: number;
+  private _speedUpEvent: Phaser.Time.TimerEvent;
 
   static get MaxDirections(): number {
     return 3;
@@ -114,12 +117,24 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       this.anims.play('hackmanDead');
       return;
     }
+
+    // default
+
+    this._hackManState = hackManState;
   }
 
-  reset() {
-    this.x = this._startX;
-    this.y = this._startY;
-  }
+  // reset() {
+  //   this.visible = true;
+  //   this.x = this._startX;
+  //   this.y = this._startY;
+  //   this.scale = 4;
+  //   this.state = HackManState.Moving;
+  //   this._speedMultiplier = 1;
+  //   this._canTurnCount = 0;
+  //   this._jumpHeight = 0;
+
+  //   this.walk(HackManWalkDirection.Right);
+  // }
 
   constructor(scene: Phaser.Scene, mapLayer: Phaser.Tilemaps.StaticTilemapLayer, x: number, y: number) {
     super(scene, x, y, Consts.Resources.HackManSprites, defaultFrame);
@@ -272,6 +287,25 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     );
   }
 
+  destroy() {
+    if (this._speedUpEvent) {
+      this._speedUpEvent.destroy();
+    }
+
+    if (this._jumpingTween) {
+      this._jumpingTween.stop();
+    }
+
+    this._shadowSprite.destroy();
+    this._jumpSprite.destroy();
+    this._collideDownSprite.destroy();
+    this._collideLeftSprite.destroy();
+    this._collideRightSprite.destroy();
+    this._collideUpSprite.destroy();
+
+    super.destroy();
+  }
+
   speedUp(time: number) {
     this._speedMultiplier = Consts.Game.HackManSpeedUpMultiplier;
     this.setVelocity(
@@ -280,7 +314,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     );
     this.anims.msPerFrame = Consts.Times.MilliSecondsInSecond / (Consts.Game.HackManFrameRate * this._speedMultiplier);
 
-    this.scene.time.delayedCall(
+    this._speedUpEvent = this.scene.time.delayedCall(
       time,
       () => {
         this._speedMultiplier = 1;
@@ -375,11 +409,16 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this.depth = this.x + this.y * window.innerWidth;
 
     this._shadowSprite.visible = this.visible;
+    this._shadowSprite.scale = this.scale;
     this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;
     this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
     this._shadowSprite.frame = this.frame;
 
     if (this.HackManState === HackManState.Paused) return;
+    if (this.state === HackManState.Dieing || this.state === HackManState.Dead) {
+      return;
+    }
+
     let tile = this._mapLayer.getTileAtWorldXY(this.x, this.y, true);
 
     if (this.WalkDirection === HackManWalkDirection.Up || this.WalkDirection === HackManWalkDirection.Down) {
@@ -403,13 +442,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     } else {
       this.visible = true;
       this._jumpSprite.visible = false;
-      this._shadowSprite.scale = this.scale;
       this._shadowSprite.setAlpha(Consts.MagicNumbers.Quarter);
-    }
-
-    if (this.HackManState === HackManState.Dead) {
-      this._shadowSprite.scale = this.scale;
-      return;
     }
 
     if (this.WalkDirection === HackManWalkDirection.Up || this.WalkDirection === HackManWalkDirection.Down) {

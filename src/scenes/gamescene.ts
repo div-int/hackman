@@ -20,6 +20,7 @@ export class GameScene extends Phaser.Scene {
   private _ghostGroup: Phaser.Physics.Arcade.Group;
   private _maskShape: Phaser.GameObjects.Graphics;
   private _mask: Phaser.Display.Masks.GeometryMask;
+  private _attractLevel: Phaser.Tilemaps.Tilemap;
   private _backgroundImage: Phaser.GameObjects.Image;
   private _mapLayerBackground: Phaser.Tilemaps.StaticTilemapLayer;
   private _mapLayerBackgroundMask: Phaser.Tilemaps.DynamicTilemapLayer;
@@ -98,8 +99,8 @@ export class GameScene extends Phaser.Scene {
       bounceY: 0,
     });
 
-    let attractLevel = this.add.tilemap('attractLevel');
-    let attractTiles = attractLevel.addTilesetImage('default', 'defaultTiles', 16, 16, 1, 2);
+    this._attractLevel = this.add.tilemap('attractLevel');
+    let attractTiles = this._attractLevel.addTilesetImage('default', 'defaultTiles', 16, 16, 1, 2);
 
     this._maskShape = this.make.graphics(config);
     this._maskShape.setScrollFactor(Consts.MagicNumbers.Half);
@@ -113,19 +114,19 @@ export class GameScene extends Phaser.Scene {
       .setScrollFactor(Consts.MagicNumbers.Quarter)
       .setScale(scale / 2);
 
-    let mapLayerBackground = attractLevel
+    let mapLayerBackground = this._attractLevel
       .createStaticLayer('Background', attractTiles, -256 * scale, -256 * scale)
       .setDepth(3)
       .setScale(scale)
       .setScrollFactor(Consts.MagicNumbers.Half);
 
-    this._mapLayerWalls = attractLevel
+    this._mapLayerWalls = this._attractLevel
       .createStaticLayer('Walls', attractTiles, 0, 0)
       .setDepth(5)
       .setScale(scale)
       .setCollisionByExclusion([-1], true, true);
 
-    this._mapLayerShadows = attractLevel
+    this._mapLayerShadows = this._attractLevel
       .createBlankDynamicLayer(
         'Shadows',
         attractTiles,
@@ -162,7 +163,7 @@ export class GameScene extends Phaser.Scene {
       this._mapLayerShadows.putTileAt(tile, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
     });
 
-    this._mapLayerPills = attractLevel
+    this._mapLayerPills = this._attractLevel
       .createDynamicLayer('Pills', attractTiles, 0, 0)
       .setOriginFromFrame()
       .setDepth(7)
@@ -219,60 +220,45 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.physics.add.collider(this._hackmanGroup, this._ghostGroup, (hackman: HackMan, ghost: Ghost) => {
-      if (!hackman.OnFloor) return;
+      if (!this._hackman.OnFloor) return;
+      if (this._hackman.state === HackManState.Dieing || this._hackman.state === HackManState.Dead) return;
+      this._hackman.state = HackManState.Dieing;
+
       if (ghost.GhostState === GhostState.Eaten) return;
 
       if (ghost.GhostState === GhostState.Frightened) {
         ghost.GhostState = GhostState.Eaten;
       } else {
-        hackManGame.gameState.lives--;
-        hackman.HackManState = HackManState.Paused;
+        this._hackman.HackManState = HackManState.Paused;
         this._ghostGroup.children.iterate((ghost: Ghost) => {
           ghost.GhostState = GhostState.Paused;
         });
         this.time.delayedCall(
-          1000,
+          Consts.Times.MilliSecondsInSecond * Consts.MagicNumbers.Half,
           () => {
             this._ghostGroup.children.iterate((ghost: Ghost) => {
               ghost.visible = false;
             });
+            this._hackman.HackManState = HackManState.Dead;
           },
           [],
           this
         );
-        hackman.HackManState = HackManState.Dead;
         this.tweens.add({
-          targets: hackman,
-          scale: scale / 4,
+          targets: this._hackman,
           alpha: 0,
-          delay: 1000,
-          duration: 2000,
+          delay: Consts.Times.MilliSecondsInSecond * Consts.MagicNumbers.Half,
+          duration: Consts.Times.MilliSecondsInSecond * 2,
           ease: 'Power2',
+          loop: 0,
           onComplete: () => {
-            hackManGame.gameState.lives--;
-            this.lostLife(hackManGame.gameState.lives);
+            this.lostLife(hackManGame.gameState.lives--);
           },
         });
       }
     });
 
-    this._hackman = new HackMan(
-      this,
-      this._mapLayerWalls,
-      (8 + Consts.Game.HackManXStart * 16) * scale,
-      (8 + Consts.Game.HackManYStart * 16) * scale
-    ).setScale(scale);
-    this._hackmanGroup.runChildUpdate = true;
-    this._hackmanGroup.add(this._hackman);
-
-    this._hackman.walk(HackManWalkDirection.Right);
-
-    this.physics.world.setBounds(
-      0,
-      0,
-      attractLevel.widthInPixels * (scale >> 1),
-      attractLevel.heightInPixels * (scale >> 1)
-    );
+    this.createHackMan();
 
     this.cameras.main.setBackgroundColor(Consts.Colours.Black);
     this.cameras.main.startFollow(this._hackman, false, Consts.MagicNumbers.Tenth, Consts.MagicNumbers.Tenth);
@@ -305,6 +291,26 @@ export class GameScene extends Phaser.Scene {
         .add(this)
         .walk(3);
     }, this);
+  }
+
+  createHackMan() {
+    this._hackman = new HackMan(
+      this,
+      this._mapLayerWalls,
+      (8 + Consts.Game.HackManXStart * 16) * scale,
+      (8 + Consts.Game.HackManYStart * 16) * scale
+    ).setScale(scale);
+    this._hackmanGroup.runChildUpdate = true;
+    this._hackmanGroup.add(this._hackman);
+
+    this._hackman.walk(HackManWalkDirection.Right);
+
+    this.physics.world.setBounds(
+      0,
+      0,
+      this._attractLevel.widthInPixels * (scale >> 1),
+      this._attractLevel.heightInPixels * (scale >> 1)
+    );
   }
 
   removeGhosts() {
@@ -351,7 +357,8 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.cameras.main.stopFollow();
-    this._hackman.reset();
+    this._hackman.destroy();
+    this.createHackMan();
     this.cameras.main.startFollow(this._hackman, false, Consts.MagicNumbers.Tenth, Consts.MagicNumbers.Tenth);
 
     this.removeGhosts();
