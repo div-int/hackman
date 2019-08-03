@@ -23,12 +23,12 @@ export class GameOverScene extends Phaser.Scene {
 
   preload() {
     console.log(`GameOverScene::preload() : ${hackManGame.version}`);
+
+    this._gameOverText = this.UIScene.addBitmapText(innerWidth >> 1, innerHeight >> 1, 'G A M E  O V E R', 32, 1);
   }
 
   create() {
     console.log(`GameOverScene::create() : ${hackManGame.version}`);
-
-    this._gameOverText = this.UIScene.addBitmapText(innerWidth >> 1, innerHeight >> 1, 'G A M E  O V E R', 32, 1);
   }
 
   update(timestamp: number, elapsed: number) {
