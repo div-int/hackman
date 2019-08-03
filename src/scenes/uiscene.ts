@@ -48,6 +48,7 @@ export class UIScene extends Phaser.Scene {
     this._orientation = orientation;
   }
 
+
   public set versionPosition(value: number) {
     this._versionText.setX(value);
   }
@@ -55,6 +56,14 @@ export class UIScene extends Phaser.Scene {
   public set statusText(value: string | string[]) {
     this._statusText.setText(value);
     this._statusText.setX(-(this._statusText.getTextBounds(false).global.width >> 1));
+  }
+
+  public get orientation() {
+    return this._orientation;
+  }
+
+  public set orientation(orientation: Orientation) {
+    this._orientation = orientation;
   }
 
   public set windowText(value: string | string[]) {
