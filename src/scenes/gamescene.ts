@@ -346,7 +346,7 @@ export class GameScene extends Phaser.Scene {
     this._hackman.destroy();
 
     if (lives === 0) {
-      this.scene.pause();
+      //this.scene.pause();
       this.scene.launch(Consts.Scenes.GameOverScene);
       return;
     }
