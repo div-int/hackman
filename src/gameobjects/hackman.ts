@@ -352,15 +352,22 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
         this.scene.tweens.add({
           targets: this,
           JumpHeight: (height / 4) * this.scale,
-          /** scale:
-            (height / Consts.Game.HackManJumpHeight) *
-            (this.scale * Consts.Game.HackManJumpZoom), */
           duration: 250,
           ease: 'Sine.easeOut',
           yoyo: true,
           loop: 0,
           onComplete: () => {
-            this._isJumping = false;
+            this.scene.tweens.add({
+              targets: this,
+              JumpHeight: (height / 8) * this.scale,
+              duration: 125,
+              ease: 'Sine.easeOut',
+              yoyo: true,
+              loop: 0,
+              onComplete: () => {
+                this._isJumping = false;
+              },
+            });
           },
         });
       },
