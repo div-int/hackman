@@ -410,7 +410,6 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
   update() {
     this.depth = this.x + this.y * window.innerWidth;
 
-    this._shadowSprite.visible = this.visible;
     this._shadowSprite.scale = this.scale;
     this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;
     this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
@@ -442,11 +441,11 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       this.visible = false;
       this._jumpSprite.visible = true;
       this._shadowSprite.scale = this.scale * (1 - this._jumpHeight / 128);
-      this._shadowSprite.setAlpha((1 - this._jumpHeight / 128) * Consts.MagicNumbers.Quarter);
+      this._shadowSprite.alpha = (1 - this._jumpHeight / 128) * Consts.MagicNumbers.Quarter;
     } else {
       this.visible = true;
       this._jumpSprite.visible = false;
-      this._shadowSprite.setAlpha(Consts.MagicNumbers.Quarter);
+      this._shadowSprite.alpha = Consts.MagicNumbers.Quarter;
     }
 
     if (this.WalkDirection === HackManWalkDirection.Up || this.WalkDirection === HackManWalkDirection.Down) {

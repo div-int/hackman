@@ -244,7 +244,7 @@ export class GameScene extends Phaser.Scene {
           ease: 'Power2',
           loop: 0,
           onComplete: () => {
-            this.lostLife(hackManGame.gameState.lives--);
+            this.lostLife(--hackManGame.gameState.lives);
           },
         });
       }
