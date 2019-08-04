@@ -27,6 +27,7 @@ namespace Consts {
     Black = 0x000000,
     Red = 0xff0000,
     Green = 0x00ff00,
+    Yellow = 0xffff00,
     Cyan = 0x00ffff,
     Blue = 0x0000ff,
     White = 0xffffff,

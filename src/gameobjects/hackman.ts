@@ -296,6 +296,8 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       this._jumpingTween.stop();
     }
 
+    this.stopJump();
+
     this._shadowSprite.destroy();
     this._jumpSprite.destroy();
     this._collideDownSprite.destroy();
@@ -415,7 +417,9 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._shadowSprite.frame = this.frame;
 
     if (this.HackManState === HackManState.Paused) return;
+
     if (this.state === HackManState.Dieing || this.state === HackManState.Dead) {
+      this._shadowSprite.alpha = this.alpha * Consts.MagicNumbers.Quarter;
       return;
     }
 
@@ -465,21 +469,21 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._collideUpSprite.y = this.y - this.displayHeight;
     this._collideDownSprite.y = this.y + this.displayHeight;
 
-    let moveLeft = !this._collideLeftSprite.data.values.blocked;
-    let moveRight = !this._collideRightSprite.data.values.blocked;
-    let moveUp = !this._collideUpSprite.data.values.blocked;
-    let moveDown = !this._collideDownSprite.data.values.blocked;
+    let canMoveLeft = !this._collideLeftSprite.data.values.blocked;
+    let canMoveRight = !this._collideRightSprite.data.values.blocked;
+    let canMoveUp = !this._collideUpSprite.data.values.blocked;
+    let canMoveDown = !this._collideDownSprite.data.values.blocked;
 
-    if (moveLeft) {
+    if (canMoveLeft) {
       this._collideLeftSprite.body.debugBodyColor = Consts.Colours.Green;
     }
-    if (moveRight) {
+    if (canMoveRight) {
       this._collideRightSprite.body.debugBodyColor = Consts.Colours.Green;
     }
-    if (moveUp) {
+    if (canMoveUp) {
       this._collideUpSprite.body.debugBodyColor = Consts.Colours.Green;
     }
-    if (moveDown) {
+    if (canMoveDown) {
       this._collideDownSprite.body.debugBodyColor = Consts.Colours.Green;
     }
 
@@ -491,20 +495,20 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     if (this._hitWall) {
       this._hitWall = false;
       this._canTurnCount = 0;
-      if (Math.random() > Consts.MagicNumbers.Quarter && moveLeft) this.walk(HackManWalkDirection.Left);
-      else if (Math.random() > Consts.MagicNumbers.Quarter && moveRight) this.walk(HackManWalkDirection.Right);
-      else if (Math.random() > Consts.MagicNumbers.Quarter && moveUp) this.walk(HackManWalkDirection.Up);
-      else if (Math.random() > Consts.MagicNumbers.Quarter && moveDown) this.walk(HackManWalkDirection.Down);
+      if (Math.random() > Consts.MagicNumbers.Quarter && canMoveLeft) this.walk(HackManWalkDirection.Left);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && canMoveRight) this.walk(HackManWalkDirection.Right);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && canMoveUp) this.walk(HackManWalkDirection.Up);
+      else if (Math.random() > Consts.MagicNumbers.Quarter && canMoveDown) this.walk(HackManWalkDirection.Down);
       else this.walk(this.WalkDirection + 2);
     }
 
     if (this.WalkDirection == HackManWalkDirection.Up || this.WalkDirection == HackManWalkDirection.Down) {
-      if (moveLeft) {
+      if (canMoveLeft) {
         if (Math.random() >= Consts.MagicNumbers.Half) {
           this.walk(HackManWalkDirection.Left);
         }
       } else {
-        if (moveRight) {
+        if (canMoveRight) {
           if (Math.random() >= Consts.MagicNumbers.Quarter) {
             this.walk(HackManWalkDirection.Right);
           }
@@ -512,14 +516,14 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       }
     } else {
       if (this.WalkDirection == HackManWalkDirection.Left || this.WalkDirection == HackManWalkDirection.Right) {
-        if (moveUp) {
+        if (canMoveUp) {
           if (Math.random() >= Consts.MagicNumbers.Half) {
             //this.x =
             //  ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
             this.walk(HackManWalkDirection.Up);
           }
         } else {
-          if (moveDown) {
+          if (canMoveDown) {
             if (Math.random() >= Consts.MagicNumbers.Quarter) {
               //this.x =
               //  ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;

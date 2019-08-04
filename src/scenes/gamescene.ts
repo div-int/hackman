@@ -53,10 +53,6 @@ export class GameScene extends Phaser.Scene {
   constructor() {
     super(Consts.Scenes.GameScene);
     console.log(`GameScene::constructor() : ${hackManGame.version}`);
-
-    // window.onresize = () => {
-    //   this.physics.world.setBounds(0, 0, window.innerWidth, window.innerHeight);
-    // };
   }
 
   init() {
@@ -74,7 +70,6 @@ export class GameScene extends Phaser.Scene {
   preload() {
     console.log(`GameScene::preload() : ${hackManGame.version}`);
 
-    // HackMan.load(this);
     Ghost.load(this);
 
     this.load.tilemapTiledJSON('attractLevel', require('../assets/levels/attract.json'));
@@ -109,7 +104,6 @@ export class GameScene extends Phaser.Scene {
     this._backgroundImage = this.add
       .image(0, 0, 'stars1')
       .setDepth(5)
-      // .setAlpha(Consts.MagicNumbers.Half)
       .setMask(this._mask)
       .setScrollFactor(Consts.MagicNumbers.Quarter)
       .setScale(scale / 2);
@@ -176,8 +170,6 @@ export class GameScene extends Phaser.Scene {
         this._mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
       }
     });
-
-    //this.animatedTiles.init(attractLevel);
 
     this.physics.add.overlap(this._hackmanGroup, this._mapLayerPills, (hackman: HackMan, tile: any) => {
       if (!hackman.anims.currentFrame.isFirst && !hackman.isJumping) return;
@@ -350,14 +342,15 @@ export class GameScene extends Phaser.Scene {
   }
 
   lostLife(lives: number) {
+    this.cameras.main.stopFollow();
+    this._hackman.destroy();
+
     if (lives === 0) {
       this.scene.pause();
       this.scene.launch(Consts.Scenes.GameOverScene);
       return;
     }
 
-    this.cameras.main.stopFollow();
-    this._hackman.destroy();
     this.createHackMan();
     this.cameras.main.startFollow(this._hackman, false, Consts.MagicNumbers.Tenth, Consts.MagicNumbers.Tenth);
 
