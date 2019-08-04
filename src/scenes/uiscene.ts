@@ -22,6 +22,7 @@ export class UIScene extends Phaser.Scene {
   private _score1UPText: Phaser.GameObjects.BitmapText;
   private _score2UPText: Phaser.GameObjects.BitmapText;
   private _highScoreText: Phaser.GameObjects.BitmapText;
+  private _livesText: Phaser.GameObjects.BitmapText;
   private _gameStateContainer: Phaser.GameObjects.Container;
 
   public get isMobile() {
@@ -98,6 +99,18 @@ export class UIScene extends Phaser.Scene {
 
   public set highScoreText(value: number) {
     this._highScoreText.text = value.toFixed(0).padStart(6, '000000');
+  }
+
+  public set livesText(value: number) {
+    let tmp = '';
+
+    if (value > 0) {
+      for (let i = 0; i < value; i++) {
+        tmp += '\x01';
+      }
+    }
+
+    this._livesText.text = tmp;
   }
 
   public addBitmapText(
@@ -203,14 +216,14 @@ export class UIScene extends Phaser.Scene {
       (this._statusText = this.addBitmapText(
         0,
         -(Consts.UI.StatusTextSize - Consts.UI.Margin) * scale,
-        '<Placeholder>',
+        '',
         Consts.UI.StatusTextSize,
         Phaser.GameObjects.BitmapText.ALIGN_CENTER
       )),
       (this._windowText = this.addBitmapText(
         (window.innerWidth >> 1) - Consts.UI.Margin * scale,
         -(Consts.UI.StatusTextSize - Consts.UI.Margin) * scale,
-        '<Placeholder>',
+        '',
         Consts.UI.StatusTextSize,
         Phaser.GameObjects.BitmapText.ALIGN_RIGHT
       )),
@@ -244,6 +257,13 @@ export class UIScene extends Phaser.Scene {
         Consts.UI.TextSize,
         1
       )),
+      (this._livesText = this.addBitmapText(
+        -(window.innerWidth >> 1) + Consts.UI.Margin * scale,
+        Consts.UI.Margin * scale,
+        '\x01\x01\x01',
+        Consts.UI.TextSize,
+        0
+      ).setTint(Consts.Colours.Yellow)),
     ]);
   }
 
@@ -282,5 +302,6 @@ export class UIScene extends Phaser.Scene {
 
     this.score1UPText = hackManGame.gameState.score;
     this.highScoreText = hackManGame.gameState.highScore;
+    this.livesText = hackManGame.gameState.lives;
   }
 }

@@ -32,6 +32,7 @@ export enum GhostWalkDirection {
 }
 
 export enum GhostState {
+  Paused,
   Waiting,
   Chase,
   Scatter,
@@ -69,6 +70,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   private _shadowSprite: Phaser.Physics.Arcade.Sprite;
   private _previousX: number;
   private _previousY: number;
+  private _previousState: GhostState;
 
   static MaxGhostNo() {
     return maxGhostNo;
@@ -121,6 +123,13 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   set GhostState(ghostState: GhostState) {
     if (ghostState === this._ghostState) return;
 
+    if (ghostState === GhostState.Paused) {
+      this.body.stop();
+      this.anims.pause();
+      this._ghostState = ghostState;
+      return;
+    }
+
     if (ghostState === GhostState.Frightened) {
       if (this._ghostState === GhostState.Eaten) return;
       this.setAlpha(Consts.MagicNumbers.ThreeQuarters);
@@ -131,6 +140,7 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
       this.walk(this.WalkDirection + 2);
       return;
     }
+
     if (ghostState === GhostState.Eaten) {
       this.setAlpha(Consts.MagicNumbers.One);
       this.SpeedMultiplier = 2;
@@ -499,10 +509,13 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   update() {
     this.setDepth(this.x + this.y * window.innerWidth);
 
+    this._shadowSprite.visible = this.visible;
     this._shadowSprite.scale = this.scale;
     this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;
     this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
     this._shadowSprite.frame = this.frame;
+
+    if (this.GhostState === GhostState.Paused) return;
 
     let x = this.x;
     let y = this.y;
