@@ -113,6 +113,7 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     if (hackManState === HackManState.Dead) {
       this._hackManState = hackManState;
       this.stopJump();
+      this.body.stop();
       this.anims.resume();
       this.anims.play('hackmanDead');
       return;
@@ -122,19 +123,6 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
 
     this._hackManState = hackManState;
   }
-
-  // reset() {
-  //   this.visible = true;
-  //   this.x = this._startX;
-  //   this.y = this._startY;
-  //   this.scale = 4;
-  //   this.state = HackManState.Moving;
-  //   this._speedMultiplier = 1;
-  //   this._canTurnCount = 0;
-  //   this._jumpHeight = 0;
-
-  //   this.walk(HackManWalkDirection.Right);
-  // }
 
   constructor(scene: Phaser.Scene, mapLayer: Phaser.Tilemaps.StaticTilemapLayer, x: number, y: number) {
     super(scene, x, y, Consts.Resources.HackManSprites, defaultFrame);
@@ -168,10 +156,31 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     scene.anims.create({
       key: 'hackmanDead',
       frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-        frames: [4, 20, 36, 40],
+        frames: [
+          6,
+          6 + 16,
+          6 + 32,
+          6 + 48,
+          7,
+          7 + 16,
+          7 + 32,
+          7 + 48,
+          8,
+          8 + 16,
+          8 + 32,
+          8 + 48,
+          9,
+          9 + 16,
+          9 + 32,
+          9 + 48,
+          10,
+          10 + 16,
+          10 + 32,
+          10 + 48,
+        ],
       }),
-      frameRate: Consts.Game.HackManFrameRate / 4,
-      repeat: -1,
+      frameRate: Consts.Game.HackManFrameRate / 2,
+      repeat: 0,
     });
 
     scene.anims.create({
@@ -319,17 +328,20 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
     this._speedUpEvent = this.scene.time.delayedCall(
       time,
       () => {
-        this._speedMultiplier = 1;
-        this.setVelocity(
-          hackManWalkDirectionValues[this.WalkDirection].velocity.x * this.scaleX * this._speedMultiplier,
-          hackManWalkDirectionValues[this.WalkDirection].velocity.y * this.scaleY * this._speedMultiplier
-        );
-        this.anims.msPerFrame =
-          Consts.Times.MilliSecondsInSecond / (Consts.Game.HackManFrameRate * this._speedMultiplier);
+        this.stopSpeedUp();
       },
       [],
       this
     );
+  }
+
+  stopSpeedUp() {
+    this._speedMultiplier = 1;
+    this.setVelocity(
+      hackManWalkDirectionValues[this.WalkDirection].velocity.x * this.scaleX * this._speedMultiplier,
+      hackManWalkDirectionValues[this.WalkDirection].velocity.y * this.scaleY * this._speedMultiplier
+    );
+    this.anims.msPerFrame = Consts.Times.MilliSecondsInSecond / (Consts.Game.HackManFrameRate * this._speedMultiplier);
   }
 
   jump(height?: number) {
@@ -366,6 +378,9 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
               loop: 0,
               onComplete: () => {
                 this._isJumping = false;
+                this.visible = true;
+                this._jumpSprite.visible = false;
+                this._shadowSprite.alpha = Consts.MagicNumbers.Quarter;
               },
             });
           },
@@ -449,10 +464,6 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       this._jumpSprite.visible = true;
       this._shadowSprite.scale = this.scale * (1 - this._jumpHeight / 128);
       this._shadowSprite.alpha = (1 - this._jumpHeight / 128) * Consts.MagicNumbers.Quarter;
-    } else {
-      this.visible = true;
-      this._jumpSprite.visible = false;
-      this._shadowSprite.alpha = Consts.MagicNumbers.Quarter;
     }
 
     if (this.WalkDirection === HackManWalkDirection.Up || this.WalkDirection === HackManWalkDirection.Down) {
