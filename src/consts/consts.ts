@@ -34,9 +34,9 @@ namespace Consts {
   }
 
   export const enum UI {
-    Margin = 2,
+    Margin = 4,
     StatusTextSize = 8,
-    TextSize = 12,
+    TextSize = 16,
   }
 
   export const enum Times {
@@ -53,7 +53,7 @@ namespace Consts {
 
     GameOverFlashRate = 0.5,
 
-    MaxSpriteDesktop = 16,
+    MaxSpriteDesktop = 32,
     MaxSpriteMobile = 16,
     ScaleDesktop = 4,
     ScaleMobile = 2,

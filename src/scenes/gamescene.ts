@@ -7,8 +7,6 @@ import { Ghost, GhostState, GhostWalkDirection } from '../gameobjects/ghost';
 import { config } from '../config/config';
 import { hackManGame } from '../index';
 
-// const hackmanSprites = "hackmanSprites";
-
 let maxsprite: number;
 let scale: number;
 
@@ -97,8 +95,11 @@ export class GameScene extends Phaser.Scene {
     this._attractLevel = this.add.tilemap('attractLevel');
     let attractTiles = this._attractLevel.addTilesetImage('default', 'defaultTiles', 16, 16, 1, 2);
 
-    this._maskShape = this.make.graphics(config);
-    this._maskShape.setScrollFactor(Consts.MagicNumbers.Half);
+    this._maskShape = this.make
+      .graphics(config)
+      .setScrollFactor(Consts.MagicNumbers.Half)
+      .setScale(scale);
+
     this._mask = this._maskShape.createGeometryMask();
 
     this._backgroundImage = this.add
@@ -176,10 +177,7 @@ export class GameScene extends Phaser.Scene {
       if (!hackman.OnFloor) return;
 
       if (tile.index != -1) {
-        this._maskShape.fillStyle(Consts.Colours.White);
-        this._maskShape.beginPath();
-        this._maskShape.fillRect((tile.x - 8) * 32 * scale, (tile.y - 8) * 32 * scale, 32 * scale, 32 * scale);
-        this._maskShape.closePath();
+        this.createBackgroundMask(tile, 32);
 
         if (tile.index === Consts.Game.FoodPillTile) hackManGame.gameState.score += Consts.Scores.FoodPill;
 
@@ -283,6 +281,13 @@ export class GameScene extends Phaser.Scene {
         .add(this)
         .walk(3);
     }, this);
+  }
+
+  createBackgroundMask(tile: Phaser.Tilemaps.Tile, size: number) {
+    this._maskShape.fillStyle(Consts.Colours.White);
+    this._maskShape.beginPath();
+    this._maskShape.fillRect((tile.x - 8) * size, (tile.y - 8) * size, size, size);
+    this._maskShape.closePath();
   }
 
   createHackMan() {
