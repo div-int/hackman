@@ -6,6 +6,7 @@ import { HackMan, HackManWalkDirection, HackManState } from '../gameobjects/hack
 import { Ghost, GhostState, GhostWalkDirection } from '../gameobjects/ghost';
 import { config } from '../config/config';
 import { hackManGame } from '../index';
+import { Sprite } from '../gameobjects/sprite';
 
 let maxsprite: number;
 let scale: number;
@@ -25,6 +26,8 @@ export class GameScene extends Phaser.Scene {
   private _mapLayerShadows: Phaser.Tilemaps.DynamicTilemapLayer;
   private _mapLayerPills: Phaser.Tilemaps.DynamicTilemapLayer;
   private _mapLayerWalls: Phaser.Tilemaps.StaticTilemapLayer;
+
+  private _sprite: Sprite;
 
   get UIScene(): UIScene {
     if (!this._uiscene) return (this._uiscene = <UIScene>this.scene.get(Consts.Scenes.UIScene));
@@ -308,6 +311,18 @@ export class GameScene extends Phaser.Scene {
       this._attractLevel.widthInPixels * (scale >> 1),
       this._attractLevel.heightInPixels * (scale >> 1)
     );
+
+    this._sprite = new Sprite(
+      this,
+      (8 + Consts.Game.HackManXStart * 16) * scale,
+      (8 + Consts.Game.HackManYStart * 16) * scale,
+      Consts.Resources.HackManSprites,
+      0,
+      true,
+      Sprite.ColliderType.All
+    )
+      .setDepth(6)
+      .setScale(4);
   }
 
   removeGhosts() {
@@ -349,6 +364,7 @@ export class GameScene extends Phaser.Scene {
   lostLife(lives: number) {
     this.cameras.main.stopFollow();
     this._hackman.destroy();
+    this._sprite.destroy();
 
     if (lives === 0) {
       //this.scene.pause();
@@ -395,5 +411,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.animatePillTiles(timestamp);
+
+    this._sprite.update();
   }
 }
