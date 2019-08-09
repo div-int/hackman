@@ -261,8 +261,8 @@ export class GameScene extends Phaser.Scene {
         new Ghost(
           this,
           this._mapLayerWalls,
-          0,
-          0,
+          (8 + Phaser.Math.Between(Consts.Game.GhostXStart - 1, Consts.Game.GhostXStart + 2) * 16) * scale,
+          (8 + Phaser.Math.Between(Consts.Game.GhostYStart - 1, Consts.Game.GhostYStart + 1) * 16) * scale,
           Phaser.Math.Between(0, Ghost.MaxGhostNo()),
           GhostWalkDirection.Down,
           GhostState.Chase
@@ -324,8 +324,8 @@ export class GameScene extends Phaser.Scene {
       let ghost = new Ghost(
         this,
         this._mapLayerWalls,
-        0,
-        0,
+        (8 + Phaser.Math.Between(Consts.Game.GhostXStart - 1, Consts.Game.GhostXStart + 2) * 16) * scale,
+        (8 + Phaser.Math.Between(Consts.Game.GhostYStart - 1, Consts.Game.GhostYStart + 1) * 16) * scale,
         Phaser.Math.Between(0, Ghost.MaxGhostNo()),
         GhostWalkDirection.Down,
         GhostState.Chase
@@ -399,6 +399,10 @@ export class GameScene extends Phaser.Scene {
       if (ghost.GhostState === GhostState.Chase) {
         ghost.targetX = this._hackman.x;
         ghost.targetY = this._hackman.y;
+      }
+      if (ghost.GhostState === GhostState.Frightened) {
+        ghost.targetX = Consts.Game.GhostXStart * 16 * scale;
+        ghost.targetY = Consts.Game.GhostYStart * 16 * scale;
       }
     });
 

@@ -48,13 +48,13 @@ namespace Consts {
   }
 
   export const enum Game {
-    StartLives = 3,
+    StartLives = 10,
     StartHighScore = 10000,
 
     GameOverFlashRate = 0.5,
 
-    MaxSpriteDesktop = 4,
-    MaxSpriteMobile = 4,
+    MaxSpriteDesktop = 16,
+    MaxSpriteMobile = 16,
     ScaleDesktop = 4,
     ScaleMobile = 2,
 

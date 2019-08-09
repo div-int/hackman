@@ -556,26 +556,76 @@ export class Ghost extends Sprite {
     // let tile = this._mapLayer.getTileAtWorldXY(x, y, true);
 
     if (this._hitWall) {
+      this.setDebugBodyColor(Consts.Colours.Red);
       this._hitWall = false;
-      if (this._targetX < this.x && this.canMoveLeft) this.walk(GhostWalkDirection.Left);
-      else if (this._targetX > this.x && this.canMoveRight) this.walk(GhostWalkDirection.Right);
-      else if (this._targetY < this.y && this.canMoveUp) this.walk(GhostWalkDirection.Up);
-      else if (this._targetY > this.x && this.canMoveDown) this.walk(GhostWalkDirection.Down);
-      //else this.walk(this.WalkDirection + Phaser.Math.Between(1, 3));
-      return;
+      if (this._targetX < this.x && this.canMoveLeft) {
+        this.walk(GhostWalkDirection.Left);
+        return;
+      }
+      if (this._targetX > this.x && this.canMoveRight) {
+        this.walk(GhostWalkDirection.Right);
+        return;
+      }
+      if (this._targetY < this.y && this.canMoveUp) {
+        this.walk(GhostWalkDirection.Up);
+        return;
+      }
+      if (this._targetY > this.x && this.canMoveDown) {
+        this.walk(GhostWalkDirection.Down);
+        return;
+      }
+      if (this.canMoveLeft) {
+        this.walk(GhostWalkDirection.Left);
+        return;
+      }
+      if (this.canMoveRight) {
+        this.walk(GhostWalkDirection.Right);
+        return;
+      }
+      if (this.canMoveUp) {
+        this.walk(GhostWalkDirection.Up);
+        return;
+      }
+      if (this.canMoveDown) {
+        this.walk(GhostWalkDirection.Down);
+        return;
+      }
+      // else this.walk(this.WalkDirection + Phaser.Math.Between(1, 3));
     }
+    this.setDebugBodyColor(Consts.Colours.White);
 
     if (this.WalkDirection === GhostWalkDirection.Up || this.WalkDirection === GhostWalkDirection.Down) {
       // this.x = ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
-      if (this._targetX < this.x && this.canMoveLeft) this.walk(GhostWalkDirection.Left);
-      else if (this._targetX > this.x && this.canMoveRight) this.walk(GhostWalkDirection.Right);
-      return;
+      if (this._targetX < this.x && this.canMoveLeft) {
+        this.walk(GhostWalkDirection.Left);
+        return;
+      }
+      if (this._targetX > this.x && this.canMoveRight) {
+        this.walk(GhostWalkDirection.Right);
+        return;
+      }
     }
     if (this.WalkDirection === GhostWalkDirection.Left || this.WalkDirection === GhostWalkDirection.Right) {
       // this.y = ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
-      if (this._targetY < this.y && this.canMoveUp) this.walk(GhostWalkDirection.Up);
-      else if (this._targetY > this.y && this.canMoveDown) this.walk(GhostWalkDirection.Down);
-      return;
+      if (this._targetY < this.y && this.canMoveUp) {
+        this.walk(GhostWalkDirection.Up);
+        return;
+      }
+      if (this._targetY > this.y && this.canMoveDown) {
+        this.walk(GhostWalkDirection.Down);
+        return;
+      }
+    }
+    this.setDebugBodyColor(Consts.Colours.Green);
+    if (this.body.touching.none === false) {
+      console.log(
+        this.WalkDirection,
+        this.body.touching,
+        this.canMoveUp,
+        this.canMoveDown,
+        this.canMoveLeft,
+        this.canMoveRight
+      );
     }
 
     // let tile1 = this._mapLayer.getTileAtWorldXY(x - w, y - h, true);
