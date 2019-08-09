@@ -27,8 +27,6 @@ export class GameScene extends Phaser.Scene {
   private _mapLayerPills: Phaser.Tilemaps.DynamicTilemapLayer;
   private _mapLayerWalls: Phaser.Tilemaps.StaticTilemapLayer;
 
-  private _sprite: Sprite;
-
   get UIScene(): UIScene {
     if (!this._uiscene) return (this._uiscene = <UIScene>this.scene.get(Consts.Scenes.UIScene));
     else return this._uiscene;
@@ -266,7 +264,8 @@ export class GameScene extends Phaser.Scene {
           0,
           0,
           Phaser.Math.Between(0, Ghost.MaxGhostNo()),
-          GhostWalkDirection.Down
+          GhostWalkDirection.Down,
+          GhostState.Chase
         ).setScale(scale),
         true
       );
@@ -311,40 +310,27 @@ export class GameScene extends Phaser.Scene {
       this._attractLevel.widthInPixels * (scale >> 1),
       this._attractLevel.heightInPixels * (scale >> 1)
     );
-
-    this._sprite = new Sprite(
-      this,
-      (8 + Consts.Game.HackManXStart * 16) * scale,
-      (8 + Consts.Game.HackManYStart * 16) * scale,
-      Consts.Resources.HackManSprites,
-      0,
-      true,
-      Sprite.ColliderType.All
-    )
-      .setDepth(6)
-      .setScale(4);
   }
 
   removeGhosts() {
     this._ghostGroup.children.each((ghost: Ghost) => {
-      ghost.destroyGhost();
+      ghost.destroy();
       this._ghostGroup.remove(ghost, true, true);
     });
   }
 
   addGhosts() {
     for (let i = 0; i < maxsprite; i++) {
-      this._ghostGroup.add(
-        new Ghost(
-          this,
-          this._mapLayerWalls,
-          0,
-          0,
-          Phaser.Math.Between(0, Ghost.MaxGhostNo()),
-          GhostWalkDirection.Down
-        ).setScale(scale),
-        true
-      );
+      let ghost = new Ghost(
+        this,
+        this._mapLayerWalls,
+        0,
+        0,
+        Phaser.Math.Between(0, Ghost.MaxGhostNo()),
+        GhostWalkDirection.Down,
+        GhostState.Chase
+      ).setScale(scale);
+      this._ghostGroup.add(ghost, true);
     }
 
     this._ghostGroup.children.each((ghost: Ghost) => {
@@ -364,7 +350,6 @@ export class GameScene extends Phaser.Scene {
   lostLife(lives: number) {
     this.cameras.main.stopFollow();
     this._hackman.destroy();
-    this._sprite.destroy();
 
     if (lives === 0) {
       //this.scene.pause();
@@ -410,8 +395,13 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
-    this.animatePillTiles(timestamp);
+    this._ghostGroup.children.iterate((ghost: Ghost) => {
+      if (ghost.GhostState === GhostState.Chase) {
+        ghost.targetX = this._hackman.x;
+        ghost.targetY = this._hackman.y;
+      }
+    });
 
-    this._sprite.update();
+    this.animatePillTiles(timestamp);
   }
 }

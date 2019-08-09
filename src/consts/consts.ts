@@ -53,8 +53,8 @@ namespace Consts {
 
     GameOverFlashRate = 0.5,
 
-    MaxSpriteDesktop = 32,
-    MaxSpriteMobile = 16,
+    MaxSpriteDesktop = 4,
+    MaxSpriteMobile = 4,
     ScaleDesktop = 4,
     ScaleMobile = 2,
 

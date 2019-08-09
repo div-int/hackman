@@ -1,7 +1,7 @@
 import 'phaser';
+import { Sprite } from './sprite';
 import { Typed } from '@div-int/typedfsm';
 
-// const Consts.Resources.HackManSprites = "Consts.Resources.HackManSprites";
 const maxGhostNo = 4;
 const maxDirections = 3;
 
@@ -49,7 +49,7 @@ export enum GhostAction {
   Pause,
 }
 
-const ghostState = new Typed.FSM<GhostState, GhostAction>(GhostState.Chase);
+//const ghostState = new Typed.FSM<GhostState, GhostAction>(GhostState.Chase);
 
 const ghostWalkDirectionValues = [
   { direction: 'Right', velocity: { x: Consts.Game.GhostSpeed, y: 0 } },
@@ -58,7 +58,7 @@ const ghostWalkDirectionValues = [
   { direction: 'Up', velocity: { x: 0, y: -Consts.Game.GhostSpeed } },
 ];
 
-export class Ghost extends Phaser.Physics.Arcade.Sprite {
+export class Ghost extends Sprite {
   private _ghostNo: number;
   private _mapLayer: Phaser.Tilemaps.StaticTilemapLayer;
   private _walkDirection: GhostWalkDirection;
@@ -67,10 +67,13 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   private _speedMultiplier: number;
   private _animationPrefix: string;
   private _ghostState: GhostState;
-  private _shadowSprite: Phaser.Physics.Arcade.Sprite;
-  private _previousX: number;
-  private _previousY: number;
-  private _previousState: GhostState;
+  private _targetX: number;
+  private _targetY: number;
+  private _walkDelay = 0;
+  // private _shadowSprite: Phaser.Physics.Arcade.Sprite;
+  // private _previousX: number;
+  // private _previousY: number;
+  // private _previousState: GhostState;
 
   static MaxGhostNo() {
     return maxGhostNo;
@@ -156,6 +159,14 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     this._animationPrefix = `ghost${this.GhostNo}`;
     this._ghostState = ghostState;
     this.updateAnimation();
+  }
+
+  public set targetX(value: number) {
+    this._targetX = value;
+  }
+
+  public set targetY(value: number) {
+    this._targetY = value;
   }
 
   static load(scene: Phaser.Scene) {
@@ -430,19 +441,29 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
     walkDirection: number,
     ghostState?: GhostState
   ) {
-    super(scene, x, y, Consts.Resources.HackManSprites, defaultFrame[ghostNo]);
-
-    this._mapLayer = mapLayer;
-    this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
+    super(
       scene,
       x,
       y,
       Consts.Resources.HackManSprites,
-      defaultFrame[ghostNo]
-    )
-      .setDepth(4)
-      .setTint(0)
-      .setAlpha(Consts.MagicNumbers.Quarter);
+      defaultFrame[ghostNo],
+      true,
+      Sprite.ColliderType.LeftRightUpDown
+    );
+
+    this._mapLayer = mapLayer;
+    // this._shadowSprite = new Phaser.Physics.Arcade.Sprite(
+    //   scene,
+    //   x,
+    //   y,
+    //   Consts.Resources.HackManSprites,
+    //   defaultFrame[ghostNo]
+    // )
+    //   .setDepth(4)
+    //   .setTint(0)
+    //   .setAlpha(Consts.MagicNumbers.Quarter);
+
+    scene.physics.add.overlap(this.colliderGroup, mapLayer, this.colliderCallback);
 
     this._ghostNo = ghostNo;
     this._walkDirection = walkDirection;
@@ -459,15 +480,14 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   add(scene: Phaser.Scene): Ghost {
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    scene.add.existing(this._shadowSprite);
+    // scene.add.existing(this._shadowSprite);
 
     return this;
   }
 
-  destroyGhost() {
-    this.anims.stop();
-    this._shadowSprite.destroy();
-    this.destroy();
+  destroy() {
+    // console.log('Ghost.destroy()');
+    super.destroy();
   }
 
   updateAnimation(): Ghost {
@@ -483,9 +503,19 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
 
   walk(walkDirection: GhostWalkDirection): Ghost {
     if (!this.active) return;
+    if (--this._walkDelay > 0) return;
     if (this.WalkDirection === walkDirection) return;
 
     this.WalkDirection = walkDirection;
+    if (this.WalkDirection === GhostWalkDirection.Up || this.WalkDirection === GhostWalkDirection.Down) {
+      this.x = (this.displayWidth >> 1) + Math.floor(this.x / this.displayWidth) * this.displayWidth;
+    }
+
+    if (this.WalkDirection === GhostWalkDirection.Left || this.WalkDirection === GhostWalkDirection.Right) {
+      this.y = (this.displayHeight >> 1) + Math.floor(this.y / this.displayHeight) * this.displayHeight;
+    }
+
+    this._walkDelay = 4;
 
     this.setVelocity(
       ghostWalkDirectionValues[this.WalkDirection].velocity.x * this.scaleX * this.SpeedMultiplier,
@@ -507,80 +537,86 @@ export class Ghost extends Phaser.Physics.Arcade.Sprite {
   }
 
   update() {
+    super.update();
     this.setDepth(this.x + this.y * window.innerWidth);
 
-    this._shadowSprite.visible = this.visible;
-    this._shadowSprite.scale = this.scale;
-    this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;
-    this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
-    this._shadowSprite.frame = this.frame;
+    // this._shadowSprite.visible = this.visible;
+    // this._shadowSprite.scale = this.scale;
+    // this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;
+    // this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
+    // this._shadowSprite.frame = this.frame;
 
     if (this.GhostState === GhostState.Paused) return;
 
-    let x = this.x;
-    let y = this.y;
-    let w = (this.displayWidth >> 1) - 8;
-    let h = (this.displayHeight >> 1) - 8;
+    // let x = this.x;
+    // let y = this.y;
+    // let w = (this.displayWidth >> 1) - 8;
+    // let h = (this.displayHeight >> 1) - 8;
 
-    let tile = this._mapLayer.getTileAtWorldXY(x, y, true);
-
-    if (this.WalkDirection === GhostWalkDirection.Up || this.WalkDirection === GhostWalkDirection.Down) {
-      this.x = ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
-    }
-
-    if (this.WalkDirection === GhostWalkDirection.Left || this.WalkDirection === GhostWalkDirection.Right) {
-      this.y = ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
-    }
-    let tile1 = this._mapLayer.getTileAtWorldXY(x - w, y - h, true);
-    let tile2 = this._mapLayer.getTileAtWorldXY(x + w, y - h, true);
-    let tile3 = this._mapLayer.getTileAtWorldXY(x + w, y + h, true);
-    let tile4 = this._mapLayer.getTileAtWorldXY(x - w, y + h, true);
-
-    let moveLeft = this._mapLayer.getTileAt(tile.x - 1, tile.y, true).index === -1;
-    let moveRight = this._mapLayer.getTileAt(tile.x + 1, tile.y, true).index === -1;
-    let moveUp = this._mapLayer.getTileAt(tile.x, tile.y - 1, true).index === -1;
-    let moveDown = this._mapLayer.getTileAt(tile.x, tile.y + 1, true).index === -1;
+    // let tile = this._mapLayer.getTileAtWorldXY(x, y, true);
 
     if (this._hitWall) {
       this._hitWall = false;
-      if (Math.random() > Consts.MagicNumbers.Quarter && moveLeft) this.walk(GhostWalkDirection.Left);
-      else if (Math.random() > Consts.MagicNumbers.Quarter && moveRight) this.walk(GhostWalkDirection.Right);
-      else if (Math.random() > Consts.MagicNumbers.Quarter && moveUp) this.walk(GhostWalkDirection.Up);
-      else if (Math.random() > Consts.MagicNumbers.Quarter && moveDown) this.walk(GhostWalkDirection.Down);
-      else this.walk(this.WalkDirection + Phaser.Math.Between(1, 3));
-
+      if (this._targetX < this.x && this.canMoveLeft) this.walk(GhostWalkDirection.Left);
+      else if (this._targetX > this.x && this.canMoveRight) this.walk(GhostWalkDirection.Right);
+      else if (this._targetY < this.y && this.canMoveUp) this.walk(GhostWalkDirection.Up);
+      else if (this._targetY > this.x && this.canMoveDown) this.walk(GhostWalkDirection.Down);
+      //else this.walk(this.WalkDirection + Phaser.Math.Between(1, 3));
       return;
     }
 
-    if (tile1.x === tile2.x && tile2.x === tile3.x && tile3.x === tile4.x) {
-      if (tile1.y === tile2.y && tile2.y === tile3.y && tile3.y === tile4.y) {
-        if (tile1.x != this._previousX || tile1.y != this._previousY) {
-          let x = tile1.x;
-          let y = tile1.y;
-          this._previousX = x;
-          this._previousY = y;
-
-          if (this.WalkDirection == GhostWalkDirection.Up || this.WalkDirection == GhostWalkDirection.Down) {
-            if (this._mapLayer.getTileAt(x - 1, y, true).index === -1) {
-              if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Left);
-            } else {
-              if (this._mapLayer.getTileAt(x + 1, y, true).index === -1) {
-                if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Right);
-              }
-            }
-          } else {
-            if (this.WalkDirection == GhostWalkDirection.Left || this.WalkDirection == GhostWalkDirection.Right) {
-              if (this._mapLayer.getTileAt(x, y - 1, true).index === -1) {
-                if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Up);
-              } else {
-                if (this._mapLayer.getTileAt(x, y + 1, true).index === -1) {
-                  if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Down);
-                }
-              }
-            }
-          }
-        }
-      }
+    if (this.WalkDirection === GhostWalkDirection.Up || this.WalkDirection === GhostWalkDirection.Down) {
+      // this.x = ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
+      if (this._targetX < this.x && this.canMoveLeft) this.walk(GhostWalkDirection.Left);
+      else if (this._targetX > this.x && this.canMoveRight) this.walk(GhostWalkDirection.Right);
+      return;
     }
+    if (this.WalkDirection === GhostWalkDirection.Left || this.WalkDirection === GhostWalkDirection.Right) {
+      // this.y = ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
+      if (this._targetY < this.y && this.canMoveUp) this.walk(GhostWalkDirection.Up);
+      else if (this._targetY > this.y && this.canMoveDown) this.walk(GhostWalkDirection.Down);
+      return;
+    }
+
+    // let tile1 = this._mapLayer.getTileAtWorldXY(x - w, y - h, true);
+    // let tile2 = this._mapLayer.getTileAtWorldXY(x + w, y - h, true);
+    // let tile3 = this._mapLayer.getTileAtWorldXY(x + w, y + h, true);
+    // let tile4 = this._mapLayer.getTileAtWorldXY(x - w, y + h, true);
+
+    // let moveLeft = this._mapLayer.getTileAt(tile.x - 1, tile.y, true).index === -1;
+    // let moveRight = this._mapLayer.getTileAt(tile.x + 1, tile.y, true).index === -1;
+    // let moveUp = this._mapLayer.getTileAt(tile.x, tile.y - 1, true).index === -1;
+    // let moveDown = this._mapLayer.getTileAt(tile.x, tile.y + 1, true).index === -1;
+
+    // if (tile1.x === tile2.x && tile2.x === tile3.x && tile3.x === tile4.x) {
+    //   if (tile1.y === tile2.y && tile2.y === tile3.y && tile3.y === tile4.y) {
+    //     if (tile1.x != this._previousX || tile1.y != this._previousY) {
+    //       let x = tile1.x;
+    //       let y = tile1.y;
+    //       this._previousX = x;
+    //       this._previousY = y;
+
+    //       if (this.WalkDirection == GhostWalkDirection.Up || this.WalkDirection == GhostWalkDirection.Down) {
+    //         if (this._mapLayer.getTileAt(x - 1, y, true).index === -1) {
+    //           if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Left);
+    //         } else {
+    //           if (this._mapLayer.getTileAt(x + 1, y, true).index === -1) {
+    //             if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Right);
+    //           }
+    //         }
+    //       } else {
+    //         if (this.WalkDirection == GhostWalkDirection.Left || this.WalkDirection == GhostWalkDirection.Right) {
+    //           if (this._mapLayer.getTileAt(x, y - 1, true).index === -1) {
+    //             if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Up);
+    //           } else {
+    //             if (this._mapLayer.getTileAt(x, y + 1, true).index === -1) {
+    //               if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Down);
+    //             }
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   }
 }
