@@ -1,10 +1,10 @@
-import 'phaser';
+import "phaser";
 
 export const config = {
-  parent: 'Phaser3',
+  parent: "Phaser3",
   type: Phaser.AUTO,
 
-  backgroundColor: '#000000',
+  backgroundColor: "#000000",
   height: window.innerHeight,
   width: window.innerWidth,
 
@@ -16,11 +16,11 @@ export const config = {
   },
 
   physics: {
-    default: 'arcade',
+    default: "arcade",
 
     arcade: {
-      debug: false,
-      tileBias: 8,
+      debug: true,
+      tileBias: 16,
       gravity: { x: 0, y: 0 },
     },
   },

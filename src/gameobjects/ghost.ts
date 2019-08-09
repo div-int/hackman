@@ -1,6 +1,6 @@
-import 'phaser';
-import { Sprite } from './sprite';
-import { Typed } from '@div-int/typedfsm';
+import "phaser";
+import { Sprite } from "./sprite";
+import { Typed } from "@div-int/typedfsm";
 
 const maxGhostNo = 4;
 const maxDirections = 3;
@@ -13,7 +13,13 @@ const ghost4 = 12;
 const ghostFrightened = 9;
 const ghostEaten = 10;
 
-const defaultFrame = [ghost0 * 16, ghost1 * 16, ghost2 * 16, ghost3 * 16, ghost4 * 16];
+const defaultFrame = [
+  ghost0 * 16,
+  ghost1 * 16,
+  ghost2 * 16,
+  ghost3 * 16,
+  ghost4 * 16,
+];
 
 const walkRightStart = 0;
 const walkRightEnd = 1;
@@ -52,10 +58,10 @@ export enum GhostAction {
 //const ghostState = new Typed.FSM<GhostState, GhostAction>(GhostState.Chase);
 
 const ghostWalkDirectionValues = [
-  { direction: 'Right', velocity: { x: Consts.Game.GhostSpeed, y: 0 } },
-  { direction: 'Down', velocity: { x: 0, y: Consts.Game.GhostSpeed } },
-  { direction: 'Left', velocity: { x: -Consts.Game.GhostSpeed, y: 0 } },
-  { direction: 'Up', velocity: { x: 0, y: -Consts.Game.GhostSpeed } },
+  { direction: "Right", velocity: { x: Consts.Game.GhostSpeed, y: 0 } },
+  { direction: "Down", velocity: { x: 0, y: Consts.Game.GhostSpeed } },
+  { direction: "Left", velocity: { x: -Consts.Game.GhostSpeed, y: 0 } },
+  { direction: "Up", velocity: { x: 0, y: -Consts.Game.GhostSpeed } },
 ];
 
 export class Ghost extends Sprite {
@@ -67,6 +73,7 @@ export class Ghost extends Sprite {
   private _speedMultiplier: number;
   private _animationPrefix: string;
   private _ghostState: GhostState;
+  private _target: Phaser.GameObjects.Sprite;
   private _targetX: number;
   private _targetY: number;
   private _walkDelay = 0;
@@ -116,7 +123,9 @@ export class Ghost extends Sprite {
   }
 
   set SpeedMultiplier(speedMultiplier: number) {
-    Math.abs(speedMultiplier) <= 2 ? (this._speedMultiplier = Math.abs(speedMultiplier)) : 2;
+    Math.abs(speedMultiplier) <= 2
+      ? (this._speedMultiplier = Math.abs(speedMultiplier))
+      : 2;
   }
 
   get GhostState() {
@@ -137,7 +146,7 @@ export class Ghost extends Sprite {
       if (this._ghostState === GhostState.Eaten) return;
       this.setAlpha(Consts.MagicNumbers.ThreeQuarters);
       this.SpeedMultiplier = Consts.MagicNumbers.Half;
-      this._animationPrefix = 'ghostFrightened';
+      this._animationPrefix = "ghostFrightened";
       this._ghostState = ghostState;
       this.updateAnimation();
       this.walk(this.WalkDirection + 2);
@@ -147,7 +156,7 @@ export class Ghost extends Sprite {
     if (ghostState === GhostState.Eaten) {
       this.setAlpha(Consts.MagicNumbers.One);
       this.SpeedMultiplier = 2;
-      this._animationPrefix = 'ghostEaten';
+      this._animationPrefix = "ghostEaten";
       this._ghostState = ghostState;
       this.updateAnimation();
       this.walk(this.WalkDirection + 2);
@@ -161,271 +170,365 @@ export class Ghost extends Sprite {
     this.updateAnimation();
   }
 
-  public set targetX(value: number) {
-    this._targetX = value;
+  public get target() {
+    return this._target;
   }
 
-  public set targetY(value: number) {
-    this._targetY = value;
+  public set target(value: Phaser.GameObjects.Sprite) {
+    this._target = value;
+  }
+
+  public get targetX() {
+    if (this._target) return this._target.x;
+    else return 0;
+  }
+
+  public get targetY() {
+    if (this._target) return this._target.y;
+    else return 0;
   }
 
   static load(scene: Phaser.Scene) {
-    scene.load.on('complete', () => {
+    scene.load.on("complete", () => {
       scene.anims.create({
-        key: 'ghost0WalkRight',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkRightStart + 16 * ghost0,
-          end: walkRightEnd + 16 * ghost0,
-        }),
+        key: "ghost0WalkRight",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghost0,
+            end: walkRightEnd + 16 * ghost0,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghost0WalkDown',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkDownStart + 16 * ghost0,
-          end: walkDownEnd + 16 * ghost0,
-        }),
+        key: "ghost0WalkDown",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghost0,
+            end: walkDownEnd + 16 * ghost0,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghost0WalkLeft',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkLeftStart + 16 * ghost0,
-          end: walkLeftEnd + 16 * ghost0,
-        }),
+        key: "ghost0WalkLeft",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghost0,
+            end: walkLeftEnd + 16 * ghost0,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghost0WalkUp',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkUpStart + 16 * ghost0,
-          end: walkUpEnd + 16 * ghost0,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-
-      scene.anims.create({
-        key: 'ghost1WalkRight',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkRightStart + 16 * ghost1,
-          end: walkRightEnd + 16 * ghost1,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: 'ghost1WalkDown',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkDownStart + 16 * ghost1,
-          end: walkDownEnd + 16 * ghost1,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: 'ghost1WalkLeft',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkLeftStart + 16 * ghost1,
-          end: walkLeftEnd + 16 * ghost1,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: 'ghost1WalkUp',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkUpStart + 16 * ghost1,
-          end: walkUpEnd + 16 * ghost1,
-        }),
+        key: "ghost0WalkUp",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghost0,
+            end: walkUpEnd + 16 * ghost0,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
 
       scene.anims.create({
-        key: 'ghost2WalkRight',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkRightStart + 16 * ghost2,
-          end: walkRightEnd + 16 * ghost2,
-        }),
+        key: "ghost1WalkRight",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghost1,
+            end: walkRightEnd + 16 * ghost1,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghost2WalkDown',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkDownStart + 16 * ghost2,
-          end: walkDownEnd + 16 * ghost2,
-        }),
+        key: "ghost1WalkDown",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghost1,
+            end: walkDownEnd + 16 * ghost1,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghost2WalkLeft',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkLeftStart + 16 * ghost2,
-          end: walkLeftEnd + 16 * ghost2,
-        }),
+        key: "ghost1WalkLeft",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghost1,
+            end: walkLeftEnd + 16 * ghost1,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghost2WalkUp',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkUpStart + 16 * ghost2,
-          end: walkUpEnd + 16 * ghost2,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-
-      scene.anims.create({
-        key: 'ghost3WalkRight',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkRightStart + 16 * ghost3,
-          end: walkRightEnd + 16 * ghost3,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: 'ghost3WalkDown',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkDownStart + 16 * ghost3,
-          end: walkDownEnd + 16 * ghost3,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: 'ghost3WalkLeft',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkLeftStart + 16 * ghost3,
-          end: walkLeftEnd + 16 * ghost3,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: 'ghost3WalkUp',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkUpStart + 16 * ghost3,
-          end: walkUpEnd + 16 * ghost3,
-        }),
+        key: "ghost1WalkUp",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghost1,
+            end: walkUpEnd + 16 * ghost1,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
 
       scene.anims.create({
-        key: 'ghost4WalkRight',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkRightStart + 16 * ghost4,
-          end: walkRightEnd + 16 * ghost4,
-        }),
+        key: "ghost2WalkRight",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghost2,
+            end: walkRightEnd + 16 * ghost2,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghost4WalkDown',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkDownStart + 16 * ghost4,
-          end: walkDownEnd + 16 * ghost4,
-        }),
+        key: "ghost2WalkDown",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghost2,
+            end: walkDownEnd + 16 * ghost2,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghost4WalkLeft',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkLeftStart + 16 * ghost4,
-          end: walkLeftEnd + 16 * ghost4,
-        }),
+        key: "ghost2WalkLeft",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghost2,
+            end: walkLeftEnd + 16 * ghost2,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghost4WalkUp',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkUpStart + 16 * ghost4,
-          end: walkUpEnd + 16 * ghost4,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-
-      scene.anims.create({
-        key: 'ghostFrightenedWalkRight',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkRightStart + 16 * ghostFrightened,
-          end: walkRightEnd + 16 * ghostFrightened,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: 'ghostFrightenedWalkDown',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkDownStart + 16 * ghostFrightened,
-          end: walkDownEnd + 16 * ghostFrightened,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: 'ghostFrightenedWalkLeft',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkLeftStart + 16 * ghostFrightened,
-          end: walkLeftEnd + 16 * ghostFrightened,
-        }),
-        frameRate: Consts.Game.GhostFrameRate,
-        repeat: -1,
-      });
-      scene.anims.create({
-        key: 'ghostFrightenedWalkUp',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkUpStart + 16 * ghostFrightened,
-          end: walkUpEnd + 16 * ghostFrightened,
-        }),
+        key: "ghost2WalkUp",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghost2,
+            end: walkUpEnd + 16 * ghost2,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
 
       scene.anims.create({
-        key: 'ghostEatenWalkRight',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkRightStart + 16 * ghostEaten,
-          end: walkRightEnd + 16 * ghostEaten,
-        }),
+        key: "ghost3WalkRight",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghost3,
+            end: walkRightEnd + 16 * ghost3,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghostEatenWalkDown',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkDownStart + 16 * ghostEaten,
-          end: walkDownEnd + 16 * ghostEaten,
-        }),
+        key: "ghost3WalkDown",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghost3,
+            end: walkDownEnd + 16 * ghost3,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghostEatenWalkLeft',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkLeftStart + 16 * ghostEaten,
-          end: walkLeftEnd + 16 * ghostEaten,
-        }),
+        key: "ghost3WalkLeft",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghost3,
+            end: walkLeftEnd + 16 * ghost3,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
       scene.anims.create({
-        key: 'ghostEatenWalkUp',
-        frames: scene.anims.generateFrameNumbers(Consts.Resources.HackManSprites, {
-          start: walkUpStart + 16 * ghostEaten,
-          end: walkUpEnd + 16 * ghostEaten,
-        }),
+        key: "ghost3WalkUp",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghost3,
+            end: walkUpEnd + 16 * ghost3,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+
+      scene.anims.create({
+        key: "ghost4WalkRight",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghost4,
+            end: walkRightEnd + 16 * ghost4,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghost4WalkDown",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghost4,
+            end: walkDownEnd + 16 * ghost4,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghost4WalkLeft",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghost4,
+            end: walkLeftEnd + 16 * ghost4,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghost4WalkUp",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghost4,
+            end: walkUpEnd + 16 * ghost4,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+
+      scene.anims.create({
+        key: "ghostFrightenedWalkRight",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghostFrightened,
+            end: walkRightEnd + 16 * ghostFrightened,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghostFrightenedWalkDown",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghostFrightened,
+            end: walkDownEnd + 16 * ghostFrightened,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghostFrightenedWalkLeft",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghostFrightened,
+            end: walkLeftEnd + 16 * ghostFrightened,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghostFrightenedWalkUp",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghostFrightened,
+            end: walkUpEnd + 16 * ghostFrightened,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+
+      scene.anims.create({
+        key: "ghostEatenWalkRight",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkRightStart + 16 * ghostEaten,
+            end: walkRightEnd + 16 * ghostEaten,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghostEatenWalkDown",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkDownStart + 16 * ghostEaten,
+            end: walkDownEnd + 16 * ghostEaten,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghostEatenWalkLeft",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkLeftStart + 16 * ghostEaten,
+            end: walkLeftEnd + 16 * ghostEaten,
+          }
+        ),
+        frameRate: Consts.Game.GhostFrameRate,
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: "ghostEatenWalkUp",
+        frames: scene.anims.generateFrameNumbers(
+          Consts.Resources.HackManSprites,
+          {
+            start: walkUpStart + 16 * ghostEaten,
+            end: walkUpEnd + 16 * ghostEaten,
+          }
+        ),
         frameRate: Consts.Game.GhostFrameRate,
         repeat: -1,
       });
@@ -463,7 +566,11 @@ export class Ghost extends Sprite {
     //   .setTint(0)
     //   .setAlpha(Consts.MagicNumbers.Quarter);
 
-    scene.physics.add.overlap(this.colliderGroup, mapLayer, this.colliderCallback);
+    scene.physics.add.overlap(
+      this.colliderGroup,
+      mapLayer,
+      this.colliderCallback
+    );
 
     this._ghostNo = ghostNo;
     this._walkDirection = walkDirection;
@@ -491,7 +598,13 @@ export class Ghost extends Sprite {
   }
 
   updateAnimation(): Ghost {
-    this.anims.play(`${this._animationPrefix}Walk${ghostWalkDirectionValues[this.FaceDirection].direction}`, true, 0);
+    this.anims.play(
+      `${this._animationPrefix}Walk${
+        ghostWalkDirectionValues[this.FaceDirection].direction
+      }`,
+      true,
+      0
+    );
 
     return this;
   }
@@ -507,19 +620,33 @@ export class Ghost extends Sprite {
     if (this.WalkDirection === walkDirection) return;
 
     this.WalkDirection = walkDirection;
-    if (this.WalkDirection === GhostWalkDirection.Up || this.WalkDirection === GhostWalkDirection.Down) {
-      this.x = (this.displayWidth >> 1) + Math.floor(this.x / this.displayWidth) * this.displayWidth;
-    }
+    // if (
+    //   this.WalkDirection === GhostWalkDirection.Up ||
+    //   this.WalkDirection === GhostWalkDirection.Down
+    // ) {
+    //   this.x =
+    //     (this.displayWidth >> 1) +
+    //     Math.floor(this.x / this.displayWidth) * this.displayWidth;
+    // }
 
-    if (this.WalkDirection === GhostWalkDirection.Left || this.WalkDirection === GhostWalkDirection.Right) {
-      this.y = (this.displayHeight >> 1) + Math.floor(this.y / this.displayHeight) * this.displayHeight;
-    }
+    // if (
+    //   this.WalkDirection === GhostWalkDirection.Left ||
+    //   this.WalkDirection === GhostWalkDirection.Right
+    // ) {
+    //   this.y =
+    //     (this.displayHeight >> 1) +
+    //     Math.floor(this.y / this.displayHeight) * this.displayHeight;
+    // }
 
-    this._walkDelay = 4;
+    this._walkDelay = 8;
 
     this.setVelocity(
-      ghostWalkDirectionValues[this.WalkDirection].velocity.x * this.scaleX * this.SpeedMultiplier,
-      ghostWalkDirectionValues[this.WalkDirection].velocity.y * this.scaleY * this.SpeedMultiplier
+      ghostWalkDirectionValues[this.WalkDirection].velocity.x *
+        this.scaleX *
+        this.SpeedMultiplier,
+      ghostWalkDirectionValues[this.WalkDirection].velocity.y *
+        this.scaleY *
+        this.SpeedMultiplier
     );
     this.face(walkDirection);
 
@@ -540,133 +667,65 @@ export class Ghost extends Sprite {
     super.update();
     this.setDepth(this.x + this.y * window.innerWidth);
 
-    // this._shadowSprite.visible = this.visible;
-    // this._shadowSprite.scale = this.scale;
-    // this._shadowSprite.x = this.x + Consts.Game.ShadowOffset * this.scale;
-    // this._shadowSprite.y = this.y + Consts.Game.ShadowOffset * this.scale;
-    // this._shadowSprite.frame = this.frame;
-
     if (this.GhostState === GhostState.Paused) return;
 
-    // let x = this.x;
-    // let y = this.y;
-    // let w = (this.displayWidth >> 1) - 8;
-    // let h = (this.displayHeight >> 1) - 8;
-
-    // let tile = this._mapLayer.getTileAtWorldXY(x, y, true);
+    let tile = this._mapLayer.getTileAtWorldXY(this.x, this.y, true);
 
     if (this._hitWall) {
       this.setDebugBodyColor(Consts.Colours.Red);
       this._hitWall = false;
-      if (this._targetX < this.x && this.canMoveLeft) {
+      if (this.targetX < this.x && this.canMoveLeft) {
         this.walk(GhostWalkDirection.Left);
         return;
       }
-      if (this._targetX > this.x && this.canMoveRight) {
+      if (this.targetX > this.x && this.canMoveRight) {
         this.walk(GhostWalkDirection.Right);
         return;
       }
-      if (this._targetY < this.y && this.canMoveUp) {
+      if (this.targetY < this.y && this.canMoveUp) {
         this.walk(GhostWalkDirection.Up);
         return;
       }
-      if (this._targetY > this.x && this.canMoveDown) {
+      if (this.targetY > this.y && this.canMoveDown) {
         this.walk(GhostWalkDirection.Down);
         return;
       }
-      if (this.canMoveLeft) {
-        this.walk(GhostWalkDirection.Left);
-        return;
-      }
-      if (this.canMoveRight) {
-        this.walk(GhostWalkDirection.Right);
-        return;
-      }
-      if (this.canMoveUp) {
-        this.walk(GhostWalkDirection.Up);
-        return;
-      }
-      if (this.canMoveDown) {
-        this.walk(GhostWalkDirection.Down);
-        return;
-      }
-      // else this.walk(this.WalkDirection + Phaser.Math.Between(1, 3));
     }
     this.setDebugBodyColor(Consts.Colours.White);
 
-    if (this.WalkDirection === GhostWalkDirection.Up || this.WalkDirection === GhostWalkDirection.Down) {
-      // this.x = ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
-      if (this._targetX < this.x && this.canMoveLeft) {
+    if (
+      this.WalkDirection === GhostWalkDirection.Up ||
+      this.WalkDirection === GhostWalkDirection.Down
+    ) {
+      this.x =
+        ((tile.width >> 1) + tile.x * tile.width) * this._mapLayer.scaleX;
+
+      if (this.targetX < this.x && this.canMoveLeft) {
         this.walk(GhostWalkDirection.Left);
         return;
       }
-      if (this._targetX > this.x && this.canMoveRight) {
+      if (this.targetX > this.x && this.canMoveRight) {
         this.walk(GhostWalkDirection.Right);
         return;
       }
     }
-    if (this.WalkDirection === GhostWalkDirection.Left || this.WalkDirection === GhostWalkDirection.Right) {
-      // this.y = ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
-      if (this._targetY < this.y && this.canMoveUp) {
+    if (
+      this.WalkDirection === GhostWalkDirection.Left ||
+      this.WalkDirection === GhostWalkDirection.Right
+    ) {
+      this.y =
+        ((tile.height >> 1) + tile.y * tile.height) * this._mapLayer.scaleY;
+
+      if (this.targetY < this.y && this.canMoveUp) {
         this.walk(GhostWalkDirection.Up);
         return;
       }
-      if (this._targetY > this.y && this.canMoveDown) {
+      if (this.targetY > this.y && this.canMoveDown) {
         this.walk(GhostWalkDirection.Down);
         return;
       }
     }
     this.setDebugBodyColor(Consts.Colours.Green);
-    if (this.body.touching.none === false) {
-      console.log(
-        this.WalkDirection,
-        this.body.touching,
-        this.canMoveUp,
-        this.canMoveDown,
-        this.canMoveLeft,
-        this.canMoveRight
-      );
-    }
-
-    // let tile1 = this._mapLayer.getTileAtWorldXY(x - w, y - h, true);
-    // let tile2 = this._mapLayer.getTileAtWorldXY(x + w, y - h, true);
-    // let tile3 = this._mapLayer.getTileAtWorldXY(x + w, y + h, true);
-    // let tile4 = this._mapLayer.getTileAtWorldXY(x - w, y + h, true);
-
-    // let moveLeft = this._mapLayer.getTileAt(tile.x - 1, tile.y, true).index === -1;
-    // let moveRight = this._mapLayer.getTileAt(tile.x + 1, tile.y, true).index === -1;
-    // let moveUp = this._mapLayer.getTileAt(tile.x, tile.y - 1, true).index === -1;
-    // let moveDown = this._mapLayer.getTileAt(tile.x, tile.y + 1, true).index === -1;
-
-    // if (tile1.x === tile2.x && tile2.x === tile3.x && tile3.x === tile4.x) {
-    //   if (tile1.y === tile2.y && tile2.y === tile3.y && tile3.y === tile4.y) {
-    //     if (tile1.x != this._previousX || tile1.y != this._previousY) {
-    //       let x = tile1.x;
-    //       let y = tile1.y;
-    //       this._previousX = x;
-    //       this._previousY = y;
-
-    //       if (this.WalkDirection == GhostWalkDirection.Up || this.WalkDirection == GhostWalkDirection.Down) {
-    //         if (this._mapLayer.getTileAt(x - 1, y, true).index === -1) {
-    //           if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Left);
-    //         } else {
-    //           if (this._mapLayer.getTileAt(x + 1, y, true).index === -1) {
-    //             if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Right);
-    //           }
-    //         }
-    //       } else {
-    //         if (this.WalkDirection == GhostWalkDirection.Left || this.WalkDirection == GhostWalkDirection.Right) {
-    //           if (this._mapLayer.getTileAt(x, y - 1, true).index === -1) {
-    //             if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Up);
-    //           } else {
-    //             if (this._mapLayer.getTileAt(x, y + 1, true).index === -1) {
-    //               if (Math.random() >= Consts.MagicNumbers.Half) this.walk(GhostWalkDirection.Down);
-    //             }
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
+    console.log(this.targetX, this.targetY);
   }
 }
