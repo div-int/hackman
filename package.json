@@ -42,7 +42,7 @@
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
-    "@div-int/typedfsm": "0.0.4",
+    "@div-int/typedfsm": "0.0.5",
     "phaser": "^3.16.2"
   },
   "keywords": [
