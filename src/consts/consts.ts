@@ -1,10 +1,10 @@
 namespace Consts {
   export const enum Scenes {
-    TitleScene = 'TitleScene',
-    UIScene = 'UIScene',
-    GameScene = 'GameScene',
-    LevelScene = 'LevelScene',
-    GameOverScene = 'GameOver',
+    TitleScene = "TitleScene",
+    UIScene = "UIScene",
+    GameScene = "GameScene",
+    LevelScene = "LevelScene",
+    GameOverScene = "GameOver",
   }
 
   export const enum Scores {
@@ -44,7 +44,7 @@ namespace Consts {
   }
 
   export const enum Resources {
-    HackManSprites = 'HackManSprites',
+    HackManSprites = "HackManSprites",
   }
 
   export const enum Game {
@@ -53,9 +53,9 @@ namespace Consts {
 
     GameOverFlashRate = 0.5,
 
-    MaxSpriteDesktop = 16,
-    MaxSpriteMobile = 16,
-    ScaleDesktop = 4,
+    MaxSpriteDesktop = 1,
+    MaxSpriteMobile = 1,
+    ScaleDesktop = 2,
     ScaleMobile = 2,
 
     TileShadowOffset = 8,
