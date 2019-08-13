@@ -228,8 +228,8 @@ export class GameScene extends Phaser.Scene {
         this.time.delayedCall(
           Consts.Times.MilliSecondsInSecond * Consts.MagicNumbers.Half,
           () => {
-            this._ghostGroup.children.iterate((ghost: Ghost) => {
-              ghost.visible = false;
+            this._ghostGroup.children.each((ghost: Ghost) => {
+              if (ghost) ghost.destroy();
             });
             this._hackman.HackManState = HackManState.Dead;
           },
