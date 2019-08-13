@@ -1,16 +1,12 @@
-import "phaser";
-import "../consts/consts";
-import { UIScene } from "./uiscene";
-import { GameState } from "../gameobjects/gamestate";
-import {
-  HackMan,
-  HackManWalkDirection,
-  HackManState,
-} from "../gameobjects/hackman";
-import { Ghost, GhostState, GhostWalkDirection } from "../gameobjects/ghost";
-import { config } from "../config/config";
-import { hackManGame } from "../index";
-import { Sprite } from "../gameobjects/sprite";
+import 'phaser';
+import '../consts/consts';
+import { UIScene } from './uiscene';
+import { GameState } from '../gameobjects/gamestate';
+import { HackMan, HackManWalkDirection, HackManState } from '../gameobjects/hackman';
+import { Ghost, GhostState, GhostWalkDirection } from '../gameobjects/ghost';
+import { config } from '../config/config';
+import { hackManGame } from '../index';
+import { Sprite } from '../gameobjects/sprite';
 
 let maxsprite: number;
 let scale: number;
@@ -32,8 +28,7 @@ export class GameScene extends Phaser.Scene {
   private _mapLayerWalls: Phaser.Tilemaps.StaticTilemapLayer;
 
   get UIScene(): UIScene {
-    if (!this._uiscene)
-      return (this._uiscene = <UIScene>this.scene.get(Consts.Scenes.UIScene));
+    if (!this._uiscene) return (this._uiscene = <UIScene>this.scene.get(Consts.Scenes.UIScene));
     else return this._uiscene;
   }
 
@@ -76,26 +71,11 @@ export class GameScene extends Phaser.Scene {
 
     Ghost.load(this);
 
-    this.load.tilemapTiledJSON(
-      "attractLevel",
-      require("../assets/levels/attract.json")
-    );
-    this.load.image(
-      "defaultTiles",
-      require("../assets/images/tiles/default.padded.png")
-    );
-    this.load.image(
-      "pyramidTiles",
-      require("../assets/images/tiles/pyramids.padded.png")
-    );
-    this.load.image(
-      "blockTiles",
-      require("../assets/images/tiles/blocks.padded.png")
-    );
-    this.load.image(
-      "stars1",
-      require("../assets/images/backgrounds/stars1.jpg")
-    );
+    this.load.tilemapTiledJSON('attractLevel', require('../assets/levels/attract.json'));
+    this.load.image('defaultTiles', require('../assets/images/tiles/default.padded.png'));
+    this.load.image('pyramidTiles', require('../assets/images/tiles/pyramids.padded.png'));
+    this.load.image('blockTiles', require('../assets/images/tiles/blocks.padded.png'));
+    this.load.image('stars1', require('../assets/images/backgrounds/stars1.jpg'));
   }
 
   create() {
@@ -113,15 +93,8 @@ export class GameScene extends Phaser.Scene {
       bounceY: 0,
     });
 
-    this._attractLevel = this.add.tilemap("attractLevel");
-    let attractTiles = this._attractLevel.addTilesetImage(
-      "default",
-      "defaultTiles",
-      16,
-      16,
-      1,
-      2
-    );
+    this._attractLevel = this.add.tilemap('attractLevel');
+    let attractTiles = this._attractLevel.addTilesetImage('default', 'defaultTiles', 16, 16, 1, 2);
 
     this._maskShape = this.make
       .graphics(config)
@@ -131,27 +104,27 @@ export class GameScene extends Phaser.Scene {
     this._mask = this._maskShape.createGeometryMask();
 
     this._backgroundImage = this.add
-      .image(0, 0, "stars1")
+      .image(0, 0, 'stars1')
       .setDepth(5)
       .setMask(this._mask)
       .setScrollFactor(Consts.MagicNumbers.Quarter)
       .setScale(scale / 2);
 
     let mapLayerBackground = this._attractLevel
-      .createStaticLayer("Background", attractTiles, -256 * scale, -256 * scale)
+      .createStaticLayer('Background', attractTiles, -256 * scale, -256 * scale)
       .setDepth(3)
       .setScale(scale)
       .setScrollFactor(Consts.MagicNumbers.Half);
 
     this._mapLayerWalls = this._attractLevel
-      .createStaticLayer("Walls", attractTiles, 0, 0)
+      .createStaticLayer('Walls', attractTiles, 0, 0)
       .setDepth(5)
       .setScale(scale)
       .setCollisionByExclusion([-1], true, true);
 
     this._mapLayerShadows = this._attractLevel
       .createBlankDynamicLayer(
-        "Shadows",
+        'Shadows',
         attractTiles,
         Consts.Game.ShadowOffset * scale,
         Consts.Game.ShadowOffset * scale
@@ -183,12 +156,11 @@ export class GameScene extends Phaser.Scene {
         return;
       }
 
-      this._mapLayerShadows.putTileAt(tile, tile.x, tile.y).index +=
-        Consts.Game.TileShadowOffset;
+      this._mapLayerShadows.putTileAt(tile, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
     });
 
     this._mapLayerPills = this._attractLevel
-      .createDynamicLayer("Pills", attractTiles, 0, 0)
+      .createDynamicLayer('Pills', attractTiles, 0, 0)
       .setOriginFromFrame()
       .setDepth(7)
       .setScale(scale);
@@ -197,48 +169,38 @@ export class GameScene extends Phaser.Scene {
 
     pillTiles.map((tile: Phaser.Tilemaps.Tile) => {
       if (tile.index != -1) {
-        this._mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index +=
-          Consts.Game.TileShadowOffset;
+        this._mapLayerShadows.putTileAt(tile.index, tile.x, tile.y).index += Consts.Game.TileShadowOffset;
       }
     });
 
-    this.physics.add.overlap(
-      this._hackmanGroup,
-      this._mapLayerPills,
-      (hackman: HackMan, tile: any) => {
-        if (!hackman.anims.currentFrame.isFirst && !hackman.isJumping) return;
-        if (!hackman.OnFloor) return;
+    this.physics.add.overlap(this._hackmanGroup, this._mapLayerPills, (hackman: HackMan, tile: any) => {
+      if (!hackman.anims.currentFrame.isFirst && !hackman.isJumping) return;
+      if (!hackman.OnFloor) return;
 
-        if (tile.index != -1) {
-          this.createBackgroundMask(tile, 32);
+      if (tile.index != -1) {
+        this.createBackgroundMask(tile, 32);
 
-          if (tile.index === Consts.Game.FoodPillTile)
-            hackManGame.gameState.score += Consts.Scores.FoodPill;
+        if (tile.index === Consts.Game.FoodPillTile) hackManGame.gameState.score += Consts.Scores.FoodPill;
 
-          if (tile.index === Consts.Game.PowerPillTile) {
-            hackManGame.gameState.score += Consts.Scores.PowerPill;
-            this.FrightenGhosts(10 * Consts.Times.MilliSecondsInSecond);
-          }
-
-          if (tile.index === Consts.Game.SpeedPillTile) {
-            this._hackmanGroup.children.iterate((hackman: HackMan) =>
-              hackman.speedUp(5 * Consts.Times.MilliSecondsInSecond)
-            );
-          }
-
-          this._mapLayerPills.removeTileAt(tile.x, tile.y);
-          this._mapLayerShadows.removeTileAt(tile.x, tile.y);
+        if (tile.index === Consts.Game.PowerPillTile) {
+          hackManGame.gameState.score += Consts.Scores.PowerPill;
+          this.FrightenGhosts(10 * Consts.Times.MilliSecondsInSecond);
         }
-      }
-    );
 
-    this.physics.add.collider(
-      this._hackmanGroup,
-      this._mapLayerWalls,
-      (hackman: HackMan, tile: any) => {
-        hackman.hitWall(tile);
+        if (tile.index === Consts.Game.SpeedPillTile) {
+          this._hackmanGroup.children.iterate((hackman: HackMan) =>
+            hackman.speedUp(5 * Consts.Times.MilliSecondsInSecond)
+          );
+        }
+
+        this._mapLayerPills.removeTileAt(tile.x, tile.y);
+        this._mapLayerShadows.removeTileAt(tile.x, tile.y);
       }
-    );
+    });
+
+    this.physics.add.collider(this._hackmanGroup, this._mapLayerWalls, (hackman: HackMan, tile: any) => {
+      hackman.hitWall(tile);
+    });
 
     this.physics.add.collider(
       this._ghostGroup,
@@ -248,62 +210,50 @@ export class GameScene extends Phaser.Scene {
       }
     );
 
-    this.physics.add.collider(
-      this._hackmanGroup,
-      this._ghostGroup,
-      (hackman: HackMan, ghost: Ghost) => {
-        if (!this._hackman.OnFloor) return;
-        if (
-          this._hackman.state === HackManState.Dieing ||
-          this._hackman.state === HackManState.Dead
-        )
-          return;
-        this._hackman.state = HackManState.Dieing;
+    this.physics.add.collider(this._hackmanGroup, this._ghostGroup, (hackman: HackMan, ghost: Ghost) => {
+      if (!this._hackman.OnFloor) return;
 
-        if (ghost.GhostState === GhostState.Eaten) return;
+      if (this._hackman.HackManState === HackManState.Dieing || this._hackman.HackManState === HackManState.Dead)
+        return;
 
-        if (ghost.GhostState === GhostState.Frightened) {
-          ghost.GhostState = GhostState.Eaten;
-        } else {
-          this._hackman.HackManState = HackManState.Paused;
-          this._ghostGroup.children.iterate((ghost: Ghost) => {
-            ghost.GhostState = GhostState.Paused;
-          });
-          this.time.delayedCall(
-            Consts.Times.MilliSecondsInSecond * Consts.MagicNumbers.Half,
-            () => {
-              this._ghostGroup.children.iterate((ghost: Ghost) => {
-                ghost.visible = false;
-              });
-              this._hackman.HackManState = HackManState.Dead;
-            },
-            [],
-            this
-          );
-          this.tweens.add({
-            targets: this._hackman,
-            alpha: 0,
-            delay: Consts.Times.MilliSecondsInSecond * Consts.MagicNumbers.Half,
-            duration: Consts.Times.MilliSecondsInSecond * 2,
-            ease: "Power2",
-            loop: 0,
-            onComplete: () => {
-              this.lostLife(--hackManGame.gameState.lives);
-            },
-          });
-        }
+      if (ghost.GhostState === GhostState.Eaten) return;
+
+      if (ghost.GhostState === GhostState.Frightened) {
+        ghost.GhostState = GhostState.Eaten;
+      } else {
+        this._hackman.HackManState = HackManState.Dieing;
+        this._ghostGroup.children.iterate((ghost: Ghost) => {
+          ghost.GhostState = GhostState.Paused;
+        });
+        this.time.delayedCall(
+          Consts.Times.MilliSecondsInSecond * Consts.MagicNumbers.Half,
+          () => {
+            this._ghostGroup.children.iterate((ghost: Ghost) => {
+              ghost.visible = false;
+            });
+            this._hackman.HackManState = HackManState.Dead;
+          },
+          [],
+          this
+        );
+        this.tweens.add({
+          targets: this._hackman,
+          alpha: 0,
+          delay: Consts.Times.MilliSecondsInSecond * Consts.MagicNumbers.Half,
+          duration: Consts.Times.MilliSecondsInSecond * 2,
+          ease: 'Power2',
+          loop: 0,
+          onComplete: () => {
+            this.lostLife(--hackManGame.gameState.lives);
+          },
+        });
       }
-    );
+    });
 
     this.createHackMan();
 
     this.cameras.main.setBackgroundColor(Consts.Colours.Black);
-    this.cameras.main.startFollow(
-      this._hackman,
-      false,
-      Consts.MagicNumbers.Tenth,
-      Consts.MagicNumbers.Tenth
-    );
+    this.cameras.main.startFollow(this._hackman, false, Consts.MagicNumbers.Tenth, Consts.MagicNumbers.Tenth);
 
     this._ghostGroup.runChildUpdate = true;
     this.addGhosts();
@@ -312,12 +262,7 @@ export class GameScene extends Phaser.Scene {
   createBackgroundMask(tile: Phaser.Tilemaps.Tile, size: number) {
     this._maskShape.fillStyle(Consts.Colours.White);
     this._maskShape.beginPath();
-    this._maskShape.fillRect(
-      (tile.x - 8) * size,
-      (tile.y - 8) * size,
-      size,
-      size
-    );
+    this._maskShape.fillRect((tile.x - 8) * size, (tile.y - 8) * size, size, size);
     this._maskShape.closePath();
   }
 
@@ -330,7 +275,7 @@ export class GameScene extends Phaser.Scene {
     ).setScale(scale);
     this._hackmanGroup.runChildUpdate = true;
     this._hackmanGroup.add(this._hackman);
-
+    this._hackman.HackManState = HackManState.Moving;
     this._hackman.walk(HackManWalkDirection.Right);
 
     this.physics.world.setBounds(
@@ -353,20 +298,8 @@ export class GameScene extends Phaser.Scene {
       let ghost = new Ghost(
         this,
         this._mapLayerWalls,
-        (8 +
-          Phaser.Math.Between(
-            Consts.Game.GhostXStart - 1,
-            Consts.Game.GhostXStart + 2
-          ) *
-            16) *
-          scale,
-        (8 +
-          Phaser.Math.Between(
-            Consts.Game.GhostYStart - 1,
-            Consts.Game.GhostYStart + 1
-          ) *
-            16) *
-          scale,
+        (8 + Phaser.Math.Between(Consts.Game.GhostXStart - 1, Consts.Game.GhostXStart + 2) * 16) * scale,
+        (8 + Phaser.Math.Between(Consts.Game.GhostYStart - 1, Consts.Game.GhostYStart + 1) * 16) * scale,
         Phaser.Math.Between(0, Ghost.MaxGhostNo()),
         GhostWalkDirection.Down,
         GhostState.Chase
@@ -378,20 +311,8 @@ export class GameScene extends Phaser.Scene {
     this._ghostGroup.children.each((ghost: Ghost) => {
       ghost
         .setPosition(
-          (8 +
-            Phaser.Math.Between(
-              Consts.Game.GhostXStart - 1,
-              Consts.Game.GhostXStart + 2
-            ) *
-              16) *
-            scale,
-          (8 +
-            Phaser.Math.Between(
-              Consts.Game.GhostYStart - 1,
-              Consts.Game.GhostYStart + 1
-            ) *
-              16) *
-            scale
+          (8 + Phaser.Math.Between(Consts.Game.GhostXStart - 1, Consts.Game.GhostXStart + 2) * 16) * scale,
+          (8 + Phaser.Math.Between(Consts.Game.GhostYStart - 1, Consts.Game.GhostYStart + 1) * 16) * scale
         )
         .setCollideWorldBounds(true)
         .setOffset(2, 2)
@@ -412,12 +333,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.createHackMan();
-    this.cameras.main.startFollow(
-      this._hackman,
-      false,
-      Consts.MagicNumbers.Tenth,
-      Consts.MagicNumbers.Tenth
-    );
+    this.cameras.main.startFollow(this._hackman, false, Consts.MagicNumbers.Tenth, Consts.MagicNumbers.Tenth);
 
     this.removeGhosts();
     this.addGhosts();
@@ -432,26 +348,20 @@ export class GameScene extends Phaser.Scene {
         tile.index === Consts.Game.PowerPillTile ||
         tile.index === Consts.Game.SpeedPillTile
       ) {
-        tile.pixelX +=
-          Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
-        tile.pixelY +=
-          Math.cos((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        tile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        tile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
 
         let shadowTile = this._mapLayerShadows.getTileAt(tile.x, tile.y, true);
 
-        shadowTile.pixelX +=
-          Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
-        shadowTile.pixelY +=
-          Math.cos((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        shadowTile.pixelX += Math.sin((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
+        shadowTile.pixelY += Math.cos((timestamp + (tile.x + tile.y * 64) * 256) / 256) / 16;
       }
     });
   }
 
   update(timestamp: number, elapsed: number) {
-    this.UIScene.statusText = `${(
-      timestamp / Consts.Times.MilliSecondsInSecond
-    ).toFixed(0)}s ${elapsed.toFixed(2)}ms ${
-      this.sys.game.device.os.desktop ? "Desktop" : "Mobile"
+    this.UIScene.statusText = `${(timestamp / Consts.Times.MilliSecondsInSecond).toFixed(0)}s ${elapsed.toFixed(2)}ms ${
+      this.sys.game.device.os.desktop ? 'Desktop' : 'Mobile'
     }`;
 
     if (Phaser.Math.Between(0, 256) === 1) {

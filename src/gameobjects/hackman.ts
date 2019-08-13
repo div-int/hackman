@@ -110,6 +110,13 @@ export class HackMan extends Phaser.Physics.Arcade.Sprite {
       return;
     }
 
+    if (hackManState === HackManState.Dieing) {
+      this._hackManState = hackManState;
+      this.body.stop();
+      this.anims.pause();
+      return;
+    }
+
     if (hackManState === HackManState.Dead) {
       this._hackManState = hackManState;
       this.stopJump();
