@@ -55,7 +55,7 @@ namespace Consts {
 
     MaxSpriteDesktop = 1,
     MaxSpriteMobile = 1,
-    ScaleDesktop = 2,
+    ScaleDesktop = 4,
     ScaleMobile = 2,
 
     TileShadowOffset = 8,
